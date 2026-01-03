@@ -1,2 +1,2 @@
 # magnesium-deficiency
-학습동아리
+학습동아리입니다.
