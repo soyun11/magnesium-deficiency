@@ -37,8 +37,8 @@ const SongSelection = () => {
         ))}
       </main>
       <footer className="py-8 flex justify-center">
-        <button className="px-20 py-4 bg-[#F8C4B4] text-3xl font-black rounded-2xl shadow-xl hover:scale-105 transition-transform">게임 시작</button>
-      </footer>
+        <button onClick={()=> navigate('/RhythmGame')} className="px-20 py-4 bg-[#F8C4B4] text-3xl font-black rounded-2xl shadow-xl hover:scale-105 transition-transform">게임 시작</button>
+    </footer>
     </div>
   );
 };
