@@ -3,37 +3,32 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import * as faceapi from 'face-api.js';
 import './RhythmGame.css';
 
-// --- 설정 및 데이터 ---
-const EMOTIONS = ['happy', 'sad', 'angry', 'neutral', 'surprised'];
-const EMOJI_MAP = { happy: '😊', sad: '😭', angry: '😡', neutral: '😐', surprised: '😮' };
-
-// [핵심 수정] 무표정(Neutral) 가중치를 압도적으로 높여 다른 감정이 튀는 걸 방지합니다.
-const EMOTION_WEIGHTS = {
-  neutral: 4.5,  // 무표정을 감정 인식의 우선순위 최상단으로 배치
-  happy: 1.5,    
-  angry: 1.6,    
-  surprised: 1.3,
-  sad: 0.5       // 슬픔이 무표정을 방해하지 않도록 가중치를 확 낮춤
+// --- [설정] 감정별 공평성 보정 데이터 ---
+const EMOTION_CONFIG = {
+  neutral:   { weight: 1.0, perfect: 0.90, good: 0.50 }, 
+  happy:     { weight: 1.4, perfect: 0.80, good: 0.45 }, 
+  surprised: { weight: 1.3, perfect: 0.75, good: 0.40 }, 
+  angry:     { weight: 1.8, perfect: 0.60, good: 0.30 }, 
+  sad:       { weight: 1.9, perfect: 0.55, good: 0.25 }  
 };
 
-const HIT_TIMING_MS = 2820; // 상단 이모지와 딱 겹치는 타이밍 (튜닝됨)
-const DETECTION_OPTIONS = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 }); // 인식 감도 상향
+const EMOTIONS = Object.keys(EMOTION_CONFIG);
+const EMOJI_MAP = { happy: '😊', sad: '😭', angry: '😡', neutral: '😐', surprised: '😮' };
+
+const HIT_TIMING_MS = 2820; 
+const DETECTION_OPTIONS = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 }); 
 const GAME_LIMIT_MS = 30000; 
 
 const RhythmGame = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const selectedSong = location.state?.song || { 
-    title: "기본 곡", 
-    url: "/assets/song_30s.mp3" 
-  };
+  const selectedSong = location.state?.song || { title: "기본 곡", url: "/assets/song_30s.mp3" };
 
   const [gameState, setGameState] = useState('ready'); 
   const [currentEmotion, setCurrentEmotion] = useState('neutral');
   const [notes, setNotes] = useState([]);
   const [score, setScore] = useState(0);
-  const [animatedScore, setAnimatedScore] = useState(0); // [추가] 애니메이션용 점수 상태
+  const [animatedScore, setAnimatedScore] = useState(0); 
   const [judgement, setJudgement] = useState(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
 
@@ -45,6 +40,7 @@ const RhythmGame = () => {
   const noteTimeoutRef = useRef(null);
   const endTimerRef = useRef(null);
 
+  // 1. 모델 로드 및 웹캠 설정
   useEffect(() => {
     const init = async () => {
       try {
@@ -63,55 +59,43 @@ const RhythmGame = () => {
     return () => stopGame();
   }, []);
 
+  // 2. 실시간 표정 감지 루프
   const detectExpressions = useCallback(async () => {
     if (!videoRef.current || videoRef.current.paused || isDetecting.current) return;
+    
     isDetecting.current = true;
     const detections = await faceapi.detectAllFaces(videoRef.current, DETECTION_OPTIONS).withFaceExpressions();
 
     if (detections.length > 0) {
       const expressions = detections[0].expressions;
       latestExpressionsRef.current = expressions;
-
-      let bestEmotion = currentEmotion;
+      
+      let bestEmotion = 'neutral';
       let maxScore = -1;
 
       EMOTIONS.forEach(em => {
-        // [수정] 무표정일 때는 점수를 더 뻥튀기해서 다른 감정이 못 이기게 함
-        const score = expressions[em] * (EMOTION_WEIGHTS[em] || 1);
-        if (score > maxScore) {
-          maxScore = score;
+        const weightedScore = expressions[em] * EMOTION_CONFIG[em].weight;
+        if (weightedScore > maxScore) {
+          maxScore = weightedScore;
           bestEmotion = em;
         }
       });
-
-      if (currentEmotion !== bestEmotion) setCurrentEmotion(bestEmotion);
+      // 감지된 즉시 상태 업데이트 (레인 색상 변경 트리거)
+      setCurrentEmotion(bestEmotion); 
     }
     isDetecting.current = false;
     requestAnimationFrame(detectExpressions);
-  }, [currentEmotion]);
+  }, []);
 
-  // --- [판정 로직 강화] 무표정 전용 보정 ---
   const judgeNote = useCallback((noteEmotion) => {
-    const rawScore = latestExpressionsRef.current[noteEmotion] || 0;
+    const rawProb = latestExpressionsRef.current[noteEmotion] || 0;
+    const config = EMOTION_CONFIG[noteEmotion];
     
-    // 무표정은 AI가 0.2~0.3만 줘도 "무표정이다"라고 인정해주도록 보너스를 부여
-    let adjustedScore = rawScore;
-    if (noteEmotion === 'neutral') {
-      adjustedScore = rawScore * 3.0; // 무표정 인식률 3배 보정
-    }
-
-    const perfectThreshold = 0.8;
-    const goodThreshold = 0.4;
-
     let res = { text: 'Miss', type: 'miss', add: 0 };
-
-    if (adjustedScore >= perfectThreshold) {
-      res = { text: 'Perfect!', type: 'perfect', add: 100 };
-    } else if (adjustedScore >= goodThreshold) {
-      res = { text: 'Good!', type: 'good', add: 50 };
-    }
-
-    setScore(prev => prev + res.add);
+    if (rawProb >= config.perfect) res = { text: 'Perfect!', type: 'perfect', add: 100 };
+    else if (rawProb >= config.good) res = { text: 'Good!', type: 'good', add: 50 };
+    
+    setScore(prev => Math.max(0, prev + res.add));
     setJudgement({ text: res.text, type: res.type });
     setTimeout(() => setJudgement(null), 500);
   }, []);
@@ -141,6 +125,7 @@ const RhythmGame = () => {
   const startGame = () => {
     setGameState('playing');
     setScore(0);
+    setAnimatedScore(0);
     audioRef.current.src = selectedSong.url;
     audioRef.current.play();
     startGameLoop();
@@ -161,42 +146,40 @@ const RhythmGame = () => {
     audioRef.current.pause();
     audioRef.current.currentTime = 0;
   };
-  // --- [추가] 점수 카운팅 애니메이션 로직 ---
+
+  // 결과 화면 점수 애니메이션
   useEffect(() => {
     if (gameState === 'finished') {
-      let start = 0;
-      const end = score;
-      if (start === end) {
-        setAnimatedScore(end);
-        return;
-      }
-
-      // 점수가 높을수록 더 빨리 올라가도록 설정 (약 1초 동안 실행)
+      const startTime = performance.now();
       const duration = 1000; 
-      const frameRate = 1000 / 60; // 60fps
-      const totalFrames = Math.round(duration / frameRate);
-      const increment = end / totalFrames;
+      const animate = (currentTime) => {
+        const elapsedTime = currentTime - startTime;
+        let progress = Math.min(elapsedTime / duration, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        const currentCount = Math.floor(easedProgress * score);
+        setAnimatedScore(currentCount < 0 ? 0 : currentCount);
+        if (progress < 1) requestAnimationFrame(animate);
+        else setAnimatedScore(score);
+      };
+      requestAnimationFrame(animate);
+    }
+  }, [gameState, score]);
 
-      const timer = setInterval(() => {
-        start += increment;
-        if (start >= end) {
-          setAnimatedScore(end);
-          clearInterval(timer);
-        } else {
-          setAnimatedScore(Math.floor(start));
-        }
-      }, frameRate);
-
-    return () => clearInterval(timer);
-  } else {
-    // 게임이 시작되거나 준비 중일 때는 0으로 초기화
-    setAnimatedScore(0);
-  }
-}, [gameState, score]);
   return (
     <div className="game-container">
       {!isModelLoaded && <div className="loading-overlay">감정 엔진 보정 중...</div>}
-      <video ref={videoRef} autoPlay playsInline muted onPlay={() => requestAnimationFrame(detectExpressions)} className="webcam-bg" />
+      
+      {/* onPlay 시점에 detectExpressions 루프 시작 
+        실제 레인 색상은 currentEmotion 상태에 따라 실시간 반영됨
+      */}
+      <video 
+        ref={videoRef} 
+        autoPlay 
+        playsInline 
+        muted 
+        onPlay={() => requestAnimationFrame(detectExpressions)} 
+        className="webcam-bg" 
+      />
 
       {gameState === 'ready' && isModelLoaded && (
         <div className="overlay-screen">
@@ -209,7 +192,9 @@ const RhythmGame = () => {
       {gameState === 'finished' && (
         <div className="overlay-screen result-screen">
           <p className="result-label">FINAL SCORE</p>
-          <h1 className="final-score-text">{animatedScore}</h1>
+          <h1 className={`final-score-text ${animatedScore === score ? 'done' : 'counting'}`}>
+            {animatedScore}
+          </h1>
           <div className="button-group">
             <button className="menu-btn retry" onClick={startGame}>다시 시도</button>
             <button className="menu-btn home" onClick={() => navigate('/Home')}>메인 화면으로</button>
@@ -217,24 +202,35 @@ const RhythmGame = () => {
         </div>
       )}
 
-      {gameState === 'playing' && (
+      {/* 게임 플레이 및 대기 상태 모두에서 레인 활성화 상태를 보여줌 */}
+      {(gameState === 'playing' || gameState === 'ready') && (
         <>
           <div className="lane-container">
             {EMOTIONS.map((emotion) => (
-              <div key={emotion} className={`lane ${emotion} ${currentEmotion === emotion ? 'active' : 'inactive'}`}>
+              <div 
+                key={emotion} 
+                className={`lane ${emotion} ${currentEmotion === emotion ? 'active' : 'inactive'}`}
+              >
                 <div className="target-emoji">{EMOJI_MAP[emotion]}</div>
-                {notes.filter(n => n.emotion === emotion && !n.judged).map(note => (
+                {gameState === 'playing' && notes.filter(n => n.emotion === emotion && !n.judged).map(note => (
                   <div key={note.id} className="note-emoji rising">{EMOJI_MAP[note.emotion]}</div>
                 ))}
               </div>
             ))}
           </div>
-          {judgement && <div className={`judgement-display ${judgement.type}`}>{judgement.text}</div>}
-          <div className="score-display">점수: {score}</div>
-          <div className="hud top-hud" style={{ position: 'absolute', top: '20px', right: '20px', color: 'white', zIndex: 100 }}>
-             재생 중: {selectedSong.title}
-          </div>
-          <div className="time-limit-bar"></div>
+          
+          {gameState === 'playing' && (
+            <div className="ui-layer">
+              {judgement && <div className={`judgement-display ${judgement.type}`}>{judgement.text}</div>}
+              <div className="score-capsule">
+                <span className="score-icon">⭐</span>
+                <span className="score-label">SCORE</span>
+                <span className="score-value">{score}</span>
+              </div>
+              <div className="hud top-hud">재생 중: {selectedSong.title}</div>
+              <div className="time-limit-bar"></div>
+            </div>
+          )}
         </>
       )}
     </div>

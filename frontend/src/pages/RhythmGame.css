@@ -1,87 +1,29 @@
-/* RhythmGame.css */
+/* RhythmGame.css - 전체 통합 버전 */
+
+/* 1. 기본 컨테이너 */
 .game-container {
   position: relative;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: black;
-  font-family: 'Pretendard', sans-serif;
+  background: #1a1a1a; /* 깊이감 있는 어두운 배경 */
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  z-index: 1;
+  transition: background-color 0.5s ease;
 }
 
+/* 2. 웹캠 배경 */
 .webcam-bg {
   position: absolute;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scaleX(-1);
+  transform: scaleX(-1); /* 좌우 반전 */
+  z-index: 2;
+  opacity: 0.5; /* 레인 색상과 점수판이 잘 보이도록 조절 */
 }
 
-.loading-overlay, .overlay-screen {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
-
-/* 결과 화면 전용 스타일 */
-.result-screen .result-label {
-  font-size: 1.5rem;
-  letter-spacing: 0.5rem;
-  color: #00ff00;
-  margin-bottom: 0;
-}
-
-.final-score-text {
-  font-size: 12rem;
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 0 50px rgba(0, 255, 0, 0.5);
-  margin: 0 0 50px 0;
-  animation: scorePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes scorePop {
-  from { transform: scale(0.5); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.button-group {
-  display: flex;
-  gap: 20px;
-}
-
-.menu-btn {
-  padding: 15px 40px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.menu-btn.start, .menu-btn.retry {
-  background: #00ff00;
-  color: black;
-}
-
-.menu-btn.home {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid white;
-}
-
-.menu-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-/* 게임 플레이 UI */
+/* 3. 게임 플레이 레인 */
 .lane-container {
   display: flex;
   position: absolute;
@@ -96,26 +38,178 @@
   flex-direction: column;
   align-items: center;
   position: relative;
-  transition: background 0.1s ease-out, opacity 0.1s ease-out;
+  transition: background 0.15s ease-in-out; 
 }
 
-.lane.active { background: var(--lane-color); opacity: 1; }
-.lane.inactive { background: rgba(0, 0, 0, 0.5); opacity: 0.2; }
+/* 활성화된 레인 테마색 */
+.lane.active { 
+  background: var(--lane-color); 
+  opacity: 1; 
+  box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.15);
+}
 
-.lane.happy { --lane-color: rgba(255, 235, 59, 0.5); }
-.lane.sad { --lane-color: rgba(33, 150, 243, 0.5); }
+.lane.inactive { 
+  background: transparent; 
+  opacity: 0.15; 
+}
+
+/* 감정별 컬러 정의 */
+.lane.happy { --lane-color: rgba(255, 235, 59, 0.4); }
+.lane.sad { --lane-color: rgba(33, 150, 243, 0.4); }
 .lane.angry { --lane-color: rgba(244, 67, 54, 0.5); }
-.lane.neutral { --lane-color: rgba(158, 158, 158, 0.3); }
-.lane.surprised { --lane-color: rgba(156, 39, 176, 0.5); }
+.lane.neutral { --lane-color: rgba(226, 232, 240, 0.6); } /* 무표정 가시성 강화 */
+.lane.surprised { --lane-color: rgba(156, 39, 176, 0.4); }
 
-.target-emoji { font-size: 4.5rem; margin-top: 50px; transition: transform 0.1s; }
+/* 타겟 이모지 */
+.target-emoji { 
+  font-size: 4.5rem; 
+  margin-top: 50px; 
+  transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  z-index: 20;
+}
 .lane.active .target-emoji { transform: scale(1.3); }
 
+/* 4. 최상단 UI 레이어 (가장 중요) */
+.ui-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 150; /* 모든 배경과 레인보다 위에 위치 */
+  pointer-events: none; /* UI 아래의 버튼 클릭 가능하게 설정 */
+}
+
+/* --- [수정] 귀엽고 센스 있는 점수 캡슐 --- */
+.score-capsule {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 10px 35px;
+  border-radius: 999px;
+  border: 4px solid #F8C4B4; /* 피치 핑크 테두리 */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  animation: scoreBounce 2s ease-in-out infinite;
+}
+
+@keyframes scoreBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-10px); }
+}
+
+.score-icon { font-size: 1.8rem; }
+.score-label {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #F8C4B4;
+  letter-spacing: 1px;
+}
+.score-value {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #333;
+  min-width: 60px;
+}
+
+/* 판정 문구 */
+.judgement-display {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 6rem;
+  font-weight: 900;
+  text-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+  animation: judgePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes judgePop {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.judgement-display.perfect { color: #ffff33; }
+.judgement-display.good { color: #33ccff; }
+.judgement-display.miss { color: #ff3333; }
+
+/* 상단 HUD */
+.hud.top-hud {
+  position: absolute;
+  top: 25px;
+  right: 30px;
+  color: #333;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-weight: 800;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* 시간 제한 바 */
+.time-limit-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 8px;
+  background: #F8C4B4;
+  box-shadow: 0 0 15px rgba(248, 196, 180, 0.5);
+  animation: timerShrink 30s linear forwards;
+}
+
+@keyframes timerShrink {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+/* 5. 결과 및 준비 화면 */
+.loading-overlay, .overlay-screen {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+
+.game-title {
+  font-size: 4rem;
+  font-weight: 900;
+  color: #F8C4B4;
+  margin-bottom: 40px;
+  text-shadow: 0 0 20px rgba(248, 196, 180, 0.3);
+}
+
+.final-score-text {
+  font-size: 10rem;
+  font-weight: 900;
+  color: #F8C4B4;
+  text-shadow: 0 0 50px rgba(248, 196, 180, 0.5);
+  margin-bottom: 50px;
+  transform: translateZ(0);
+}
+
+.final-score-text.counting {
+  animation: scorePulse 0.1s infinite alternate;
+}
+
+@keyframes scorePulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+/* 6. 노트 애니메이션 */
 .note-emoji.rising {
   position: absolute;
   bottom: 0;
   left: 50%;
   font-size: 4rem;
+  z-index: 15;
   will-change: transform;
   animation: moveUpSmooth 3s linear forwards;
 }
@@ -125,44 +219,17 @@
   to { transform: translateX(-50%) translateY(-110vh); }
 }
 
-.judgement-display {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 6rem;
-  font-weight: 900;
-  z-index: 100;
+/* 버튼 스타일 */
+.button-group { display: flex; gap: 20px; }
+.menu-btn { 
+  padding: 15px 45px; 
+  font-size: 1.3rem; 
+  font-weight: 800; 
+  border: none; 
+  border-radius: 50px; 
+  cursor: pointer; 
+  transition: all 0.2s; 
 }
-
-.judgement-display.perfect { color: #ffff33; }
-.judgement-display.good { color: #33ccff; }
-.judgement-display.miss { color: #ff3333; }
-
-.score-display {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 3rem;
-  color: #00ff00; 
-  background: rgba(0,0,0,0.7);
-  padding: 10px 40px;
-  border-radius: 50px;
-  border: 2px solid #00ff00;
-}
-
-.final-score-text {
-  font-size: 5rem;
-  color: #fffb00; /* 황금색 */
-  text-shadow: 0 0 20px rgba(255, 251, 0, 0.5);
-  transition: transform 0.05s ease-out;
-  /* 점수가 변할 때마다 scale이 살짝 커지는 애니메이션 */
-  animation: pop 0.1s ease-out;
-}
-
-@keyframes pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
+.menu-btn.start, .menu-btn.retry { background: #F8C4B4; color: white; }
+.menu-btn.home { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid white; }
+.menu-btn:hover { transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
