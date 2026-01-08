@@ -1,3 +1,4 @@
+/* RhythmGame.css */
 .game-container {
   position: relative;
   width: 100vw;
@@ -18,7 +19,7 @@
 .loading-overlay, .overlay-screen {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.85);
   color: white;
   display: flex;
   flex-direction: column;
@@ -27,16 +28,60 @@
   z-index: 100;
 }
 
-.start-btn {
-  padding: 15px 40px;
+/* 결과 화면 전용 스타일 */
+.result-screen .result-label {
   font-size: 1.5rem;
-  background: #00ff00;
+  letter-spacing: 0.5rem;
+  color: #00ff00;
+  margin-bottom: 0;
+}
+
+.final-score-text {
+  font-size: 12rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 50px rgba(0, 255, 0, 0.5);
+  margin: 0 0 50px 0;
+  animation: scorePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scorePop {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.button-group {
+  display: flex;
+  gap: 20px;
+}
+
+.menu-btn {
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  font-weight: bold;
+  transition: all 0.2s;
 }
 
+.menu-btn.start, .menu-btn.retry {
+  background: #00ff00;
+  color: black;
+}
+
+.menu-btn.home {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid white;
+}
+
+.menu-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+/* 게임 플레이 UI */
 .lane-container {
   display: flex;
   position: absolute;
@@ -54,15 +99,8 @@
   transition: background 0.1s ease-out, opacity 0.1s ease-out;
 }
 
-.lane.active {
-  background: var(--lane-color);
-  opacity: 1;
-}
-
-.lane.inactive {
-  background: rgba(0, 0, 0, 0.4);
-  opacity: 0.3;
-}
+.lane.active { background: var(--lane-color); opacity: 1; }
+.lane.inactive { background: rgba(0, 0, 0, 0.5); opacity: 0.2; }
 
 .lane.happy { --lane-color: rgba(255, 235, 59, 0.5); }
 .lane.sad { --lane-color: rgba(33, 150, 243, 0.5); }
@@ -70,12 +108,7 @@
 .lane.neutral { --lane-color: rgba(158, 158, 158, 0.3); }
 .lane.surprised { --lane-color: rgba(156, 39, 176, 0.5); }
 
-.target-emoji {
-  font-size: 4.5rem;
-  margin-top: 50px;
-  transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
+.target-emoji { font-size: 4.5rem; margin-top: 50px; transition: transform 0.1s; }
 .lane.active .target-emoji { transform: scale(1.3); }
 
 .note-emoji.rising {
@@ -97,21 +130,14 @@
   top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 5rem;
+  font-size: 6rem;
   font-weight: 900;
   z-index: 100;
-  animation: pop 0.4s ease-out forwards;
 }
 
-.judgement-display.perfect { color: #ffff33; text-shadow: 0 0 20px rgba(255,255,51,0.8); }
+.judgement-display.perfect { color: #ffff33; }
 .judgement-display.good { color: #33ccff; }
 .judgement-display.miss { color: #ff3333; }
-
-@keyframes pop {
-  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-  30% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-}
 
 .score-display {
   position: absolute;

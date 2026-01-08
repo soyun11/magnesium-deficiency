@@ -1,44 +1,106 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const SONGS = [
-  { id: 1, title: '생일 축하송', artist: 'Suno AI', bpm: 100, diff: 'EASY', stars: 1 },
-  { id: 2, title: '생일 축하송2', artist: 'Suno AI', bpm: 110, diff: 'NORMAL', stars: 2 },
-  { id: 3, title: '딸기시루 줄 너무 길어', artist: 'Suno AI', bpm: 130, diff: 'HARD', stars: 3 },
-  { id: 4, title: '곰세마리', artist: 'Suno AI', bpm: 110, diff: 'NORMAL', stars: 2 },
-];
-
 const SongSelection = () => {
-  const [selectedSong, setSelectedSong] = useState(1);
+  const [songs, setSongs] = useState([]); // DB에서 받아올 곡 목록
+  const [selectedSongId, setSelectedSongId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
+  // 1. 페이지 로드 시 백엔드 API로부터 곡 정보 가져오기
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        // 백엔드 서버(8080)가 켜져 있어야 합니다.
+        const response = await fetch('http://localhost:8080/api/songs'); 
+        if (!response.ok) throw new Error('네트워크 응답 에러');
+        
+        const data = await response.json();
+        setSongs(data);
+        if (data.length > 0) setSelectedSongId(data[0].id); // 첫 번째 곡 자동 선택
+      } catch (error) {
+        console.error("데이터 로딩 실패:", error);
+        // 에러 시 테스트용 임시 데이터 (백엔드가 안 켜졌을 때 대비)
+        setSongs([
+          { 
+            id: 1, 
+            title: '생일 축하 노래', 
+            artist: '마그네슘 부족', 
+            bpm: 100, 
+            diff: 'EASY', 
+            url: 'http://localhost:8080/birthday_star.mp3',
+            img: 'http://localhost:8080/birthday_cover.jpg' 
+          }
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSongs();
+  }, []);
+
+  const handleStartGame = () => {
+    const selectedSongData = songs.find(s => s.id === selectedSongId);
+    if (selectedSongData) {
+      navigate('/RhythmGame', { state: { song: selectedSongData } });
+    }
+  };
+
+  if (isLoading) return <div className="min-h-screen bg-white flex items-center justify-center font-black">데이터 불러오는 중...</div>;
 
   return (
     <div className="min-h-screen bg-white flex flex-col p-8">
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-black" onClick={() => navigate('/')}>마그네슘 부족</h1>
+        <h1 className="text-3xl font-black cursor-pointer" onClick={() => navigate('/')}>마그네슘 부족</h1>
         <div className="flex gap-6 text-sm text-gray-500">
           <button onClick={() => navigate('/')}>홈</button>
           <span>랭킹</span><span>설정</span>
         </div>
       </header>
+      
       <main className="flex-1 grid grid-cols-2 gap-10 px-10 overflow-y-auto">
-        {SONGS.map((song) => (
+        {songs.map((song) => (
           <div 
             key={song.id}
-            onClick={() => setSelectedSong(song.id)}
-            className={`p-6 rounded-[30px] cursor-pointer transition-all ${selectedSong === song.id ? 'bg-[#F8C4B4] shadow-lg scale-105' : 'bg-gray-100 hover:bg-gray-200'}`}
+            onClick={() => setSelectedSongId(song.id)}
+            className={`p-6 rounded-[30px] cursor-pointer transition-all ${selectedSongId === song.id ? 'bg-[#F8C4B4] shadow-lg scale-105' : 'bg-gray-100 hover:bg-gray-200'}`}
           >
-            <div className="w-full aspect-video bg-[#FDEBD0] rounded-2xl mb-4 flex items-center justify-center font-bold text-gray-400">SONG IMAGE</div>
+            <div className="w-full aspect-video rounded-2xl mb-4 overflow-hidden bg-gray-200">
+              <img 
+                src={song.img} 
+                alt={song.title} 
+                className="w-full h-full object-cover object-center"
+                // [이전 피드백 반영] 이미지 에러 시 대체 이미지 로드
+                onError={(e) => { 
+                  e.target.onerror = null; 
+                  e.target.src = '/G54d4NraAAAAx6y.jpg'; 
+                }}
+              />
+            </div>
+
             <div className="flex justify-between items-end">
-              <div><h3 className="text-xl font-bold">{song.title}</h3><p className="text-sm">{song.bpm} BPM</p></div>
-              <div className="text-right font-bold"><p>{song.artist}</p><span className="text-xs bg-white/50 px-2 py-1 rounded-full">{song.diff}</span></div>
+              <div>
+                <h3 className="text-xl font-bold">{song.title}</h3>
+                <p className="text-sm">{song.bpm} BPM</p>
+              </div>
+              <div className="text-right font-bold">
+                <p>{song.artist}</p>
+                <span className="text-xs bg-white/50 px-2 py-1 rounded-full">{song.diff}</span>
+              </div>
             </div>
           </div>
         ))}
       </main>
+      
       <footer className="py-8 flex justify-center">
-        <button onClick={()=> navigate('/RhythmGame')} className="px-20 py-4 bg-[#F8C4B4] text-3xl font-black rounded-2xl shadow-xl hover:scale-105 transition-transform">게임 시작</button>
-    </footer>
+        <button 
+          onClick={handleStartGame} 
+          className="px-20 py-4 bg-[#F8C4B4] text-3xl font-black rounded-2xl shadow-xl hover:scale-105 transition-transform"
+        >
+          게임 시작
+        </button>
+      </footer>
     </div>
   );
 };
