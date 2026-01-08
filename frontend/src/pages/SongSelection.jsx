@@ -33,7 +33,7 @@ const SongSelection = () => {
           }
         ]);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); //
       }
     };
 
@@ -43,7 +43,7 @@ const SongSelection = () => {
   const handleStartGame = () => {
     const selectedSongData = songs.find(s => s.id === selectedSongId);
     if (selectedSongData) {
-      navigate('/RhythmGame', { state: { song: selectedSongData } });
+      navigate('/RhythmGame', { state: { song: selectedSongData } }); //
     }
   };
 
@@ -51,30 +51,59 @@ const SongSelection = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col p-8">
+      {/* --- 헤더 영역 (뒤로 가기 버튼 추가) --- */}
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-black cursor-pointer" onClick={() => navigate('/')}>마그네슘 부족</h1>
-        <div className="flex gap-6 text-sm text-gray-500">
-          <button onClick={() => navigate('/')}>홈</button>
-          <span>랭킹</span><span>설정</span>
+        <div className="flex items-center gap-4">
+          {/* 뒤로 가기 버튼 */}
+          <button 
+            onClick={() => navigate('/Home')} 
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
+            aria-label="뒤로 가기"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-8 w-8 text-gray-800 group-hover:text-black" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <h1 
+            className="text-3xl font-black cursor-pointer" 
+            onClick={() => navigate('/Home')}
+          >
+            마그네슘 부족
+          </h1>
+        </div>
+
+        <div className="flex gap-6 text-sm text-gray-500 font-bold">
+          <button onClick={() => navigate('/Home')} className="hover:text-black">홈</button>
+          <span className="cursor-default">랭킹</span>
+          <span className="cursor-default">설정</span>
         </div>
       </header>
       
+      {/* --- 곡 리스트 영역 --- */}
       <main className="flex-1 grid grid-cols-2 gap-10 px-10 overflow-y-auto">
         {songs.map((song) => (
           <div 
             key={song.id}
             onClick={() => setSelectedSongId(song.id)}
-            className={`p-6 rounded-[30px] cursor-pointer transition-all ${selectedSongId === song.id ? 'bg-[#F8C4B4] shadow-lg scale-105' : 'bg-gray-100 hover:bg-gray-200'}`}
+            className={`p-6 rounded-[30px] cursor-pointer transition-all ${
+              selectedSongId === song.id ? 'bg-[#F8C4B4] shadow-lg scale-105' : 'bg-gray-100 hover:bg-gray-200'
+            }`}
           >
             <div className="w-full aspect-video rounded-2xl mb-4 overflow-hidden bg-gray-200">
               <img 
                 src={song.img} 
                 alt={song.title} 
                 className="w-full h-full object-cover object-center"
-                // [이전 피드백 반영] 이미지 에러 시 대체 이미지 로드
                 onError={(e) => { 
                   e.target.onerror = null; 
-                  e.target.src = '/G54d4NraAAAAx6y.jpg'; 
+                  e.target.src = '/G54d4NraAAAAx6y.jpg'; //
                 }}
               />
             </div>
@@ -93,6 +122,7 @@ const SongSelection = () => {
         ))}
       </main>
       
+      {/* --- 하단 버튼 영역 --- */}
       <footer className="py-8 flex justify-center">
         <button 
           onClick={handleStartGame} 
