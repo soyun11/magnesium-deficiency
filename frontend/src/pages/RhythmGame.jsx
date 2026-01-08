@@ -32,6 +32,7 @@ const RhythmGame = () => {
   const [currentEmotion, setCurrentEmotion] = useState('neutral');
   const [notes, setNotes] = useState([]);
   const [score, setScore] = useState(0);
+  const [animatedScore, setAnimatedScore] = useState(0); // [추가] 애니메이션용 점수 상태
   const [judgement, setJudgement] = useState(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
 
@@ -148,7 +149,38 @@ const RhythmGame = () => {
     audioRef.current.pause();
     audioRef.current.currentTime = 0;
   };
+  // --- [추가] 점수 카운팅 애니메이션 로직 ---
+  useEffect(() => {
+    if (gameState === 'finished') {
+      let start = 0;
+      const end = score;
+      if (start === end) {
+        setAnimatedScore(end);
+        return;
+      }
 
+      // 점수가 높을수록 더 빨리 올라가도록 설정 (약 1초 동안 실행)
+      const duration = 1000; 
+      const frameRate = 1000 / 60; // 60fps
+      const totalFrames = Math.round(duration / frameRate);
+      const increment = end / totalFrames;
+
+      const timer = setInterval(() => {
+        start += increment;
+        if (start >= end) {
+          setAnimatedScore(end);
+          clearInterval(timer);
+        } else {
+          setAnimatedScore(Math.floor(start));
+        }
+      }, frameRate);
+
+    return () => clearInterval(timer);
+  } else {
+    // 게임이 시작되거나 준비 중일 때는 0으로 초기화
+    setAnimatedScore(0);
+  }
+}, [gameState, score]);
   return (
     <div className="game-container">
       {!isModelLoaded && <div className="loading-overlay">AI 엔진 가동 중...</div>}
@@ -165,7 +197,7 @@ const RhythmGame = () => {
       {gameState === 'finished' && (
         <div className="overlay-screen result-screen">
           <p className="result-label">FINAL SCORE</p>
-          <h1 className="final-score-text">{score}</h1>
+          <h1 className="final-score-text">{animatedScore}</h1>
           <div className="button-group">
             <button className="menu-btn retry" onClick={startGame}>다시 시도</button>
             <button className="menu-btn home" onClick={() => navigate('/Home')}>메인 화면으로</button>

@@ -145,9 +145,24 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 3rem;
-  color: #00ff00;
+  color: #00ff00; 
   background: rgba(0,0,0,0.7);
   padding: 10px 40px;
   border-radius: 50px;
   border: 2px solid #00ff00;
+}
+
+.final-score-text {
+  font-size: 5rem;
+  color: #fffb00; /* 황금색 */
+  text-shadow: 0 0 20px rgba(255, 251, 0, 0.5);
+  transition: transform 0.05s ease-out;
+  /* 점수가 변할 때마다 scale이 살짝 커지는 애니메이션 */
+  animation: pop 0.1s ease-out;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
