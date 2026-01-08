@@ -20,7 +20,6 @@ const Tutorial = () => {
   const webcamRef = useRef(null);
   const navigate = useNavigate();
   
-  // [수정] 실시간 상태 확인을 위한 Ref (상태 업데이트 지연 방지)
   const isFinishedRef = useRef(false);
 
   useEffect(() => {
@@ -45,7 +44,6 @@ const Tutorial = () => {
     let interval;
     if (isModelLoaded && target && !isFinished) {
       interval = setInterval(async () => {
-        // [핵심] 이미 끝났다면 연산 자체를 수행하지 않음
         if (isFinishedRef.current) return;
 
         if (webcamRef.current && webcamRef.current.video.readyState === 4) {
@@ -54,16 +52,12 @@ const Tutorial = () => {
             .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
             .withFaceExpressions();
 
-          // 연산 중간에 끝났을 경우를 대비해 한 번 더 체크
           if (isFinishedRef.current || !detections || detections.length === 0) return;
 
           const prob = detections[0].expressions[target.key];
-
-          // [수정] 무표정일 때는 판정 기준을 더 엄격하게 (0.95), 일반 표정은 0.8
           const perfectThreshold = target.key === 'neutral' ? 0.95 : 0.8;
 
           if (prob >= perfectThreshold) {
-            // Perfect 달성 시 즉시 모든 플래그 차단
             isFinishedRef.current = true;
             setIsFinished(true);
             setCurrentScore("Perfect");
@@ -74,7 +68,7 @@ const Tutorial = () => {
               navigate('/Home');
             }, 5000);
 
-          } else if (!isFinishedRef.current) { // 이미 끝난 게 아닐 때만 점수 업데이트
+          } else if (!isFinishedRef.current) {
             if (prob >= 0.5) {
               setCurrentScore("Good");
             } else {
@@ -90,11 +84,28 @@ const Tutorial = () => {
   if (!target) return <div className="bg-black min-h-screen flex items-center justify-center text-white">준비 중...</div>;
 
   return (
-    <div className="relative min-h-screen bg-black overflow-hidden">
+    <div className="relative min-h-screen bg-black overflow-hidden font-sans">
       <Webcam audio={false} ref={webcamRef} className="absolute inset-0 w-full h-full object-cover mirror" />
 
-      {/* 상단 미션 안내 */}
-      <header className="absolute top-0 w-full py-8 px-12 z-10">
+      {/* 상단 헤더 (뒤로 가기 버튼 및 미션 안내) */}
+      <header className="absolute top-0 w-full py-8 px-12 z-20 flex items-start gap-6">
+        {/* 뒤로 가기 버튼 추가 */}
+        <button 
+          onClick={() => navigate('/Home')} 
+          className="p-3 bg-black/40 backdrop-blur-md border border-white/20 rounded-full hover:bg-black/60 transition-all group"
+          aria-label="뒤로 가기"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-8 w-8 text-white group-hover:scale-110 transition-transform" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
         <div className="inline-block bg-black/50 backdrop-blur-md px-8 py-3 rounded-2xl border border-white/20">
           <p className="text-white text-lg font-bold opacity-80">이번 미션</p>
           <h1 className="text-5xl font-black text-yellow-300 tracking-tighter">
