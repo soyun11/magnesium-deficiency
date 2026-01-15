@@ -30,17 +30,18 @@ const SongSelection = () => {
         console.error("데이터 로딩 실패:", error);
         // 에러 시 테스트용 임시 데이터 (백엔드가 안 켜졌을 때 대비)
         setSongs([
-          { 
-            id: 1, 
-            title: '생일 축하 노래', 
-            artist: '마그네슘 부족', 
-            bpm: 100, 
-            diff: 'EASY', 
-            url: 'http://localhost:8080/birthday_star.mp3',
-            img: 'http://localhost:8080/birthday_cover.jpg' 
-          }
-        ]);
-        setSelectedSongId(1);
+        {
+          id: 1,
+          title: '생일 축하 노래',
+          artist: '마그네슘 부족',
+          bpm: 100,
+          difficulty: 1,
+          file_path: '/birthday_star.mp3',
+          img: 'http://localhost:8080/birthday_cover.jpg',
+        }
+      ]);
+      setSelectedSongId(1);
+
       } finally {
         setIsLoading(false); 
       }
@@ -50,22 +51,23 @@ const SongSelection = () => {
   }, []);
 
   const handleStartGame = () => {
-    const selectedSongData = songs.find(s => s.id === selectedSongId);
-    if (selectedSongData) {
-      navigate('/RhythmGame', 
-        { state: {
-            song: {
-              id: selectedSongData.id,
-              title: selectedSongData.title,
-              artist: selectedSongData.artist,
-              bpm: selectedSongData.bpm,
-              difficulty: selectedSongData.difficulty,
-              audioUrl: `http://localhost:8080${selectedSongData.file_Path}`,
-            }
-          }
-        });
-      }
-    };
+    const selectedSongData = songs.find((s) => s.id === selectedSongId);
+    if (!selectedSongData) return;
+
+    navigate('/RhythmGame', {
+      state: {
+        song: {
+          id: selectedSongData.id,
+          title: selectedSongData.title,
+          artist: selectedSongData.artist,
+          bpm: selectedSongData.bpm,
+          difficulty: selectedSongData.difficulty,
+          audioUrl: `http://localhost:8080${selectedSongData.file_path}`,
+        },
+      },
+    });
+  };
+
   if (isLoading) return <div className="min-h-screen bg-white flex items-center justify-center font-black">데이터 불러오는 중...</div>;
 
   return (
@@ -117,12 +119,12 @@ const SongSelection = () => {
           >
             <div className="w-full aspect-video rounded-2xl mb-4 overflow-hidden bg-gray-200">
               <img 
-                src={song.img} 
+                src={song.img ?? '/G54d4NraAAAAx6y.jpg'}
                 alt={song.title} 
                 className="w-full h-full object-cover object-center"
-                onError={(e) => { 
-                  e.target.onerror = null; 
-                  e.target.src = '/G54d4NraAAAAx6y.jpg'; //
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = '/G54d4NraAAAAx6y.jpg';
                 }}
               />
             </div>
@@ -134,7 +136,7 @@ const SongSelection = () => {
               </div>
               <div className="text-right font-bold">
                 <p>{song.artist}</p>
-                <span className="text-xs bg-white/50 px-2 py-1 rounded-full">{song.diff}</span>
+                <span className="text-xs bg-white/50 px-2 py-1 rounded-full">{difficultyLabel(song.difficulty)}</span>
               </div>
             </div>
           </div>
