@@ -7,6 +7,14 @@ const SongSelection = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  // 난이도 추가
+  const difficultyLabel = (difficulty) => {
+    if (difficulty === 1) return "EASY";
+    if (difficulty === 2) return "NORMAL";
+    if (difficulty === 3) return "HARD";
+    return "UNKNOWN";
+  };
+
   // 1. 페이지 로드 시 백엔드 API로부터 곡 정보 가져오기
   useEffect(() => {
     const fetchSongs = async () => {
@@ -32,8 +40,9 @@ const SongSelection = () => {
             img: 'http://localhost:8080/birthday_cover.jpg' 
           }
         ]);
+        setSelectedSongId(1);
       } finally {
-        setIsLoading(false); //
+        setIsLoading(false); 
       }
     };
 
@@ -43,10 +52,20 @@ const SongSelection = () => {
   const handleStartGame = () => {
     const selectedSongData = songs.find(s => s.id === selectedSongId);
     if (selectedSongData) {
-      navigate('/RhythmGame', { state: { song: selectedSongData } }); //
-    }
-  };
-
+      navigate('/RhythmGame', 
+        { state: {
+            song: {
+              id: selectedSongData.id,
+              title: selectedSongData.title,
+              artist: selectedSongData.artist,
+              bpm: selectedSongData.bpm,
+              difficulty: selectedSongData.difficulty,
+              audioUrl: `http://localhost:8080${selectedSongData.file_Path}`,
+            }
+          }
+        });
+      }
+    };
   if (isLoading) return <div className="min-h-screen bg-white flex items-center justify-center font-black">데이터 불러오는 중...</div>;
 
   return (
