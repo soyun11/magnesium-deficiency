@@ -6,7 +6,7 @@ VALUES
 (
   'Birthday Star',
   'soyun',
-  '../static/songs/birthday_star.mp3',
+  '/songs/birthday_star.mp3',
   90,
   104,
   2
@@ -14,7 +14,7 @@ VALUES
 (
   'Combo',
   'gongju',
-  '../static/songs/combo.mp3',
+  '/songs/combo.mp3',
   88,
   60,
   1
@@ -22,7 +22,7 @@ VALUES
 (
   'Rock',
   'onepearl',
-  '../static/songs/rock.mp3',
+  '/songs/rock.mp3',
   116,
   65,
   2
@@ -30,7 +30,7 @@ VALUES
 (
   'Sungsimdang',
   'jjooya',
-  '../static/songs/sungsimdang.mp3',
+  '/songs/sungsimdang.mp3',
   130,
   69,
   3
