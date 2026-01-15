@@ -1,0 +1,23 @@
+/* Home.css */
+
+/* 타이틀이 공중에 떠 있는 듯한 효과  */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+h1 {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* 폰트 강조 (보고서에서 언급한 Black Han Sans 적용 추천) */
+h1, button, span {
+  font-family: 'Black Han Sans', sans-serif;
+  word-break: keep-all;
+}
+
+/* 버튼 클릭 시 팅기는 효과  */
+button:active {
+  transform: scale(0.95);
+}

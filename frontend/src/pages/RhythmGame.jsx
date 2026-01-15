@@ -8,8 +8,8 @@ const EMOTION_CONFIG = {
   neutral:   { weight: 1.0, perfect: 0.90, good: 0.50 }, 
   happy:     { weight: 1.4, perfect: 0.80, good: 0.45 }, 
   surprised: { weight: 1.3, perfect: 0.75, good: 0.40 }, 
-  angry:     { weight: 1.8, perfect: 0.60, good: 0.30 }, 
-  sad:       { weight: 1.9, perfect: 0.55, good: 0.25 }  
+  angry:     { weight: 1.7, perfect: 0.60, good: 0.30 }, 
+  sad:       { weight: 1.4, perfect: 0.55, good: 0.25 }  
 };
 
 const EMOTIONS = Object.keys(EMOTION_CONFIG);
