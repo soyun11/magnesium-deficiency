@@ -163,7 +163,7 @@ const Signup = () => {
         <div className="flex justify-center">
           <button 
             onClick={handleSignup}
-            className={`w-48 py-4 rounded-[20px] text-2xl font-bold shadow-lg transition-all
+            className={`w-48 py-4 bg-[#F8C4B4] rounded-[20px] text-2xl font-bold shadow-lg hover:bg-[#f3b09a] transition-all
               ${(isIdChecked && isIdAvailable && password.length > 0 && !pwError) 
                 ? 'bg-[#F8C4B4] hover:bg-[#f3b09a]' 
                 : 'bg-[#D9D9D9] cursor-not-allowed'}`}
