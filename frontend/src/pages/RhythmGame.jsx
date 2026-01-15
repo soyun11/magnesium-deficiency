@@ -122,16 +122,50 @@ const RhythmGame = () => {
     noteTimeoutRef.current = setTimeout(scheduleNextNote, Math.random() * 2000 + 1000); 
   }, []);
 
+ // [1] 코드 맨 위에 백엔드 주소 상수가 없으면 추가해주세요.
+  const BACKEND_URL = 'http://localhost:8080'; 
+
+  // ... (중략) ...
+
+  // [2] startGame 함수를 이렇게 수정하세요.
   const startGame = () => {
+    console.log("--- 게임 시작 시도 ---");
     setGameState('playing');
     setScore(0);
     setAnimatedScore(0);
-    audioRef.current.src = selectedSong.url;
-    audioRef.current.play();
-    startGameLoop();
-    scheduleNextNote();
-    audioRef.current.onended = () => endGame();
-    endTimerRef.current = setTimeout(() => { endGame(); }, GAME_LIMIT_MS);
+
+    // [핵심 수정 부분] 
+    // SongSelection.js에서 넘어온 키값(file_path)을 우선적으로 찾고, 
+    // 없으면 혹시 모를 audioUrl이나 url도 찾아봅니다. (안전장치)
+    let songUrl = selectedSong.file_path || selectedSong.audioUrl || selectedSong.url;
+    
+    // 만약 주소가 '/songs/...' 처럼 상대로 경로로 오면 앞에 http://localhost:8080을 붙여줍니다.
+    if (songUrl && songUrl.startsWith('/')) {
+        songUrl = `${BACKEND_URL}${songUrl}`;
+    }
+
+    console.log("최종 재생 URL:", songUrl); // F12 콘솔에서 주소 확인 가능
+    
+    audioRef.current.src = songUrl;
+    audioRef.current.volume = 0.5;
+
+    // 재생 시도 및 에러 처리
+    const playPromise = audioRef.current.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          console.log("오디오 재생 성공!");
+          startGameLoop();
+          scheduleNextNote();
+          audioRef.current.onended = () => endGame();
+          endTimerRef.current = setTimeout(() => { endGame(); }, GAME_LIMIT_MS);
+        })
+        .catch(error => {
+          console.error("오디오 재생 실패:", error);
+          alert("노래 재생 실패! (백엔드 연결이나 파일 경로를 확인하세요)");
+          setGameState('ready');
+        });
+    }
   };
 
   const endGame = () => {
