@@ -1,0 +1,171 @@
+/* Auth.css */
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
+
+.auth-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: #FFF9F9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* 배경 장식 원형 */
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.15;
+  animation: authPulse 4s infinite alternate;
+}
+
+.circle-1 { width: 400px; height: 400px; background-color: #F8C4B4; top: -100px; left: -100px; }
+.circle-2 { width: 500px; height: 500px; background-color: #B4E4F8; bottom: -150px; right: -150px; }
+
+@keyframes authPulse {
+  from { transform: scale(1); opacity: 0.1; }
+  to { transform: scale(1.1); opacity: 0.2; }
+}
+
+/* 중앙 카드 섹션 */
+.auth-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 450px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  padding: 60px 40px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+/* 타이틀 및 텍스트 */
+.auth-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 3.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: 500;
+  margin-bottom: 3rem;
+}
+
+.field-label {
+  display: block;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #F8C4B4;
+  margin-left: 15px;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+/* 입력 필드 */
+.input-wrapper {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.auth-input {
+  width: 100%;
+  height: 55px;
+  background: white;
+  border: 2px solid transparent;
+  border-radius: 50px;
+  padding: 0 25px;
+  font-size: 1rem;
+  transition: all 0.3s;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #F8C4B4;
+  box-shadow: 0 5px 20px rgba(248, 196, 180, 0.3);
+}
+
+/* 버튼 스타일 */
+.auth-btn-group {
+  margin-top: 2rem;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 18px 0;
+  border-radius: 50px;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-family: 'Black Han Sans', sans-serif;
+}
+
+.btn-primary {
+  background-color: #F8C4B4;
+  color: white;
+  box-shadow: 0 10px 25px rgba(248, 196, 180, 0.5);
+}
+
+.btn-primary:hover {
+  transform: translateY(-5px);
+  filter: brightness(1.05);
+}
+
+.btn-primary:disabled {
+  background-color: #ddd;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.link-btn:hover { color: #F8C4B4; text-decoration: underline; }
+
+/* 에러 메시지 */
+.error-text {
+  font-size: 0.75rem;
+  color: #f87171;
+  text-align: left;
+  margin-left: 15px;
+  margin-top: 5px;
+  font-weight: 600;
+}
+
+/* 중복 확인 버튼 전용 */
+.check-btn {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  bottom: 6px;
+  background-color: #B4E4F8;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 0 15px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  cursor: pointer;
+}
