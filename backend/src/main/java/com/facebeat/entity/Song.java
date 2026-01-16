@@ -22,6 +22,7 @@ public class Song {
     private Integer bpm;
     private Integer duration;
     private Integer difficulty;
+    private String image_path;
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime created_at;
@@ -36,6 +37,7 @@ public class Song {
     public Integer getDuration() { return duration; }
     public Integer getDifficulty() { return difficulty; }
     public LocalDateTime getCreated_at() { return created_at; }
+    public String getImage_path() { return image_path; }
 
     public void setId(Long id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
@@ -44,4 +46,5 @@ public class Song {
     public void setBpm(Integer bpm) { this.bpm = bpm; }
     public void setDuration(Integer duration) { this.duration = duration; }
     public void setDifficulty(Integer difficulty) { this.difficulty = difficulty; }
+    public void setImage_path(String image_path) { this.image_path = image_path; }
 }
