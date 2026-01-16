@@ -58,9 +58,23 @@ const SongSelection = () => {
     fetchSongs();
   }, []);
 
+  // [핵심 수정] 카드 클릭 시 선택/해제 토글 로직
+  const handleSelectSong = (id) => {
+    if (selectedSongId === id) {
+      setSelectedSongId(null); // 이미 선택된 곡을 다시 누르면 해제 (기본색/크기로 복원)
+    } else {
+      setSelectedSongId(id); // 다른 곡을 누르면 해당 곡 선택
+    }
+  };
+
   const handleStartGame = () => {
     const selectedSongData = songs.find((s) => s.id === selectedSongId);
-    if (!selectedSongData) return;
+    
+    // 곡이 선택되지 않았을 때의 예외 처리
+    if (!selectedSongData) {
+      alert("플레이할 노래를 선택해 주세요! 😊");
+      return;
+    }
 
     navigate('/RhythmGame', {
       state: {
@@ -77,7 +91,7 @@ const SongSelection = () => {
     });
   };
 
-  if (isLoading) return <div className="min-h-screen bg-white flex items-center justify-center font-black">데이터 불러오는 중...</div>;
+  if (isLoading) return <div className="min-h-screen bg-white flex items-center justify-center font-black text-2xl">데이터 불러오는 중...</div>;
 
   return (
     <div className="min-h-screen bg-white flex flex-col p-8">
@@ -101,7 +115,7 @@ const SongSelection = () => {
         </div>
         <div className="flex gap-6 text-sm text-gray-500 font-bold">
           <button onClick={() => navigate('/Home')} className="hover:text-black">홈</button>
-          <span className="cursor-default">랭킹</span>
+          <button onClick={() => navigate('/Ranking')} className="hover:text-black">랭킹</button>
           <span className="cursor-default">설정</span>
         </div>
       </header>
@@ -110,9 +124,11 @@ const SongSelection = () => {
         {songs.map((song) => (
           <div 
             key={song.id}
-            onClick={() => setSelectedSongId(song.id)}
-            className={`p-6 rounded-[30px] cursor-pointer transition-all ${
-              selectedSongId === song.id ? 'bg-[#F8C4B4] shadow-lg scale-105' : 'bg-gray-100 hover:bg-gray-200'
+            onClick={() => handleSelectSong(song.id)}
+            className={`p-6 rounded-[40px] cursor-pointer transition-all duration-300 transform ${
+              selectedSongId === song.id 
+              ? 'bg-[#F8C4B4] shadow-[0_20px_40px_rgba(248,196,180,0.4)] scale-105 border-4 border-white' 
+              : 'bg-gray-50 hover:bg-gray-100 border-4 border-transparent'
             }`}
           >
             <div className="w-full aspect-video rounded-2xl mb-4 overflow-hidden bg-gray-200 relative">
@@ -121,7 +137,7 @@ const SongSelection = () => {
               <img 
                 src={getResourceUrl(song.image_path)}
                 alt={song.title} 
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-cover"
                 onError={(e) => {
                   e.currentTarget.onerror = null;
                   e.currentTarget.src = '/G54d4NraAAAAx6y.jpg';
@@ -131,12 +147,22 @@ const SongSelection = () => {
             </div>
             <div className="flex justify-between items-end">
               <div>
-                <h3 className="text-xl font-bold">{song.title}</h3>
-                <p className="text-sm">{song.bpm} BPM</p>
+                <h3 className={`text-2xl font-black mb-1 ${selectedSongId === song.id ? 'text-white' : 'text-[#333]'}`}>
+                  {song.title}
+                </h3>
+                <p className={`text-sm font-bold ${selectedSongId === song.id ? 'text-white/80' : 'text-gray-400'}`}>
+                  {song.bpm} BPM
+                </p>
               </div>
-              <div className="text-right font-bold">
-                <p>{song.artist}</p>
-                <span className="text-xs bg-white/50 px-2 py-1 rounded-full">{difficultyLabel(song.difficulty)}</span>
+              <div className="text-right">
+                <p className={`font-black text-lg mb-2 ${selectedSongId === song.id ? 'text-white' : 'text-[#333]'}`}>
+                  {song.artist}
+                </p>
+                <span className={`text-xs font-black px-3 py-1 rounded-full ${
+                  selectedSongId === song.id ? 'bg-white text-[#F8C4B4]' : 'bg-gray-200 text-gray-500'
+                }`}>
+                  {difficultyLabel(song.difficulty)}
+                </span>
               </div>
             </div>
           </div>
@@ -146,7 +172,11 @@ const SongSelection = () => {
       <footer className="py-8 flex justify-center">
         <button 
           onClick={handleStartGame} 
-          className="px-20 py-4 bg-[#F8C4B4] text-3xl font-black rounded-2xl shadow-xl hover:scale-105 transition-transform"
+          className={`px-24 py-6 text-3xl font-black rounded-[30px] shadow-2xl transition-all active:scale-95 ${
+            selectedSongId 
+            ? 'bg-[#F8C4B4] text-white hover:brightness-105' 
+            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
         >
           게임 시작
         </button>

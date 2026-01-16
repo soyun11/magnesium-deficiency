@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import SongSelection from './pages/SongSelection';
 import Tutorial from './pages/Tutorial';
 import RhythmGame from './pages/RhythmGame';
+import Ranking from './pages/Ranking';
 // 나머지 10여 개의 페이지들도 여기서 import 합니다.
 
 function App() {
