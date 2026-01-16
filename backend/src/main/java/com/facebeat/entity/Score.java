@@ -20,21 +20,39 @@ public class Score {
     @JoinColumn(name = "song_id")
     private Song song;
 
+    // 점수
+    @Column(name = "score_value")
     private Integer score;
 
+    private Integer combo;
+    private String grade;
+
     @Column(name = "created_at", insertable = false, updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     public Score() {}
+
+    // 생성자 추가 
+    public Score(User user, Song song, Integer score, Integer combo, String grade) {
+        this.user = user;
+        this.song = song;
+        this.score = score;
+        this.combo = combo;
+        this.grade = grade;
+    }
 
     public Long getId() { return id; }
     public User getUser() { return user; }
     public Song getSong() { return song; }
     public Integer getScore() { return score; }
-    public LocalDateTime getCreated_at() { return created_at; }
+    public Integer getCombo() { return combo; }
+    public String getGrade() { return grade; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
     public void setId(Long id) { this.id = id; }
     public void setUser(User user) { this.user = user; }
     public void setSong(Song song) { this.song = song; }
     public void setScore(Integer score) { this.score = score; }
+    public void setCombo(Integer combo) { this.combo = combo; }
+    public void setGrade(String grade) { this.grade = grade; }
 }
