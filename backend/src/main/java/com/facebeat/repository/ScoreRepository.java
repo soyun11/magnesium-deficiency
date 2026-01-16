@@ -3,4 +3,4 @@ package com.facebeat.repository;
 import com.facebeat.entity.Score;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ScoreRepository extends JpaRepository<Score, Long> {}
+public interface ScoreRepository extends JpaRepository<Score, Long> {List<Score> findTop10BySongIdOrderByScoreDesc(Long songId);}

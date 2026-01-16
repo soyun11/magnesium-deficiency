@@ -2,6 +2,7 @@ package com.facebeat.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import lombok.Builder;
 
 @Entity
 @Table(name = "scores")
@@ -33,6 +34,7 @@ public class Score {
     public Score() {}
 
     // 생성자 추가 
+    @Builder
     public Score(User user, Song song, Integer score, Integer combo, String grade) {
         this.user = user;
         this.song = song;
