@@ -37,7 +37,7 @@ const SongSelection = () => {
           bpm: 100,
           difficulty: 1,
           file_path: '/birthday_star.mp3',
-          img: 'http://localhost:8080/birthday_cover.jpg',
+          img_path: '/birthday_star.png',
         }
       ]);
       setSelectedSongId(1);
@@ -63,6 +63,7 @@ const SongSelection = () => {
           bpm: selectedSongData.bpm,
           difficulty: selectedSongData.difficulty,
           audioUrl: `http://localhost:8080${selectedSongData.file_path}`,
+          image_path: `http://localhost:8080${selectedSongData.img_path}`,
         },
       },
     });
@@ -119,7 +120,7 @@ const SongSelection = () => {
           >
             <div className="w-full aspect-video rounded-2xl mb-4 overflow-hidden bg-gray-200">
               <img 
-                src={song.img ?? '/G54d4NraAAAAx6y.jpg'}
+                src={song.image_path ?? '/G54d4NraAAAAx6y.jpg'}
                 alt={song.title} 
                 className="w-full h-full object-cover object-center"
                 onError={(e) => {
