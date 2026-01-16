@@ -2,12 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const SongSelection = () => {
-  const [songs, setSongs] = useState([]); // DB에서 받아올 곡 목록
+  const [songs, setSongs] = useState([]);
   const [selectedSongId, setSelectedSongId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // 난이도 라벨 변환
+  // [필수 1] 백엔드 주소 상수 정의
+  const BACKEND_URL = 'http://localhost:8080';
+
+  // [필수 2] 이미지 경로 앞에 백엔드 주소를 붙여주는 함수
+  const getResourceUrl = (path) => {
+    if (!path) return '/G54d4NraAAAAx6y.jpg'; // 경로가 없으면 기본 이미지
+    // 이미 http로 시작하면(외부 이미지면) 그대로 두고, 아니면 백엔드 주소 붙이기
+    return path.startsWith('http') ? path : `${BACKEND_URL}${path}`;
+  };
+
   const difficultyLabel = (difficulty) => {
     if (difficulty === 1) return "EASY";
     if (difficulty === 2) return "NORMAL";
@@ -15,19 +24,19 @@ const SongSelection = () => {
     return "UNKNOWN";
   };
 
-  // 1. 페이지 로드 시 백엔드 API로부터 곡 정보 가져오기
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/songs'); 
+        const response = await fetch(`${BACKEND_URL}/api/songs`); 
         if (!response.ok) throw new Error('네트워크 응답 에러');
         
         const data = await response.json();
         setSongs(data);
-        // [수정] 첫 번째 곡 자동 선택 로직을 제거하거나 선택 사항으로 둡니다.
-        // 유저가 직접 고르는 재미를 위해 초기값은 null로 유지하는 것이 좋습니다.
+        if (data.length > 0) setSelectedSongId(data[0].id);
       } catch (error) {
         console.error("데이터 로딩 실패:", error);
+        
+        // [필수 3] 더미 데이터 키 이름을 'image_path'로 통일 (img_path 아님!)
         setSongs([
           {
             id: 1,
@@ -36,9 +45,11 @@ const SongSelection = () => {
             bpm: 100,
             difficulty: 1,
             file_path: '/birthday_star.mp3',
-            img: 'http://localhost:8080/birthday_cover.jpg',
+            image_path: '/birthday_star.png', // 여기 수정됨
           }
         ]);
+        setSelectedSongId(1);
+
       } finally {
         setIsLoading(false); 
       }
@@ -73,7 +84,8 @@ const SongSelection = () => {
           artist: selectedSongData.artist,
           bpm: selectedSongData.bpm,
           difficulty: selectedSongData.difficulty,
-          audioUrl: `http://localhost:8080${selectedSongData.file_path}`,
+          file_path: selectedSongData.file_path,
+          image_path: selectedSongData.image_path,
         },
       },
     });
@@ -82,34 +94,33 @@ const SongSelection = () => {
   if (isLoading) return <div className="min-h-screen bg-white flex items-center justify-center font-black text-2xl">데이터 불러오는 중...</div>;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col p-8 font-sans">
-      {/* --- 헤더 영역 --- */}
-      <header className="flex justify-between items-center mb-8 px-4">
+    <div className="min-h-screen bg-white flex flex-col p-8">
+      <header className="flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate('/Home')} 
             className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
-            aria-label="뒤로 가기"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-8 w-8 text-gray-800 group-hover:text-black" 
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          
-          <h1 className="text-4xl font-black cursor-pointer text-[#333]" onClick={() => navigate('/Home')}>
-            마그네슘 <span className="text-[#F8C4B4]">부족</span>
+          <h1 className="text-3xl font-black cursor-pointer" onClick={() => navigate('/Home')}>
+            마그네슘 부족
           </h1>
         </div>
-
-        <div className="flex gap-8 text-sm text-gray-400 font-black">
-          <button onClick={() => navigate('/Home')} className="hover:text-[#F8C4B4] transition-colors">HOME</button>
-          <button onCLick={()=> navigate('/Ranking')} className="hover:text-[#F8C4B4] transition-colors">RANKING</button>
-          <span className="cursor-not-allowed">SETTINGS</span>
+        <div className="flex gap-6 text-sm text-gray-500 font-bold">
+          <button onClick={() => navigate('/Home')} className="hover:text-black">홈</button>
+          <span className="cursor-default">랭킹</span>
+          <span className="cursor-default">설정</span>
         </div>
       </header>
       
-      {/* --- 곡 리스트 영역 --- */}
-      <main className="flex-1 grid grid-cols-2 gap-10 px-10 overflow-y-auto py-4">
+      <main className="flex-1 grid grid-cols-2 gap-10 px-10 overflow-y-auto">
         {songs.map((song) => (
           <div 
             key={song.id}
@@ -120,9 +131,11 @@ const SongSelection = () => {
               : 'bg-gray-50 hover:bg-gray-100 border-4 border-transparent'
             }`}
           >
-            <div className="w-full aspect-video rounded-[30px] mb-6 overflow-hidden bg-gray-200 shadow-inner">
+            <div className="w-full aspect-video rounded-2xl mb-4 overflow-hidden bg-gray-200 relative">
+              
+              {/* [필수 4] getResourceUrl 함수로 감싸서 이미지를 불러옴 */}
               <img 
-                src={song.img ?? '/G54d4NraAAAAx6y.jpg'}
+                src={getResourceUrl(song.image_path)}
                 alt={song.title} 
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -130,9 +143,9 @@ const SongSelection = () => {
                   e.currentTarget.src = '/G54d4NraAAAAx6y.jpg';
                 }}
               />
+              
             </div>
-
-            <div className="flex justify-between items-end px-2">
+            <div className="flex justify-between items-end">
               <div>
                 <h3 className={`text-2xl font-black mb-1 ${selectedSongId === song.id ? 'text-white' : 'text-[#333]'}`}>
                   {song.title}
@@ -156,8 +169,7 @@ const SongSelection = () => {
         ))}
       </main>
       
-      {/* --- 하단 버튼 영역 --- */}
-      <footer className="py-12 flex justify-center">
+      <footer className="py-8 flex justify-center">
         <button 
           onClick={handleStartGame} 
           className={`px-24 py-6 text-3xl font-black rounded-[30px] shadow-2xl transition-all active:scale-95 ${
