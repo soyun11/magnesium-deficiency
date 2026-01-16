@@ -38,7 +38,7 @@ public class ScoreService {
         Score score = Score.builder()
                 .user(user)
                 .song(song)
-                .scoreValue(request.getScore())
+                .score(request.getScore())
                 .combo(request.getCombo())
                 .grade(request.getGrade())
                 .build();
@@ -51,7 +51,7 @@ public class ScoreService {
     @Transactional(readOnly = true)
     public List<RankingResponse> getRanking(Long songId) {
         // DB에서 점수 높은 순으로 10개 가져오기
-        List<Score> scores = scoreRepository.findTop10BySongIdOrderByScoreValueDesc(songId);
+        List<Score> scores = scoreRepository.findBySongIdOrderByScoreDesc(songId);
 
         // 랭킹 번호표 붙여서 내보내기
         List<RankingResponse> responseList = new ArrayList<>();
