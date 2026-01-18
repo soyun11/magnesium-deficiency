@@ -1,49 +1,51 @@
 package com.facebeat.service;
 
-import com.facebeat.dto.request.LoginRequest; // 로그인 요청 DTO (아이디, 비번)
-import com.facebeat.dto.request.SignupRequest; // 회원가입 요청 DTO (아이디, 비번)
+import com.facebeat.dto.request.SignupRequest; // (회원가입용 DTO 필요 시)
 import com.facebeat.entity.User;
 import com.facebeat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder; // 이거 임포트!
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // final 붙은 필드만 생성자 자동 생성 (Autowired 대체)
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder; // ▼ [핵심] 암호화 기계 주입받기
+    private final PasswordEncoder passwordEncoder; // 암호화 기계
 
-    // 1. 회원가입 (암호화해서 저장)
+    // 1. 회원가입 (비밀번호 암호화 후 저장)
     @Transactional
     public void signup(SignupRequest request) {
-        // 중복 체크 등 로직 생략...
+        // 이미 있는 ID인지 확인
+        if (userRepository.findByUserId(request.getUserId()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+        }
 
-        // ▼ [핵심 1] 비밀번호를 암호화(Encoding) 한다!
-        // 입력: "1234" -> 출력: "$2a$10$DkLx..."
+        // 비밀번호 암호화 ("1234" -> "$2a$10$Of...")
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        // 암호화된 비밀번호로 유저 생성
-        User user = new User(request.getUsername(), encodedPassword);
+        // User 객체 생성 (아이디, 이름, 암호화된비번)
+        User user = new User(request.getUserId(), request.getUsername(), encodedPassword);
         
         userRepository.save(user);
     }
 
-    // 2. 로그인 (암호화된 것과 비교)
+    // 2. 로그인 (암호화된 비번 비교 & User 객체 반환)
     @Transactional(readOnly = true)
-    public void login(LoginRequest request) {
-        // 1. 아이디로 유저 찾기 (없으면 에러)
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("없는 아이디입니다."));
+    public User login(String userId, String password) {
+        // 1. 아이디(userId)로 찾기
+        User user = userRepository.findByUserId(userId)
+                .orElse(null); // 없으면 null
 
-        // 2. ▼ [핵심 2] 비밀번호 비교 (Matching)
-        // passwordEncoder.matches(입력한_쌩_비번, DB에_있는_암호화_비번)
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 틀렸습니다!");
+        // 2. 유저가 있고 + 비밀번호가 맞는지(matches) 확인
+        // matches(입력받은_쌩_비번, DB의_암호화_비번)
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            return user; // 성공 시 유저 정보 반환 (Controller가 써야 하니까!)
         }
 
-        // 통과하면 로그인 성공! (나중엔 여기서 토큰 발급 등을 함)
+        // 실패 시 null 반환
+        return null;
     }
 }
