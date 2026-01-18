@@ -7,6 +7,7 @@ import SongSelection from './pages/SongSelection';
 import Tutorial from './pages/Tutorial';
 import RhythmGame from './pages/RhythmGame';
 import Ranking from './pages/Ranking';
+import Settings from './pages/setting';
 // 나머지 10여 개의 페이지들도 여기서 import 합니다.
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/select" element={<SongSelection />} />
         <Route path="/tutorial" element={<Tutorial />} />
         <Route path="/RhythmGame" element={<RhythmGame />} />
+        <Route path="/Settings" element={<Settings />} />
         {/* <Route path="/game" element={<GamePlay />} /> */}
       </Routes>
     </Router>
