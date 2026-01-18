@@ -116,7 +116,7 @@ const SongSelection = () => {
         <div className="flex gap-6 text-sm text-gray-500 font-bold">
           <button onClick={() => navigate('/Home')} className="hover:text-black">홈</button>
           <button onClick={() => navigate('/Ranking')} className="hover:text-black">랭킹</button>
-          <span className="cursor-default">설정</span>
+          <button onClick={() => navigate('/Settings')} className="hover:text-black">설정</button>
         </div>
       </header>
       
