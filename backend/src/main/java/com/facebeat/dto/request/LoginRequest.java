@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class LoginRequest {
-    private String username;
+    private String user_id;
     private String password;
 
-    public String getUsername() { return username; }
+    public String getUserId() { return user_id; }
     public String getPassword() { return password; }
 }
