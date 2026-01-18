@@ -1,5 +1,3 @@
-/* RhythmGame.css */
-
 .game-container {
   position: relative;
   width: 100vw;
@@ -33,8 +31,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative;
+  position: relative; /* 자식인 note-stream의 기준 */
   transition: background 0.15s ease-in-out;
+  overflow: hidden;
 }
 
 .lane.active { 
@@ -51,7 +50,40 @@
 .lane.neutral { --lane-color: rgba(255, 255, 255, 0.5); }
 .lane.surprised { --lane-color: rgba(156, 39, 176, 0.45); }
 
-.target-emoji { font-size: 4.5rem; margin-top: 50px; z-index: 20; }
+.target-emoji { font-size: 4.5rem; margin-top: 50px; z-index: 20; position: relative; }
+
+/* 노드가 지나가는 길 - 레인 전체를 채워야 함 */
+.note-stream {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.note-emoji.rising {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 4.5rem;
+  z-index: 15;
+  animation-name: moveUpSmooth;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+/* 판정된 이모지는 자연스럽게 사라짐 */
+.note-emoji.rising.judged {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* 아래에서 위 타겟까지 올라가는 애니메이션 */
+@keyframes moveUpSmooth {
+  from { bottom: -10%; }
+  to { bottom: 100%; } /* 타겟 이모지 위치를 지나 화면 끝까지 */
+}
 
 .ui-layer {
   position: absolute;
@@ -60,7 +92,6 @@
   pointer-events: none;
 }
 
-/* 귀여운 점수 캡슐 (중앙 정렬 고정) */
 .score-capsule {
   position: absolute;
   bottom: 40px;
@@ -74,7 +105,6 @@
   border-radius: 999px;
   border: 4px solid #F8C4B4;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-  pointer-events: auto;
   animation: scoreBounce 2s ease-in-out infinite;
 }
 
@@ -100,35 +130,12 @@
 .judgement-display.good { color: #33ccff; }
 .judgement-display.miss { color: #ff3333; }
 
-/* 결과 점수 및 GPU 가속 */
 .final-score-text {
   font-size: 10rem;
   font-weight: 900;
   color: #F8C4B4;
   text-shadow: 0 0 50px rgba(248, 196, 180, 0.5);
   margin-bottom: 50px;
-  transform: translate3d(0,0,0);
-  will-change: transform;
-}
-
-.final-score-text.counting { transform: scale(1.1) translate3d(0,0,0); }
-
-/* 동적 속도가 적용될 노트 애니메이션 */
-.note-emoji.rising {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 4.5rem;
-  z-index: 15;
-  animation-name: moveUpSmooth;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-
-@keyframes moveUpSmooth {
-  from { transform: translateX(-50%) translateY(100px); }
-  to { transform: translateX(-50%) translateY(-110vh); }
 }
 
 .time-limit-bar {
@@ -137,6 +144,7 @@
   left: 0;
   height: 8px;
   background: #F8C4B4;
+  z-index: 300;
   animation: timerShrink 30s linear forwards;
 }
 
@@ -154,9 +162,7 @@
   z-index: 200;
 }
 
-.menu-btn { padding: 15px 45px; font-size: 1.3rem; font-weight: 800; border: none; border-radius: 50px; cursor: pointer; transition: 0.2s; }
+.menu-btn { padding: 15px 45px; font-size: 1.3rem; font-weight: 800; border: none; border-radius: 50px; cursor: pointer; transition: 0.2s; margin: 10px; }
 .menu-btn.start, .menu-btn.retry { background: #F8C4B4; color: white; }
 .menu-btn.home { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid white; }
 .menu-btn:hover { transform: scale(1.1); }
-
-.song-info-text { font-size: 1.2rem; color: #00ff00; margin-bottom: 30px; font-weight: bold; }
