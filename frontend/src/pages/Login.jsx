@@ -15,19 +15,38 @@ const Login = () => {
       return;
     }
 
+    // 관리자 계정인지 확인 (admin123인 경우 관리자 API 호출)
+    const isAdmin = userId === 'admin123';
+    const API_URL = isAdmin 
+      ? 'http://localhost:8080/api/admin/login' 
+      : 'http://localhost:8080/api/users/login';
+
     try {
-      const response = await fetch('http://localhost:8080/api/users/login', {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, password }),
+        // 관리자 DTO는 'id'를 사용하고 일반 유저는 'userId'를 사용하는 경우에 대비한 처리
+        body: JSON.stringify(isAdmin ? { id: userId, password } : { userId, password }),
       });
 
       if (response.ok) {
         const userData = await response.json();
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userId', userData.userId);
-        alert(`${userData.userId}님, 환영합니다!`);
-        navigate('/Home');
+        
+        if (isAdmin) {
+          // 관리자 로그인 성공 시
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userRole', 'ADMIN'); // 관리자 권한 저장
+          localStorage.setItem('userId', userId);
+          alert("관리자님, 환영합니다!");
+          navigate('/AdminDashboard'); // 관리자 전용 페이지로 이동
+        } else {
+          // 일반 사용자 로그인 성공 시
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userRole', 'USER');
+          localStorage.setItem('userId', userData.userId);
+          alert(`${userData.userId}님, 환영합니다!`);
+          navigate('/Home');
+        }
       } else {
         const errorData = await response.text();
         alert(errorData || '아이디 또는 비밀번호가 일치하지 않습니다.');
@@ -62,7 +81,7 @@ const Login = () => {
           <div className="input-wrapper">
             <label className="field-label">PASSWORD</label>
             <input 
-              type="password"
+              type="password" 
               value={password}
               onChange={(e) => validRegex.test(e.target.value) && setPassword(e.target.value)}
               placeholder="비밀번호를 입력하세요"
