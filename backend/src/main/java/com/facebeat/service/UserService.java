@@ -46,19 +46,4 @@ public class UserService {
 
         // 통과하면 로그인 성공! (나중엔 여기서 토큰 발급 등을 함)
     }
-
-
-    public User login(String userId, String password) {
-        // 1. DB에서 userId(username)로 사용자 조회
-        User user = userRepository.findByUsername(userId)
-                .orElse(null);
-
-        // 2. 사용자가 없거나 비밀번호가 틀리면 null 반환
-        // 실제 서비스에서는 BCryptPasswordEncoder 등을 사용하여 암호화 비교를 해야 합니다.
-        if (user != null && user.getPassword().equals(password)) {
-            return user;
-        }
-
-        return null;
-    }
 }

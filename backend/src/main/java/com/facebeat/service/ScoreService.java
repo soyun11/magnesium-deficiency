@@ -50,7 +50,7 @@ public class ScoreService {
     // 2. 랭킹 조회하기
     @Transactional(readOnly = true)
     public List<RankingResponse> getRanking(Long songId) {
-        // DB에서 점수 높은 순으로 10개 가져오기
+        // DB에서 점수 모두 가져오기
         List<Score> scores = scoreRepository.findBySongIdOrderByScoreDesc(songId);
 
         // 랭킹 번호표 붙여서 내보내기
