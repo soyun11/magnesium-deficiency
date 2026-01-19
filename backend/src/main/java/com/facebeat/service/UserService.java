@@ -34,7 +34,8 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         // User 엔티티 생성 및 저장
-        User user = new User(request.getUserId(), request.getUsername(), encodedPassword);
+        // UserId = UserName
+        User user = new User(request.getUserId(), request.getUserId(), encodedPassword);
         userRepository.save(user);
     }
 
