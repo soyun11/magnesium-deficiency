@@ -14,21 +14,21 @@ const EMOTION_CONFIG = {
 const EMOTIONS = Object.keys(EMOTION_CONFIG);
 const EMOJI_MAP = { happy: '😊', sad: '😭', angry: '😡', neutral: '😐', surprised: '😮' };
 const BACKEND_URL = 'http://localhost:8080';
-const GAME_LIMIT_MS = 30000; 
 
 const RhythmGame = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
   // 1. 상태 관리
-  const [gameState, setGameState] = useState('ready'); 
+  const [gameState, setGameState] = useState('ready'); // ready, playing, paused, finished
   const [currentEmotion, setCurrentEmotion] = useState('neutral');
   const [notes, setNotes] = useState([]); 
   const [score, setScore] = useState(0);
   const [judgement, setJudgement] = useState(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [progress, setProgress] = useState(100);
 
-  // 2. 타이머 및 외부 객체 관리 (Ref 사용으로 리렌더링 방지)
+  // 2. 타이머 및 외부 객체 관리
   const videoRef = useRef(null);
   const audioRef = useRef(new Audio()); 
   const gameLoopRef = useRef(null);
@@ -37,7 +37,7 @@ const RhythmGame = () => {
   const latestExpressionsRef = useRef({});
   const isDetecting = useRef(false);
 
-  // 3. 노래 데이터 처리 (Memoization)
+  // 3. 노래 데이터 처리
   const selectedSong = useMemo(() => location.state?.song || { 
     title: "기본 곡", artist: "Artist", bpm: 120, difficulty: 2, file_path: "song_30s.mp3" 
   }, [location.state]);
@@ -59,11 +59,12 @@ const RhythmGame = () => {
     gameLoopRef.current = null;
     noteTimeoutRef.current = null;
     audioRef.current.pause();
-    audioRef.current.currentTime = 0;
   }, []);
 
   const spawnNote = useCallback(() => {
-    // 타이머 콜백 안에서 최신 상태를 알 수 없으므로 Ref나 Functional Update 사용
+    // 일시정지 상태면 노트를 생성하지 않음
+    if (gameState !== 'playing') return;
+
     const randomEm = EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)];
     const now = Date.now();
     
@@ -76,9 +77,9 @@ const RhythmGame = () => {
 
     const nextDelay = Math.random() * (settings.spawnRange[1] - settings.spawnRange[0]) + settings.spawnRange[0];
     noteTimeoutRef.current = setTimeout(spawnNote, nextDelay);
-  }, [settings]);
+  }, [gameState, settings]);
 
-  // 5. 초기 초기화 (한 번만 실행)
+  // 5. 초기 모델 초기화
   useEffect(() => {
     const initFaceApi = async () => {
       try {
@@ -104,10 +105,10 @@ const RhythmGame = () => {
       const expressions = detections[0].expressions;
       latestExpressionsRef.current = expressions;
       let bestEmotion = 'neutral';
-      let maxVal = -1;
+      let maxScore = -1;
       EMOTIONS.forEach(em => {
         const weighted = (expressions[em] || 0) * EMOTION_CONFIG[em].weight;
-        if (weighted > maxVal) { maxVal = weighted; bestEmotion = em; }
+        if (weighted > maxScore) { maxScore = weighted; bestEmotion = em; }
       });
       setCurrentEmotion(bestEmotion); 
     }
@@ -115,12 +116,17 @@ const RhythmGame = () => {
     requestAnimationFrame(detectExpressions);
   }, []);
 
-  // 7. 게임 엔진 (오류의 주범이었던 부분 수정)
+  // 7. 게임 엔진 제어 (일시정지 로직 통합)
   useEffect(() => {
-    // 의존성 배열의 크기를 항상 1([gameState])로 고정
     if (gameState === 'playing') {
       gameLoopRef.current = setInterval(() => {
         const now = Date.now();
+        
+        if (audioRef.current.duration) {
+          const currentProgress = ((audioRef.current.duration - audioRef.current.currentTime) / audioRef.current.duration) * 100;
+          setProgress(Math.max(0, currentProgress));
+        }
+
         setNotes(prev => prev.map(note => {
           if (!note.judged && now >= note.hitTime) {
             const rawProb = latestExpressionsRef.current[note.emotion] || 0;
@@ -138,7 +144,9 @@ const RhythmGame = () => {
       }, 16);
       spawnNote();
     } else {
-      stopAllTimers();
+      // playing 상태가 아니면 타이머 제거 (일시정지 포함)
+      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
+      if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
     }
     return () => {
       if (gameLoopRef.current) clearInterval(gameLoopRef.current);
@@ -146,26 +154,42 @@ const RhythmGame = () => {
     };
   }, [gameState, spawnNote, stopAllTimers]);
 
-  // 8. 게임 시작 함수 (사용자 클릭 직결)
+  // 8. 제어 함수들
   const startGame = () => {
     const audio = audioRef.current;
     const cleanPath = selectedSong.file_path.startsWith('/') ? selectedSong.file_path.substring(1) : selectedSong.file_path;
     audio.src = `${BACKEND_URL}/${cleanPath}`;
     audio.crossOrigin = "anonymous";
 
-    // 클릭 이벤트 '즉시' 실행하여 브라우저 차단 우회
-    audio.play()
-      .then(() => {
-        setNotes([]);
-        setScore(0);
-        setGameState('playing');
-        audio.onended = () => setGameState('finished');
-        endTimerRef.current = setTimeout(() => setGameState('finished'), GAME_LIMIT_MS);
-      })
-      .catch(err => {
-        console.error("Play Error:", err);
-        alert("오디오 재생 실패. 다시 시도해주세요.");
-      });
+    audio.play().then(() => {
+      setNotes([]);
+      setScore(0);
+      setGameState('playing');
+      audio.onended = () => { setGameState('finished'); stopAllTimers(); };
+    }).catch(err => { alert("오디오 재생 실패"); });
+  };
+
+  const pauseGame = () => {
+    if (gameState !== 'playing') return;
+    setGameState('paused');
+    audioRef.current.pause(); // 음악 중지
+  };
+
+  const resumeGame = () => {
+    if (gameState !== 'paused') return;
+    audioRef.current.play().then(() => {
+      setGameState('playing'); // 엔진 자동 재시작
+    });
+  };
+
+  const restartGame = () => {
+    stopAllTimers();
+    startGame();
+  };
+
+  const goToSongSelection = () => {
+    stopAllTimers();
+    navigate('/select'); // 노래 선택 페이지 경로에 맞게 수정
   };
 
   return (
@@ -173,6 +197,14 @@ const RhythmGame = () => {
       {!isModelLoaded && <div className="loading-overlay">모델 로딩 중...</div>}
       <video ref={videoRef} autoPlay playsInline muted onPlay={() => requestAnimationFrame(detectExpressions)} className="webcam-bg" />
       
+      {/* 상단 시간바 */}
+      {(gameState === 'playing' || gameState === 'paused') && (
+        <div className="progress-bar-container">
+          <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+        </div>
+      )}
+
+      {/* 게임 대기 화면 */}
       {gameState === 'ready' && (
         <div className="overlay-screen">
           <h1 className="game-title">Emotion Rhythm</h1>
@@ -184,6 +216,19 @@ const RhythmGame = () => {
         </div>
       )}
 
+      {/* [신규] 일시정지 오버레이 메뉴 */}
+      {gameState === 'paused' && (
+        <div className="overlay-screen pause-menu">
+          <h1 className="menu-title">PAUSED</h1>
+          <div className="button-group">
+            <button className="menu-btn resume" onClick={resumeGame}>이어서 하기</button>
+            <button className="menu-btn restart" onClick={restartGame}>다시 하기</button>
+            <button className="menu-btn select" onClick={goToSongSelection}>곡 선택하러 가기</button>
+          </div>
+        </div>
+      )}
+
+      {/* 결과 화면 */}
       {gameState === 'finished' && (
         <div className="overlay-screen result-screen">
           <h1 className="final-score-text">{score}</h1>
@@ -191,21 +236,32 @@ const RhythmGame = () => {
         </div>
       )}
 
-      {(gameState === 'playing' || gameState === 'ready') && (
-        <div className="lane-container">
-          {EMOTIONS.map((emotion) => (
-            <div key={emotion} className={`lane ${emotion} ${currentEmotion === emotion ? 'active' : 'inactive'}`}>
-              <div className="target-emoji">{EMOJI_MAP[emotion]}</div>
-              <div className="note-stream">
-                {notes.filter(n => n.emotion === emotion && !n.judged).map(note => (
-                  <div key={note.id} className="note-emoji rising" style={{ animationDuration: `${settings.hitTiming}ms` }}>
-                    {EMOJI_MAP[note.emotion]}
-                  </div>
-                ))}
+      {/* 인게임 요소 */}
+      {(gameState === 'playing' || gameState === 'paused' || gameState === 'ready') && (
+        <>
+          {gameState === 'playing' && (
+            <button className="pause-icon-btn" onClick={pauseGame}>❚❚</button>
+          )}
+          
+          <div className="lane-container">
+            {EMOTIONS.map((emotion) => (
+              <div key={emotion} className={`lane ${emotion} ${currentEmotion === emotion ? 'active' : 'inactive'}`}>
+                <div className="target-emoji">{EMOJI_MAP[emotion]}</div>
+                <div className="note-stream">
+                  {notes.filter(n => n.emotion === emotion && !n.judged).map(note => (
+                    <div 
+                      key={note.id} 
+                      className={`note-emoji rising ${gameState === 'paused' ? 'paused' : ''}`} 
+                      style={{ animationDuration: `${settings.hitTiming}ms` }}
+                    >
+                      {EMOJI_MAP[note.emotion]}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
 
       {gameState === 'playing' && (

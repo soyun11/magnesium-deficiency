@@ -150,7 +150,7 @@
 
 @keyframes timerShrink { from { width: 100%; } to { width: 0%; } }
 
-.loading-overlay, .overlay-screen {
+.overlay-screen {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.9);
@@ -162,6 +162,91 @@
   z-index: 200;
 }
 
+/* 시간바 컨테이너 */
+.progress-bar-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px; /* 바의 두께 */
+  background: rgba(255, 255, 255, 0.2); /* 배경 트랙 색상 */
+  z-index: 200; /* 모든 요소 위에 표시 */
+}
+
+/* 실제 줄어드는 바 */
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff7e5f, #feb47b); /* 예쁜 그라데이션 */
+  box-shadow: 0 0 10px rgba(255, 126, 95, 0.8);
+  transition: width 0.1s linear; /* 부드럽게 움직이게 함 */
+}
+
+/* 기존 스타일들... */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: black;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 300;
+}
+
+/* 일시정지 아이콘 버튼 (플레이 중 우측 상단) */
+.pause-icon-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 150;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.pause-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+
+/* 일시정지 메뉴 오버레이 */
+.pause-menu {
+  background: rgba(0, 0, 0, 0.85) !important;
+}
+
+.menu-title {
+  font-size: 4rem;
+  color: #F8C4B4;
+  margin-bottom: 40px;
+  letter-spacing: 5px;
+  text-shadow: 0 0 15px rgba(248, 196, 180, 0.5);
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 300px;
+}
+
+/* 일시정지 시 노트 애니메이션 멈춤 */
+.note-emoji.paused {
+  animation-play-state: paused !important;
+}
+
+/* PAUSE 전용 버튼 스타일링 */
+.menu-btn.resume { background: #4CAF50; color: white; }
+.menu-btn.restart { background: #FF9800; color: white; }
+.menu-btn.select { background: #2196F3; color: white; }
 .menu-btn { padding: 15px 45px; font-size: 1.3rem; font-weight: 800; border: none; border-radius: 50px; cursor: pointer; transition: 0.2s; margin: 10px; }
 .menu-btn.start, .menu-btn.retry { background: #F8C4B4; color: white; }
 .menu-btn.home { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid white; }
