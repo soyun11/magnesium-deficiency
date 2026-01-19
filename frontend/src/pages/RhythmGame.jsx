@@ -171,13 +171,14 @@ const RhythmGame = () => {
     setScore(0);
     setJudgement(null);
 
+
     const songUrl = selectedSong.file_path.startsWith('http') 
       ? selectedSong.file_path 
       : `${BACKEND_URL}${selectedSong.file_path.startsWith('/') ? '' : '/'}${selectedSong.file_path}`;
 
     const audio = audioRef.current;
     audio.src = songUrl;
-    audio.volume = 1.0; 
+    audio.volume = 1.0;
     
     try {
       console.log("🎵 오디오 로드 및 재생 시도 중...");

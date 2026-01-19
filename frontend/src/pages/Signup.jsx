@@ -48,15 +48,19 @@ const Signup = () => {
     }
     try {
       const response = await fetch(`http://localhost:8080/api/users/check-id?userId=${userId}`);
-      const isDuplicate = await response.json();
-      if (isDuplicate) {
-        alert('이미 사용 중인 아이디입니다.');
+      if (response.ok) {
+        // 상태 코드 200 (OK)
+        alert("사용 가능한 아이디입니다! (Available)");
+        setIsIdAvailable(true);
+        setIsIdChecked(true);
+      } else if (response.status === 409) {
+        // 🔥 상태 코드 409 (지금 보시는 화면)
+        alert("이미 존재하는 아이디입니다. 다른 걸 써주세요.");
         setIsIdAvailable(false);
       } else {
-        alert('사용 가능합니다!');
-        setIsIdAvailable(true);
+        // 그 외 진짜 에러
+        alert("서버 오류가 발생했습니다.");
       }
-      setIsIdChecked(true);
     } catch (error) {
       alert('통신 오류');
     }
