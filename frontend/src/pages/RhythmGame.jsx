@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import * as faceapi from 'face-api.js';
 import './RhythmGame.css';
 
+// 설정 상수
 const EMOTION_CONFIG = {
   neutral:   { weight: 6.0, perfect: 0.90, good: 0.50 }, 
   happy:     { weight: 1.5, perfect: 0.80, good: 0.45 }, 
@@ -10,7 +11,6 @@ const EMOTION_CONFIG = {
   angry:     { weight: 1.6, perfect: 0.60, good: 0.30 }, 
   sad:       { weight: 0.5, perfect: 0.55, good: 0.25 }  
 };
-
 const EMOTIONS = Object.keys(EMOTION_CONFIG);
 const EMOJI_MAP = { happy: '😊', sad: '😭', angry: '😡', neutral: '😐', surprised: '😮' };
 const BACKEND_URL = 'http://localhost:8080';
@@ -20,20 +20,7 @@ const RhythmGame = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const selectedSong = useMemo(() => location.state?.song || { 
-    title: "기본 곡", artist: "Artist", bpm: 120, difficulty: 2, file_path: "song_30s.mp3" 
-  }, [location.state]);
-
-  const settings = useMemo(() => {
-    const bpm = selectedSong.bpm || 120;
-    const diffLabel = (selectedSong.difficulty === 1 || selectedSong.difficulty === 'Easy') ? "EASY" : 
-                      (selectedSong.difficulty === 3 || selectedSong.difficulty === 'Hard') ? "HARD" : "NORMAL";
-    let baseTiming = (60000 / bpm) * 4; 
-    const config = { 'EASY': 1.5, 'NORMAL': 1.0, 'HARD': 0.7 }[diffLabel];
-    const spawn = { 'EASY': [2000, 3000], 'NORMAL': [1000, 2000], 'HARD': [600, 1200] }[diffLabel];
-    return { hitTiming: baseTiming * config, spawnRange: spawn, label: diffLabel };
-  }, [selectedSong]);
-
+  // 1. 상태 관리
   const [gameState, setGameState] = useState('ready'); 
   const [currentEmotion, setCurrentEmotion] = useState('neutral');
   const [notes, setNotes] = useState([]); 
@@ -41,20 +28,59 @@ const RhythmGame = () => {
   const [judgement, setJudgement] = useState(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
 
+  // 2. 타이머 및 외부 객체 관리 (Ref 사용으로 리렌더링 방지)
   const videoRef = useRef(null);
-  const audioRef = useRef(null); // JSX의 <audio> 태그 참조
-  const isDetecting = useRef(false);
-  const latestExpressionsRef = useRef({});
+  const audioRef = useRef(new Audio()); 
   const gameLoopRef = useRef(null);
   const noteTimeoutRef = useRef(null);
   const endTimerRef = useRef(null);
-  const gameStateRef = useRef('ready');
+  const latestExpressionsRef = useRef({});
+  const isDetecting = useRef(false);
 
-  useEffect(() => { gameStateRef.current = gameState; }, [gameState]);
+  // 3. 노래 데이터 처리 (Memoization)
+  const selectedSong = useMemo(() => location.state?.song || { 
+    title: "기본 곡", artist: "Artist", bpm: 120, difficulty: 2, file_path: "song_30s.mp3" 
+  }, [location.state]);
 
-  // 1. 모델 초기화
+  const settings = useMemo(() => {
+    const bpm = selectedSong.bpm || 120;
+    const diff = selectedSong.difficulty;
+    const diffLabel = (diff === 1 || diff === 'Easy') ? "EASY" : (diff === 3 || diff === 'Hard') ? "HARD" : "NORMAL";
+    let baseTiming = (60000 / bpm) * 4; 
+    const config = { 'EASY': 1.5, 'NORMAL': 1.0, 'HARD': 0.7 }[diffLabel];
+    return { hitTiming: baseTiming * config, spawnRange: [1000, 2000] };
+  }, [selectedSong]);
+
+  // 4. 기능 함수들
+  const stopAllTimers = useCallback(() => {
+    if (gameLoopRef.current) clearInterval(gameLoopRef.current);
+    if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
+    if (endTimerRef.current) clearTimeout(endTimerRef.current);
+    gameLoopRef.current = null;
+    noteTimeoutRef.current = null;
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+  }, []);
+
+  const spawnNote = useCallback(() => {
+    // 타이머 콜백 안에서 최신 상태를 알 수 없으므로 Ref나 Functional Update 사용
+    const randomEm = EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)];
+    const now = Date.now();
+    
+    setNotes(prev => [...prev, { 
+      id: `${now}-${Math.random()}`, 
+      emotion: randomEm, 
+      hitTime: now + settings.hitTiming, 
+      judged: false 
+    }]);
+
+    const nextDelay = Math.random() * (settings.spawnRange[1] - settings.spawnRange[0]) + settings.spawnRange[0];
+    noteTimeoutRef.current = setTimeout(spawnNote, nextDelay);
+  }, [settings]);
+
+  // 5. 초기 초기화 (한 번만 실행)
   useEffect(() => {
-    const init = async () => {
+    const initFaceApi = async () => {
       try {
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
@@ -65,10 +91,11 @@ const RhythmGame = () => {
         if (videoRef.current) videoRef.current.srcObject = stream;
       } catch (err) { console.error("Init Error:", err); }
     };
-    init();
-    return () => stopGame();
-  }, []);
+    initFaceApi();
+    return () => stopAllTimers();
+  }, [stopAllTimers]);
 
+  // 6. 감정 감지 루프
   const detectExpressions = useCallback(async () => {
     if (!videoRef.current || videoRef.current.paused || isDetecting.current) return;
     isDetecting.current = true;
@@ -88,32 +115,9 @@ const RhythmGame = () => {
     requestAnimationFrame(detectExpressions);
   }, []);
 
-  const stopGame = useCallback(() => {
-    if (gameLoopRef.current) clearInterval(gameLoopRef.current);
-    if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
-    if (endTimerRef.current) clearTimeout(endTimerRef.current);
-    gameLoopRef.current = null;
-    noteTimeoutRef.current = null;
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  }, []);
-
-  // 2. 노트 생성 로직 (단일 루프 보장)
-  const scheduleNextNote = useCallback(() => {
-    if (gameStateRef.current !== 'playing') return;
-    const randomEm = EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)];
-    const now = Date.now();
-    setNotes(prev => [...prev, { 
-      id: `${now}-${Math.random()}`, emotion: randomEm, hitTime: now + settings.hitTiming, judged: false 
-    }]);
-    const nextDelay = Math.random() * (settings.spawnRange[1] - settings.spawnRange[0]) + settings.spawnRange[0];
-    noteTimeoutRef.current = setTimeout(scheduleNextNote, nextDelay); 
-  }, [settings]);
-
-  // 3. 게임 루프 (중복 방지를 위해 cleanup 철저히 수행)
+  // 7. 게임 엔진 (오류의 주범이었던 부분 수정)
   useEffect(() => {
+    // 의존성 배열의 크기를 항상 1([gameState])로 고정
     if (gameState === 'playing') {
       gameLoopRef.current = setInterval(() => {
         const now = Date.now();
@@ -132,66 +136,41 @@ const RhythmGame = () => {
           return note;
         }).filter(note => now < note.hitTime + 1000));
       }, 16);
-      scheduleNextNote();
+      spawnNote();
+    } else {
+      stopAllTimers();
     }
     return () => {
       if (gameLoopRef.current) clearInterval(gameLoopRef.current);
       if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
     };
-  }, [gameState, scheduleNextNote]);
+  }, [gameState, spawnNote, stopAllTimers]);
 
-  // ★ [해결 포인트] 자동 재생 차단을 뚫기 위한 동기 재생 함수
+  // 8. 게임 시작 함수 (사용자 클릭 직결)
   const startGame = () => {
     const audio = audioRef.current;
-    if (!audio) return;
+    const cleanPath = selectedSong.file_path.startsWith('/') ? selectedSong.file_path.substring(1) : selectedSong.file_path;
+    audio.src = `${BACKEND_URL}/${cleanPath}`;
+    audio.crossOrigin = "anonymous";
 
-    // 1. 클릭하자마자 바로 재생 명령 (브라우저 정책 통과 핵심)
-    const playPromise = audio.play();
-
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          // 2. 재생이 확실히 시작되면 그 때 리액트 상태를 'playing'으로 변경
-          console.log("재생 성공 - 게임 시작");
-          setNotes([]);
-          setScore(0);
-          setGameState('playing');
-
-          audio.onended = () => {
-            setGameState('finished');
-            stopGame();
-          };
-
-          if (endTimerRef.current) clearTimeout(endTimerRef.current);
-          endTimerRef.current = setTimeout(() => {
-            setGameState('finished');
-            stopGame();
-          }, GAME_LIMIT_MS);
-        })
-        .catch((err) => {
-          console.error("재생 차단됨:", err);
-          alert("재생이 차단되었습니다. 다시 클릭해주세요.");
-        });
-    }
+    // 클릭 이벤트 '즉시' 실행하여 브라우저 차단 우회
+    audio.play()
+      .then(() => {
+        setNotes([]);
+        setScore(0);
+        setGameState('playing');
+        audio.onended = () => setGameState('finished');
+        endTimerRef.current = setTimeout(() => setGameState('finished'), GAME_LIMIT_MS);
+      })
+      .catch(err => {
+        console.error("Play Error:", err);
+        alert("오디오 재생 실패. 다시 시도해주세요.");
+      });
   };
-
-  const songSrc = useMemo(() => {
-    const rawPath = selectedSong.file_path || "song_30s.mp3";
-    const cleanPath = rawPath.startsWith('/') ? rawPath.substring(1) : rawPath;
-    return `${BACKEND_URL}/${cleanPath}`;
-  }, [selectedSong]);
 
   return (
     <div className="game-container">
-      {/* 4. 표준 audio 태그와 CORS 설정 */}
-      <audio 
-        ref={audioRef} 
-        src={songSrc} 
-        preload="auto" 
-        crossOrigin="anonymous" 
-      />
-
-      {!isModelLoaded && <div className="loading-overlay">감정 엔진 보정 중...</div>}
+      {!isModelLoaded && <div className="loading-overlay">모델 로딩 중...</div>}
       <video ref={videoRef} autoPlay playsInline muted onPlay={() => requestAnimationFrame(detectExpressions)} className="webcam-bg" />
       
       {gameState === 'ready' && (
@@ -199,18 +178,16 @@ const RhythmGame = () => {
           <h1 className="game-title">Emotion Rhythm</h1>
           <div className="song-detail-box">
              <p className="song-title-text">{selectedSong.title}</p>
-             <p className="song-sub-text">{selectedSong.artist} | {settings.label}</p>
+             <p className="song-sub-text">{selectedSong.artist}</p>
           </div>
-          <button className="menu-btn start" onClick={startGame}>게임 시작</button>
+          <button className="menu-btn start" onClick={startGame}>START</button>
         </div>
       )}
 
       {gameState === 'finished' && (
         <div className="overlay-screen result-screen">
-          <h2 className="result-label">FINAL SCORE</h2>
           <h1 className="final-score-text">{score}</h1>
-          <button className="menu-btn retry" onClick={() => setGameState('ready')}>다시 하기</button>
-          <button className="menu-btn home" onClick={() => navigate('/Home')}>메인으로</button>
+          <button className="menu-btn retry" onClick={() => setGameState('ready')}>RETRY</button>
         </div>
       )}
 
@@ -220,12 +197,8 @@ const RhythmGame = () => {
             <div key={emotion} className={`lane ${emotion} ${currentEmotion === emotion ? 'active' : 'inactive'}`}>
               <div className="target-emoji">{EMOJI_MAP[emotion]}</div>
               <div className="note-stream">
-                {notes.filter(n => n.emotion === emotion).map(note => (
-                  <div 
-                    key={note.id} 
-                    className={`note-emoji rising ${note.judged ? 'judged' : ''}`}
-                    style={{ animationDuration: `${settings.hitTiming}ms` }}
-                  >
+                {notes.filter(n => n.emotion === emotion && !n.judged).map(note => (
+                  <div key={note.id} className="note-emoji rising" style={{ animationDuration: `${settings.hitTiming}ms` }}>
                     {EMOJI_MAP[note.emotion]}
                   </div>
                 ))}
