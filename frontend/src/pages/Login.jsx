@@ -7,7 +7,26 @@ const Login = () => {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
 
+  // 기존 허용 정규표현식 (영문, 숫자, 특수문자)
   const validRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+  // 한글 감지 정규표현식
+  const koreanRegex = /[ㄱ-ㅎㅏ-ㅣ가-힣]/;
+
+  // 입력 핸들러 함수
+  const handleInputChange = (e, setter) => {
+    const value = e.target.value;
+
+    // 1. 한글이 포함되어 있는지 먼저 검사
+    if (koreanRegex.test(value)) {
+      alert('한글은 입력할 수 없습니다.');
+      return; // 한글이 있으면 여기서 중단하여 setter를 실행하지 않음
+    }
+
+    // 2. 한글이 없고, 기존 validRegex(특수문자/영문/숫자)를 통과할 때만 상태 업데이트
+    if (value === '' || validRegex.test(value)) {
+      setter(value);
+    }
+  };
 
   const handleLogin = async () => {
     if (!userId || !password) {
@@ -15,7 +34,6 @@ const Login = () => {
       return;
     }
 
-    // 관리자 계정인지 확인 (admin123인 경우 관리자 API 호출)
     const isAdmin = userId === 'admin123';
     const API_URL = isAdmin 
       ? 'http://localhost:8080/api/admin/login' 
@@ -25,7 +43,6 @@ const Login = () => {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // 관리자 DTO는 'id'를 사용하고 일반 유저는 'userId'를 사용하는 경우에 대비한 처리
         body: JSON.stringify(isAdmin ? { id: userId, password } : { userId, password }),
       });
 
@@ -33,14 +50,12 @@ const Login = () => {
         const userData = await response.json();
         
         if (isAdmin) {
-          // 관리자 로그인 성공 시
           localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('userRole', 'ADMIN'); // 관리자 권한 저장
+          localStorage.setItem('userRole', 'ADMIN');
           localStorage.setItem('userId', userId);
           alert("관리자님, 환영합니다!");
-          navigate('/AdminDashboard'); // 관리자 전용 페이지로 이동
+          navigate('/AdminDashboard');
         } else {
-          // 일반 사용자 로그인 성공 시
           localStorage.setItem('isLoggedIn', 'true');
           localStorage.setItem('userRole', 'USER');
           localStorage.setItem('userId', userData.userId);
@@ -72,7 +87,8 @@ const Login = () => {
             <input 
               type="text" 
               value={userId}
-              onChange={(e) => validRegex.test(e.target.value) && setUserId(e.target.value)}
+              // handleInputChange를 사용하도록 수정
+              onChange={(e) => handleInputChange(e, setUserId)}
               placeholder="아이디를 입력하세요"
               className="auth-input"
             />
@@ -83,7 +99,8 @@ const Login = () => {
             <input 
               type="password" 
               value={password}
-              onChange={(e) => validRegex.test(e.target.value) && setPassword(e.target.value)}
+              // handleInputChange를 사용하도록 수정
+              onChange={(e) => handleInputChange(e, setPassword)}
               placeholder="비밀번호를 입력하세요"
               className="auth-input"
             />
