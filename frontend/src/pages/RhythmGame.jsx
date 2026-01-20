@@ -3,11 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import * as faceapi from 'face-api.js';
 import './RhythmGame.css';
 
-<<<<<<< HEAD
-const userId = localStorage.getItem('userId');
-
-=======
->>>>>>> feat/be-signup-soyun
 const EMOTION_CONFIG = {
   neutral:   { weight: 6.0, perfect: 0.90, good: 0.50 }, 
   happy:     { weight: 1.5, perfect: 0.80, good: 0.45 }, 
