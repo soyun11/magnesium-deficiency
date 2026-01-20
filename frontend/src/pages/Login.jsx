@@ -54,12 +54,16 @@ const Login = () => {
           localStorage.setItem('userRole', 'ADMIN');
           localStorage.setItem('userId', userId);
           alert("관리자님, 환영합니다!");
+          // 로그인 성공 시
+          localStorage.setItem('userId', userData.userId);
           navigate('/AdminDashboard');
         } else {
           localStorage.setItem('isLoggedIn', 'true');
           localStorage.setItem('userRole', 'USER');
           localStorage.setItem('userId', userData.userId);
           alert(`${userData.userId}님, 환영합니다!`);
+          // 로그인 성공 시
+          localStorage.setItem('userId', userData.userId);
           navigate('/Home');
         }
       } else {
@@ -69,6 +73,7 @@ const Login = () => {
     } catch (err) {
       console.error('로그인 에러:', err);
       alert('서버 연결 실패');
+      
     }
   };
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+const userId = localStorage.getItem('userId');
 
 const Home = () => {
   const navigate = useNavigate();
@@ -24,9 +25,9 @@ const Home = () => {
     <div className="relative min-h-screen bg-[#FFF9F9] flex flex-col items-center justify-center overflow-hidden">
       
       {/* --- 상단 헤더 (우측 정렬 로직 핵심) --- */}
-      <header className="absolute top-0 left-0 right-0 w-full p-8 flex justify-end items-center z-20">
+      <header className="absolute top-0 left-0 right-0 w-full p-8 flex justify-between items-center z-20">
         {/* 좌측 로고 영역: justify-between에 의해 왼쪽 끝 고정 */}
-
+        <h5 className="font-black text-[#F8C4B4] mb-4 text-center">{userId}</h5>
         {/* 우측 네비게이션 영역: justify-between에 의해 오른쪽 끝 고정 */}
         <nav className="flex gap-8 text-sm text-gray-500 font-bold">
           <button 

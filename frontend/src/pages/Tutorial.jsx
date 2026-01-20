@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Webcam from "react-webcam";
 import { useNavigate } from 'react-router-dom';
 import * as faceapi from 'face-api.js';
+const userId = localStorage.getItem('userId');
 
 const Tutorial = () => {
   const expressionsList = [

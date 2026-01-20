@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+const userId = localStorage.getItem('userId');
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ const Settings = () => {
       {/* 메인 설정 영역 */}
       <main className="flex-1 max-w-2xl mx-auto w-full flex flex-col gap-10">
         <h2 className="text-4xl font-black text-[#333] mb-4 text-center">게임 설정</h2>
+        <h5 className="text-4xl font-black text-[#F8C4B4] mb-4 text-center">{userId}</h5>
 
         {/* 배경 음악 설정 카드 */}
         <section className="bg-gray-50 p-8 rounded-[40px] shadow-sm">

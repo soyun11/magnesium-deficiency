@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+const userId = localStorage.getItem('userId');
 
 const SongSelection = () => {
   const [songs, setSongs] = useState([]);

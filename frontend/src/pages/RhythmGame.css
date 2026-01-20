@@ -1,210 +1,119 @@
+/* 1. 기본 레이아웃 및 배경 */
 .game-container {
   position: relative;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
   background: #000;
-  font-family: 'Pretendard', sans-serif;
-  z-index: 1;
+  overflow: hidden;
+  font-family: 'Pretendard', sans-serif; /* 혹은 굵은 시스템 폰트 */
 }
 
 .webcam-bg {
   position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scaleX(-1);
-  z-index: 2;
-  opacity: 0.5;
+  transform: scaleX(-1); /* 좌우 반전 */
+  opacity: 0.4;
+  z-index: 1;
 }
 
+/* 2. 레인 시스템 */
 .lane-container {
   display: flex;
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   z-index: 10;
+  padding: 0 50px;
 }
 
 .lane {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  position: relative; /* 자식인 note-stream의 기준 */
-  transition: background 0.15s ease-in-out;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+/* 감정별 하이라이트 배경색 */
+.lane.active { opacity: 1; }
+.lane.inactive { opacity: 0.15; }
+
+.lane.happy.active { background: rgba(255, 235, 59, 0.4); }
+.lane.sad.active { background: rgba(33, 150, 243, 0.4); }
+.lane.angry.active { background: rgba(244, 67, 54, 0.4); }
+.lane.neutral.active { background: rgba(255, 255, 255, 0.3); }
+.lane.surprised.active { background: rgba(156, 39, 176, 0.4); }
+
+.target-emoji {
+  font-size: 4rem;
+  margin-top: 80px;
+  text-align: center;
+  filter: drop-shadow(0 0 10px white);
+}
+
+.note-stream {
+  flex: 1;
+  position: relative;
+  width: 100%;
   overflow: hidden;
 }
 
-.lane.active { 
-  background: var(--lane-color); 
-  opacity: 1; 
-  box-shadow: inset 0 0 100px rgba(255, 255, 255, 0.2);
-}
-
-.lane.inactive { background: transparent; opacity: 0.15; }
-
-.lane.happy { --lane-color: rgba(255, 235, 59, 0.45); }
-.lane.sad { --lane-color: rgba(33, 150, 243, 0.45); }
-.lane.angry { --lane-color: rgba(244, 67, 54, 0.5); }
-.lane.neutral { --lane-color: rgba(255, 255, 255, 0.5); }
-.lane.surprised { --lane-color: rgba(156, 39, 176, 0.45); }
-
-.target-emoji { font-size: 4.5rem; margin-top: 50px; z-index: 20; position: relative; }
-
-/* 노드가 지나가는 길 - 레인 전체를 채워야 함 */
-.note-stream {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
+/* 3. 이모지(노트) 및 상승 애니메이션 */
 .note-emoji.rising {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 4.5rem;
-  z-index: 15;
-  animation-name: moveUpSmooth;
+  font-size: 4rem;
+  bottom: -100px;
+  animation-name: moveUp;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
 
-/* 판정된 이모지는 자연스럽게 사라짐 */
-.note-emoji.rising.judged {
-  opacity: 0;
-  transition: opacity 0.2s;
+/* 일시정지 시 애니메이션 멈춤 */
+.note-emoji.paused {
+  animation-play-state: paused !important;
 }
 
-/* 아래에서 위 타겟까지 올라가는 애니메이션 */
-@keyframes moveUpSmooth {
-  from { bottom: -10%; }
-  to { bottom: 100%; } /* 타겟 이모지 위치를 지나 화면 끝까지 */
+@keyframes moveUp {
+  0% { bottom: 0; opacity: 0; }
+  10% { opacity: 1; }
+  100% { bottom: 100%; opacity: 1; }
 }
 
-.ui-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 150;
-  pointer-events: none;
-}
-
-.score-capsule {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: white;
-  padding: 10px 35px;
-  border-radius: 999px;
-  border: 4px solid #F8C4B4;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-  animation: scoreBounce 2s ease-in-out infinite;
-}
-
-@keyframes scoreBounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-10px); }
-}
-
-.score-value { font-size: 2.2rem; font-weight: 900; color: #333; min-width: 60px; text-align: center; }
-.score-label { font-size: 1rem; font-weight: 900; color: #F8C4B4; }
-
-.judgement-display {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 7rem;
-  font-weight: 900;
-  text-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-}
-
-.judgement-display.perfect { color: #ffff33; }
-.judgement-display.good { color: #33ccff; }
-.judgement-display.miss { color: #ff3333; }
-
-.final-score-text {
-  font-size: 10rem;
-  font-weight: 900;
-  color: #F8C4B4;
-  text-shadow: 0 0 50px rgba(248, 196, 180, 0.5);
-  margin-bottom: 50px;
-}
-
-.time-limit-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 8px;
-  background: #F8C4B4;
-  z-index: 300;
-  animation: timerShrink 30s linear forwards;
-}
-
-@keyframes timerShrink { from { width: 100%; } to { width: 0%; } }
-
-.overlay-screen {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 200;
-}
-
-/* 시간바 컨테이너 */
+/* 4. 상단 시간바(Progress Bar) */
 .progress-bar-container {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 8px; /* 바의 두께 */
-  background: rgba(255, 255, 255, 0.2); /* 배경 트랙 색상 */
-  z-index: 200; /* 모든 요소 위에 표시 */
+  height: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 200;
 }
 
-/* 실제 줄어드는 바 */
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #ff7e5f, #feb47b); /* 예쁜 그라데이션 */
-  box-shadow: 0 0 10px rgba(255, 126, 95, 0.8);
-  transition: width 0.1s linear; /* 부드럽게 움직이게 함 */
+  background: linear-gradient(90deg, #F8C4B4, #B4E4F8);
+  box-shadow: 0 0 15px rgba(248, 196, 180, 0.8);
+  transition: width 0.1s linear;
 }
 
-/* 기존 스타일들... */
-.loading-overlay {
-  position: absolute;
-  inset: 0;
-  background: black;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 300;
-}
-
-/* 일시정지 아이콘 버튼 (플레이 중 우측 상단) */
+/* 5. 일시정지 아이콘 버튼 (우측 상단) */
 .pause-icon-btn {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 30px;
+  right: 30px;
   background: rgba(255, 255, 255, 0.2);
-  border: 2px solid white;
+  border: 3px solid white;
   color: white;
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
+  font-weight: 900;
   cursor: pointer;
   z-index: 150;
   display: flex;
@@ -218,36 +127,153 @@
   transform: scale(1.1);
 }
 
-/* 일시정지 메뉴 오버레이 */
-.pause-menu {
-  background: rgba(0, 0, 0, 0.85) !important;
+/* 6. 오버레이 화면 (Ready, Paused, Finished 공통) */
+.overlay-screen {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  color: white;
+  text-align: center;
 }
 
-.menu-title {
-  font-size: 4rem;
+.game-title, .menu-title {
+  font-size: 5rem;
+  font-weight: 900;
   color: #F8C4B4;
-  margin-bottom: 40px;
-  letter-spacing: 5px;
-  text-shadow: 0 0 15px rgba(248, 196, 180, 0.5);
+  margin-bottom: 20px;
+  letter-spacing: -2px;
 }
 
+.song-detail-box {
+  margin-bottom: 40px;
+}
+
+.song-title-text {
+  font-size: 2.5rem;
+  font-weight: 900;
+}
+
+.song-sub-text {
+  font-size: 1.2rem;
+  color: #ccc;
+}
+
+/* 7. 버튼 그룹 및 공통 버튼 스타일 */
 .button-group {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: 300px;
+  width: 350px;
 }
 
-/* 일시정지 시 노트 애니메이션 멈춤 */
-.note-emoji.paused {
-  animation-play-state: paused !important;
+.button-group.horizontal {
+  flex-direction: row !important;
+  justify-content: center;
+  width: auto;
+  min-width: 600px;
+  gap: 30px;
 }
 
-/* PAUSE 전용 버튼 스타일링 */
-.menu-btn.resume { background: #4CAF50; color: white; }
-.menu-btn.restart { background: #FF9800; color: white; }
-.menu-btn.select { background: #2196F3; color: white; }
-.menu-btn { padding: 15px 45px; font-size: 1.3rem; font-weight: 800; border: none; border-radius: 50px; cursor: pointer; transition: 0.2s; margin: 10px; }
-.menu-btn.start, .menu-btn.retry { background: #F8C4B4; color: white; }
-.menu-btn.home { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid white; }
-.menu-btn:hover { transform: scale(1.1); }
+.menu-btn {
+  padding: 20px 40px;
+  font-size: 1.8rem;
+  font-weight: 900;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.menu-btn:hover {
+  transform: translateY(-5px);
+  filter: brightness(1.1);
+}
+
+.menu-btn.start, .menu-btn.resume, .menu-btn.retry {
+  background: #F8C4B4;
+  color: white;
+}
+
+.menu-btn.select {
+  background: #B4E4F8;
+  color: #333;
+}
+
+.menu-btn.restart {
+  background: #eee;
+  color: #333;
+}
+
+/* 8. 판정 및 점수 UI */
+.ui-layer {
+  position: absolute;
+  bottom: 50px;
+  width: 100%;
+  pointer-events: none;
+  z-index: 110;
+}
+
+.score-capsule {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  color: #333;
+  padding: 15px 50px;
+  border-radius: 50px;
+  font-size: 2.5rem;
+  font-weight: 900;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.judgement-display {
+  position: absolute;
+  top: -300px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 7rem;
+  font-weight: 900;
+  font-style: italic;
+  text-shadow: 0 0 20px rgba(0,0,0,0.8);
+}
+
+.judgement-display.perfect { color: #ffff33; }
+.judgement-display.good { color: #33ccff; }
+.judgement-display.miss { color: #ff3333; }
+
+/* 9. 결과 화면 전용 */
+.result-label {
+  font-size: 1.5rem;
+  color: #B4E4F8;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.final-score-text {
+  font-size: 10rem;
+  font-weight: 900;
+  margin-bottom: 60px;
+  text-shadow: 0 0 40px rgba(248, 196, 180, 0.8);
+}
+
+/* 로딩 화면 */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  color: #F8C4B4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: 900;
+  z-index: 1000;
+}
