@@ -1,0 +1,3828 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+backend/.gitattributes
+backend/.gitignore
+backend/build.gradle
+backend/gradle/wrapper/gradle-wrapper.jar
+backend/gradle/wrapper/gradle-wrapper.properties
+backend/gradlew
+backend/gradlew.bat
+backend/settings.gradle
+backend/src/main/java/com/Application.java
+backend/src/main/java/com/facebeat/config/CorsConfig.java
+backend/src/main/java/com/facebeat/config/SecurityConfig.java
+backend/src/main/java/com/facebeat/controller/ScoreController.java
+backend/src/main/java/com/facebeat/controller/SongController.java
+backend/src/main/java/com/facebeat/controller/UserController.java
+backend/src/main/java/com/facebeat/dto/request/AdminLoginRequest.java
+backend/src/main/java/com/facebeat/dto/request/LoginRequest.java
+backend/src/main/java/com/facebeat/dto/request/RegisterRequest.java
+backend/src/main/java/com/facebeat/dto/request/ScoreRequest.java
+backend/src/main/java/com/facebeat/dto/request/SignupRequest.java
+backend/src/main/java/com/facebeat/dto/response/RankingResponse.java
+backend/src/main/java/com/facebeat/dto/response/TokenResponse.java
+backend/src/main/java/com/facebeat/dto/response/UserResponse.java
+backend/src/main/java/com/facebeat/entity/Score.java
+backend/src/main/java/com/facebeat/entity/Song.java
+backend/src/main/java/com/facebeat/entity/SongNote.java
+backend/src/main/java/com/facebeat/entity/User.java
+backend/src/main/java/com/facebeat/repository/ScoreRepository.java
+backend/src/main/java/com/facebeat/repository/SongNoteRepository.java
+backend/src/main/java/com/facebeat/repository/SongRepository.java
+backend/src/main/java/com/facebeat/repository/UserRepository.java
+backend/src/main/java/com/facebeat/service/AuthService.java
+backend/src/main/java/com/facebeat/service/ScoreService.java
+backend/src/main/java/com/facebeat/service/UserService.java
+backend/src/main/java/com/facebeat/util/JwtUtil.java
+backend/src/main/java/com/magnesium/springStarter/DemoApplication.java
+backend/src/main/java/com/magnesium/springStarter/MemberController.java
+backend/src/main/java/com/magnesium/springStarter/WebConfig.java
+backend/src/main/resources/application.properties
+backend/src/main/resources/application.yml
+backend/src/main/resources/db/migration/V1__init.sql
+backend/src/main/resources/db/migration/V2__create_music_table.sql
+backend/src/main/resources/db/migration/V3__insert_music.sql
+backend/src/main/resources/db/migration/V4__add_image_path_to_the_music.sql
+backend/src/main/resources/db/migration/V5__create_score_table.sql
+backend/src/main/resources/db/migration/V6__update_member.sql
+backend/src/main/resources/db/migration/V7__dummy_users.sql
+backend/src/main/resources/db/migration/V8__insert_admin_user.sql
+backend/src/main/resources/static/images/birthday_star.png
+backend/src/main/resources/static/images/combo.png
+backend/src/main/resources/static/images/rock.png
+backend/src/main/resources/static/images/sungsimdang.png
+backend/src/main/resources/static/songs/birthday_star.mp3
+backend/src/main/resources/static/songs/combo.mp3
+backend/src/main/resources/static/songs/rock.mp3
+backend/src/main/resources/static/songs/sungsimdang.mp3
+backend/src/test/java/com/magnesium/springStarter/DemoApplicationTests.java
+frontend/.gitignore
+frontend/eslint.config.js
+frontend/example.tsx
+frontend/index.html
+frontend/package.json
+frontend/postcss.config.js
+frontend/public/models/face_expression_model-shard1
+frontend/public/models/face_expression_model-weights_manifest.json
+frontend/public/models/face_landmark_68_model-shard1
+frontend/public/models/face_landmark_68_model-weights_manifest.json
+frontend/public/models/tiny_face_detector_model-shard1
+frontend/public/models/tiny_face_detector_model-weights_manifest.json
+frontend/public/vite.svg
+frontend/README.md
+frontend/src/App.css
+frontend/src/App.jsx
+frontend/src/assets/react.svg
+frontend/src/index.css
+frontend/src/main.jsx
+frontend/src/pages/AdminDashboard.jsx
+frontend/src/pages/Auth.css
+frontend/src/pages/AuthSelection.jsx
+frontend/src/pages/Home.css
+frontend/src/pages/Home.jsx
+frontend/src/pages/Login.jsx
+frontend/src/pages/Ranking.jsx
+frontend/src/pages/RhythmGame.css
+frontend/src/pages/RhythmGame.jsx
+frontend/src/pages/setting.jsx
+frontend/src/pages/Signup.jsx
+frontend/src/pages/SongSelection.jsx
+frontend/src/pages/Tutorial.jsx
+frontend/tailwind.config.js
+frontend/vite.config.js
+README.md
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="backend/.gitattributes">
+/gradlew text eol=lf
+*.bat text eol=crlf
+*.jar binary
+</file>
+
+<file path="backend/gradle/wrapper/gradle-wrapper.properties">
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-9.2.1-bin.zip
+networkTimeout=10000
+validateDistributionUrl=true
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+</file>
+
+<file path="backend/gradlew">
+#!/bin/sh
+
+#
+# Copyright © 2015 the original authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+##############################################################################
+#
+#   Gradle start up script for POSIX generated by Gradle.
+#
+#   Important for running:
+#
+#   (1) You need a POSIX-compliant shell to run this script. If your /bin/sh is
+#       noncompliant, but you have some other compliant shell such as ksh or
+#       bash, then to run this script, type that shell name before the whole
+#       command line, like:
+#
+#           ksh Gradle
+#
+#       Busybox and similar reduced shells will NOT work, because this script
+#       requires all of these POSIX shell features:
+#         * functions;
+#         * expansions «$var», «${var}», «${var:-default}», «${var+SET}»,
+#           «${var#prefix}», «${var%suffix}», and «$( cmd )»;
+#         * compound commands having a testable exit status, especially «case»;
+#         * various built-in commands including «command», «set», and «ulimit».
+#
+#   Important for patching:
+#
+#   (2) This script targets any POSIX shell, so it avoids extensions provided
+#       by Bash, Ksh, etc; in particular arrays are avoided.
+#
+#       The "traditional" practice of packing multiple parameters into a
+#       space-separated string is a well documented source of bugs and security
+#       problems, so this is (mostly) avoided, by progressively accumulating
+#       options in "$@", and eventually passing that to Java.
+#
+#       Where the inherited environment variables (DEFAULT_JVM_OPTS, JAVA_OPTS,
+#       and GRADLE_OPTS) rely on word-splitting, this is performed explicitly;
+#       see the in-line comments for details.
+#
+#       There are tweaks for specific operating systems such as AIX, CygWin,
+#       Darwin, MinGW, and NonStop.
+#
+#   (3) This script is generated from the Groovy template
+#       https://github.com/gradle/gradle/blob/HEAD/platforms/jvm/plugins-application/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
+#       within the Gradle project.
+#
+#       You can find Gradle at https://github.com/gradle/gradle/.
+#
+##############################################################################
+
+# Attempt to set APP_HOME
+
+# Resolve links: $0 may be a link
+app_path=$0
+
+# Need this for daisy-chained symlinks.
+while
+    APP_HOME=${app_path%"${app_path##*/}"}  # leaves a trailing /; empty if no leading path
+    [ -h "$app_path" ]
+do
+    ls=$( ls -ld "$app_path" )
+    link=${ls#*' -> '}
+    case $link in             #(
+      /*)   app_path=$link ;; #(
+      *)    app_path=$APP_HOME$link ;;
+    esac
+done
+
+# This is normally unused
+# shellcheck disable=SC2034
+APP_BASE_NAME=${0##*/}
+# Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
+APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exit
+
+# Use the maximum available, or set MAX_FD != -1 to use that value.
+MAX_FD=maximum
+
+warn () {
+    echo "$*"
+} >&2
+
+die () {
+    echo
+    echo "$*"
+    echo
+    exit 1
+} >&2
+
+# OS specific support (must be 'true' or 'false').
+cygwin=false
+msys=false
+darwin=false
+nonstop=false
+case "$( uname )" in                #(
+  CYGWIN* )         cygwin=true  ;; #(
+  Darwin* )         darwin=true  ;; #(
+  MSYS* | MINGW* )  msys=true    ;; #(
+  NONSTOP* )        nonstop=true ;;
+esac
+
+
+
+# Determine the Java command to use to start the JVM.
+if [ -n "$JAVA_HOME" ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+        # IBM's JDK on AIX uses strange locations for the executables
+        JAVACMD=$JAVA_HOME/jre/sh/java
+    else
+        JAVACMD=$JAVA_HOME/bin/java
+    fi
+    if [ ! -x "$JAVACMD" ] ; then
+        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
+else
+    JAVACMD=java
+    if ! command -v java >/dev/null 2>&1
+    then
+        die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+
+Please set the JAVA_HOME variable in your environment to match the
+location of your Java installation."
+    fi
+fi
+
+# Increase the maximum file descriptors if we can.
+if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
+    case $MAX_FD in #(
+      max*)
+        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+        MAX_FD=$( ulimit -H -n ) ||
+            warn "Could not query maximum file descriptor limit"
+    esac
+    case $MAX_FD in  #(
+      '' | soft) :;; #(
+      *)
+        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
+        # shellcheck disable=SC2039,SC3045
+        ulimit -n "$MAX_FD" ||
+            warn "Could not set maximum file descriptor limit to $MAX_FD"
+    esac
+fi
+
+# Collect all arguments for the java command, stacking in reverse order:
+#   * args from the command line
+#   * the main class name
+#   * -classpath
+#   * -D...appname settings
+#   * --module-path (only if needed)
+#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and GRADLE_OPTS environment variables.
+
+# For Cygwin or MSYS, switch paths to Windows format before running java
+if "$cygwin" || "$msys" ; then
+    APP_HOME=$( cygpath --path --mixed "$APP_HOME" )
+
+    JAVACMD=$( cygpath --unix "$JAVACMD" )
+
+    # Now convert the arguments - kludge to limit ourselves to /bin/sh
+    for arg do
+        if
+            case $arg in                                #(
+              -*)   false ;;                            # don't mess with options #(
+              /?*)  t=${arg#/} t=/${t%%/*}              # looks like a POSIX filepath
+                    [ -e "$t" ] ;;                      #(
+              *)    false ;;
+            esac
+        then
+            arg=$( cygpath --path --ignore --mixed "$arg" )
+        fi
+        # Roll the args list around exactly as many times as the number of
+        # args, so each arg winds up back in the position where it started, but
+        # possibly modified.
+        #
+        # NB: a `for` loop captures its iteration list before it begins, so
+        # changing the positional parameters here affects neither the number of
+        # iterations, nor the values presented in `arg`.
+        shift                   # remove old arg
+        set -- "$@" "$arg"      # push replacement arg
+    done
+fi
+
+
+# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+
+# Collect all arguments for the java command:
+#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and optsEnvironmentVar are not allowed to contain shell fragments,
+#     and any embedded shellness will be escaped.
+#   * For example: A user cannot expect ${Hostname} to be expanded, as it is an environment variable and will be
+#     treated as '${Hostname}' itself on the command line.
+
+set -- \
+        "-Dorg.gradle.appname=$APP_BASE_NAME" \
+        -jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
+        "$@"
+
+# Stop when "xargs" is not available.
+if ! command -v xargs >/dev/null 2>&1
+then
+    die "xargs is not available"
+fi
+
+# Use "xargs" to parse quoted args.
+#
+# With -n1 it outputs one arg per line, with the quotes and backslashes removed.
+#
+# In Bash we could simply go:
+#
+#   readarray ARGS < <( xargs -n1 <<<"$var" ) &&
+#   set -- "${ARGS[@]}" "$@"
+#
+# but POSIX shell has neither arrays nor command substitution, so instead we
+# post-process each arg (as a line of input to sed) to backslash-escape any
+# character that might be a shell metacharacter, then use eval to reverse
+# that process (while maintaining the separation between arguments), and wrap
+# the whole thing up as a single "set" statement.
+#
+# This will of course break if any of these variables contains a newline or
+# an unmatched quote.
+#
+
+eval "set -- $(
+        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
+        xargs -n1 |
+        sed ' s~[^-[:alnum:]+,./:=@_]~\\&~g; ' |
+        tr '\n' ' '
+    )" '"$@"'
+
+exec "$JAVACMD" "$@"
+</file>
+
+<file path="backend/gradlew.bat">
+@rem
+@rem Copyright 2015 the original author or authors.
+@rem
+@rem Licensed under the Apache License, Version 2.0 (the "License");
+@rem you may not use this file except in compliance with the License.
+@rem You may obtain a copy of the License at
+@rem
+@rem      https://www.apache.org/licenses/LICENSE-2.0
+@rem
+@rem Unless required by applicable law or agreed to in writing, software
+@rem distributed under the License is distributed on an "AS IS" BASIS,
+@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+@rem See the License for the specific language governing permissions and
+@rem limitations under the License.
+@rem
+@rem SPDX-License-Identifier: Apache-2.0
+@rem
+
+@if "%DEBUG%"=="" @echo off
+@rem ##########################################################################
+@rem
+@rem  Gradle startup script for Windows
+@rem
+@rem ##########################################################################
+
+@rem Set local scope for the variables with windows NT shell
+if "%OS%"=="Windows_NT" setlocal
+
+set DIRNAME=%~dp0
+if "%DIRNAME%"=="" set DIRNAME=.
+@rem This is normally unused
+set APP_BASE_NAME=%~n0
+set APP_HOME=%DIRNAME%
+
+@rem Resolve any "." and ".." in APP_HOME to make it shorter.
+for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
+
+@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
+
+@rem Find java.exe
+if defined JAVA_HOME goto findJavaFromJavaHome
+
+set JAVA_EXE=java.exe
+%JAVA_EXE% -version >NUL 2>&1
+if %ERRORLEVEL% equ 0 goto execute
+
+echo. 1>&2
+echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH. 1>&2
+echo. 1>&2
+echo Please set the JAVA_HOME variable in your environment to match the 1>&2
+echo location of your Java installation. 1>&2
+
+goto fail
+
+:findJavaFromJavaHome
+set JAVA_HOME=%JAVA_HOME:"=%
+set JAVA_EXE=%JAVA_HOME%/bin/java.exe
+
+if exist "%JAVA_EXE%" goto execute
+
+echo. 1>&2
+echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME% 1>&2
+echo. 1>&2
+echo Please set the JAVA_HOME variable in your environment to match the 1>&2
+echo location of your Java installation. 1>&2
+
+goto fail
+
+:execute
+@rem Setup the command line
+
+
+
+@rem Execute Gradle
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -jar "%APP_HOME%\gradle\wrapper\gradle-wrapper.jar" %*
+
+:end
+@rem End local scope for the variables with windows NT shell
+if %ERRORLEVEL% equ 0 goto mainEnd
+
+:fail
+rem Set variable GRADLE_EXIT_CONSOLE if you need the _script_ return code instead of
+rem the _cmd.exe /c_ return code!
+set EXIT_CODE=%ERRORLEVEL%
+if %EXIT_CODE% equ 0 set EXIT_CODE=1
+if not ""=="%GRADLE_EXIT_CONSOLE%" exit %EXIT_CODE%
+exit /b %EXIT_CODE%
+
+:mainEnd
+if "%OS%"=="Windows_NT" endlocal
+
+:omega
+</file>
+
+<file path="backend/settings.gradle">
+rootProject.name = 'demo'
+</file>
+
+<file path="backend/src/main/java/com/Application.java">
+package com;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/config/CorsConfig.java">
+
+</file>
+
+<file path="backend/src/main/java/com/facebeat/controller/SongController.java">
+package com.facebeat.controller;
+
+import com.facebeat.entity.Song;
+import com.facebeat.repository.SongRepository;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173") // Vite 기본 포트
+public class SongController {
+
+    private final SongRepository songRepository;
+
+    public SongController(SongRepository songRepository) {
+        this.songRepository = songRepository;
+    }
+
+    @GetMapping("/songs")
+    public List<Song> getSongs() {
+        return songRepository.findAll();
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/dto/request/AdminLoginRequest.java">
+package com.facebeat.dto.request;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
+public class AdminLoginRequest {
+    private String id;
+    private String password;
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/dto/request/ScoreRequest.java">
+package com.facebeat.dto.request;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+public class ScoreRequest {
+    private Long userId;   // 누가 (테스트를 위해 ID를 직접 받음)
+    private Long songId;   // 어떤 노래
+    private int score;     // 점수
+    private int combo;     // 콤보
+    private String grade;  // 등급
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/service/AuthService.java">
+
+</file>
+
+<file path="backend/src/main/java/com/facebeat/util/JwtUtil.java">
+
+</file>
+
+<file path="backend/src/main/java/com/magnesium/springStarter/MemberController.java">
+package com.magnesium.springStarter;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class MemberController {
+    @GetMapping("/api/test")
+    public Map<String, String> testConnection() {
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "성공");
+        response.put("message", "백엔드 서버와 연결되었습니다!");
+        return response;
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/magnesium/springStarter/WebConfig.java">
+package com.magnesium.springStarter;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**") // 모든 경로에 대해
+                .allowedOrigins("http://localhost:5173") // 허용할-Origin
+                .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메서드
+                .allowCredentials(true);
+    }
+}
+</file>
+
+<file path="backend/src/main/resources/application.properties">
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://localhost:3306/magnesium_db?serverTimezone=Asia/Seoul
+spring.datasource.username=root
+spring.datasource.password=${DB_PASSWORD}
+
+spring.flyway.enabled=true
+
+# 이 줄이 가장 중요합니다. 뒤에 다른 글자가 붙지 않게 주의하세요!
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+</file>
+
+<file path="backend/src/main/resources/application.yml">
+
+</file>
+
+<file path="backend/src/main/resources/db/migration/V2__create_music_table.sql">
+CREATE TABLE music (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,   -- 고유 식별자 (자동 증가)
+    title VARCHAR(255) NOT NULL,            -- 곡 제목
+    artist VARCHAR(255),                    -- 아티스트 명
+    file_path VARCHAR(500) NOT NULL,        -- 파일 저장 경로
+    bpm INT,                                -- 곡의 박자 (BPM)
+    duration INT,                           -- 곡 길이 (초)
+    difficulty INT,                         -- 난이도 (1, 2, 3...)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP -- 등록 일시 (자동 설정)
+);
+</file>
+
+<file path="backend/src/main/resources/db/migration/V4__add_image_path_to_the_music.sql">
+ALTER TABLE music ADD COLUMN image_path VARCHAR(500) AFTER file_path;
+
+UPDATE music SET image_path = '/images/birthday_star.png' WHERE title = 'Birthday Star';
+UPDATE music SET image_path = '/images/combo.png' WHERE title = 'Combo';
+UPDATE music SET image_path = '/images/rock.png' WHERE title = 'Rock';
+UPDATE music SET image_path = '/images/sungsimdang.png' WHERE title = 'Sungsimdang';
+</file>
+
+<file path="backend/src/main/resources/db/migration/V5__create_score_table.sql">
+CREATE TABLE scores (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,        -- member 테이블의 id를 참조
+    song_id BIGINT NOT NULL,        -- music 테이블의 id를 참조
+    score_value INT NOT NULL,       -- 점수
+    combo INT DEFAULT 0,            -- 최대 콤보
+    grade VARCHAR(10),              -- 등급 (S, A, B...)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    -- [핵심] 외래키 연결 (테이블 이름 정확히 매칭)
+    FOREIGN KEY (user_id) REFERENCES member(id) ON DELETE CASCADE,
+    FOREIGN KEY (song_id) REFERENCES music(id) ON DELETE CASCADE
+);
+</file>
+
+<file path="backend/src/main/resources/db/migration/V6__update_member.sql">
+-- 1. user_id 컬럼을 추가합니다. (기존 데이터가 있을 수 있으므로 일단 NULL 허용)
+ALTER TABLE member ADD COLUMN user_id VARCHAR(50);
+
+-- 2. 기존 데이터가 있다면, username 값을 user_id로 복사해서 채워줍니다.
+-- (나중에 실행될 때 데이터가 있어도 에러가 나지 않게 해줍니다)
+UPDATE member SET user_id = username WHERE user_id IS NULL;
+
+-- 3. 모든 칸이 채워졌으므로 NOT NULL과 UNIQUE(중복금지) 제약조건을 겁니다.
+ALTER TABLE member MODIFY COLUMN user_id VARCHAR(50) NOT NULL UNIQUE;
+</file>
+
+<file path="backend/src/main/resources/db/migration/V8__insert_admin_user.sql">
+INSERT INTO member (username, user_id, password) VALUES 
+('admin', 'admin123', '$2a$12$/fqVHIXYGgDNty7KbKt6Aeej4XYIO87pd90Iua2FoA84GjqsqVY6S');
+</file>
+
+<file path="backend/src/test/java/com/magnesium/springStarter/DemoApplicationTests.java">
+package com.magnesium.springStarter;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class DemoApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
+</file>
+
+<file path="frontend/.gitignore">
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+</file>
+
+<file path="frontend/eslint.config.js">
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+])
+</file>
+
+<file path="frontend/example.tsx">
+
+</file>
+
+<file path="frontend/index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>magnesium</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+</file>
+
+<file path="frontend/postcss.config.js">
+export default {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+</file>
+
+<file path="frontend/public/models/face_expression_model-weights_manifest.json">
+[{"weights":[{"name":"dense0/conv0/filters","shape":[3,3,3,32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0057930146946626555,"min":-0.7125408074435067}},{"name":"dense0/conv0/bias","shape":[32],"dtype":"float32"},{"name":"dense0/conv1/depthwise_filter","shape":[3,3,32,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.006473719839956246,"min":-0.6408982641556684}},{"name":"dense0/conv1/pointwise_filter","shape":[1,1,32,32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010509579321917366,"min":-1.408283629136927}},{"name":"dense0/conv1/bias","shape":[32],"dtype":"float32"},{"name":"dense0/conv2/depthwise_filter","shape":[3,3,32,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.005666389652326995,"min":-0.7252978754978554}},{"name":"dense0/conv2/pointwise_filter","shape":[1,1,32,32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010316079270605948,"min":-1.1760330368490781}},{"name":"dense0/conv2/bias","shape":[32],"dtype":"float32"},{"name":"dense0/conv3/depthwise_filter","shape":[3,3,32,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0063220320963392074,"min":-0.853474333005793}},{"name":"dense0/conv3/pointwise_filter","shape":[1,1,32,32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010322785377502442,"min":-1.4658355236053466}},{"name":"dense0/conv3/bias","shape":[32],"dtype":"float32"},{"name":"dense1/conv0/depthwise_filter","shape":[3,3,32,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0042531527724920535,"min":-0.5741756242864272}},{"name":"dense1/conv0/pointwise_filter","shape":[1,1,32,64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010653339647779278,"min":-1.1825207009035}},{"name":"dense1/conv0/bias","shape":[64],"dtype":"float32"},{"name":"dense1/conv1/depthwise_filter","shape":[3,3,64,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.005166931012097527,"min":-0.6355325144879957}},{"name":"dense1/conv1/pointwise_filter","shape":[1,1,64,64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.011478300188101974,"min":-1.3888743227603388}},{"name":"dense1/conv1/bias","shape":[64],"dtype":"float32"},{"name":"dense1/conv2/depthwise_filter","shape":[3,3,64,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.006144821410085641,"min":-0.8479853545918185}},{"name":"dense1/conv2/pointwise_filter","shape":[1,1,64,64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010541967317169788,"min":-1.3809977185492421}},{"name":"dense1/conv2/bias","shape":[64],"dtype":"float32"},{"name":"dense1/conv3/depthwise_filter","shape":[3,3,64,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.005769844849904378,"min":-0.686611537138621}},{"name":"dense1/conv3/pointwise_filter","shape":[1,1,64,64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010939095534530341,"min":-1.2689350820055196}},{"name":"dense1/conv3/bias","shape":[64],"dtype":"float32"},{"name":"dense2/conv0/depthwise_filter","shape":[3,3,64,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0037769308277204924,"min":-0.40790852939381317}},{"name":"dense2/conv0/pointwise_filter","shape":[1,1,64,128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.01188667194516051,"min":-1.4382873053644218}},{"name":"dense2/conv0/bias","shape":[128],"dtype":"float32"},{"name":"dense2/conv1/depthwise_filter","shape":[3,3,128,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.006497045825509464,"min":-0.8381189114907208}},{"name":"dense2/conv1/pointwise_filter","shape":[1,1,128,128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.011632198913424622,"min":-1.3377028750438316}},{"name":"dense2/conv1/bias","shape":[128],"dtype":"float32"},{"name":"dense2/conv2/depthwise_filter","shape":[3,3,128,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.005947182225246056,"min":-0.7969224181829715}},{"name":"dense2/conv2/pointwise_filter","shape":[1,1,128,128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.011436844339557722,"min":-1.4524792311238306}},{"name":"dense2/conv2/bias","shape":[128],"dtype":"float32"},{"name":"dense2/conv3/depthwise_filter","shape":[3,3,128,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.006665432686899222,"min":-0.8998334127313949}},{"name":"dense2/conv3/pointwise_filter","shape":[1,1,128,128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.01283421422920975,"min":-1.642779421338848}},{"name":"dense2/conv3/bias","shape":[128],"dtype":"float32"},{"name":"dense3/conv0/depthwise_filter","shape":[3,3,128,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.004711699953266218,"min":-0.6737730933170692}},{"name":"dense3/conv0/pointwise_filter","shape":[1,1,128,256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010955964817720302,"min":-1.3914075318504784}},{"name":"dense3/conv0/bias","shape":[256],"dtype":"float32"},{"name":"dense3/conv1/depthwise_filter","shape":[3,3,256,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.00554193468654857,"min":-0.7149095745647656}},{"name":"dense3/conv1/pointwise_filter","shape":[1,1,256,256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.016790372250126858,"min":-2.484975093018775}},{"name":"dense3/conv1/bias","shape":[256],"dtype":"float32"},{"name":"dense3/conv2/depthwise_filter","shape":[3,3,256,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.006361540626077091,"min":-0.8142772001378676}},{"name":"dense3/conv2/pointwise_filter","shape":[1,1,256,256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.01777329678628959,"min":-1.7062364914838006}},{"name":"dense3/conv2/bias","shape":[256],"dtype":"float32"},{"name":"dense3/conv3/depthwise_filter","shape":[3,3,256,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.006900275922289082,"min":-0.8625344902861353}},{"name":"dense3/conv3/pointwise_filter","shape":[1,1,256,256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.015449936717164282,"min":-1.9003422162112067}},{"name":"dense3/conv3/bias","shape":[256],"dtype":"float32"},{"name":"fc/weights","shape":[256,7],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.004834276554631252,"min":-0.7203072066400565}},{"name":"fc/bias","shape":[7],"dtype":"float32"}],"paths":["face_expression_model-shard1"]}]
+</file>
+
+<file path="frontend/public/models/face_landmark_68_model-weights_manifest.json">
+[{"weights":[{"name":"dense0/conv0/filters","shape":[3,3,3,32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.004853619781194949,"min":-0.5872879935245888}},{"name":"dense0/conv0/bias","shape":[32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.004396426443960153,"min":-0.7298067896973853}},{"name":"dense0/conv1/depthwise_filter","shape":[3,3,32,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.00635151559231328,"min":-0.5589333721235686}},{"name":"dense0/conv1/pointwise_filter","shape":[1,1,32,32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.009354315552057004,"min":-1.2628325995276957}},{"name":"dense0/conv1/bias","shape":[32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0029380727048013726,"min":-0.5846764682554731}},{"name":"dense0/conv2/depthwise_filter","shape":[3,3,32,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0049374802439820535,"min":-0.6171850304977566}},{"name":"dense0/conv2/pointwise_filter","shape":[1,1,32,32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.009941946758943446,"min":-1.3421628124573652}},{"name":"dense0/conv2/bias","shape":[32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0030300481062309416,"min":-0.5272283704841838}},{"name":"dense0/conv3/depthwise_filter","shape":[3,3,32,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.005672684837790097,"min":-0.7431217137505026}},{"name":"dense0/conv3/pointwise_filter","shape":[1,1,32,32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010712201455060173,"min":-1.5639814124387852}},{"name":"dense0/conv3/bias","shape":[32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0030966934035806097,"min":-0.3839899820439956}},{"name":"dense1/conv0/depthwise_filter","shape":[3,3,32,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0039155554537679636,"min":-0.48161332081345953}},{"name":"dense1/conv0/pointwise_filter","shape":[1,1,32,64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.01023082966898002,"min":-1.094698774580862}},{"name":"dense1/conv0/bias","shape":[64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0027264176630506327,"min":-0.3871513081531898}},{"name":"dense1/conv1/depthwise_filter","shape":[3,3,64,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.004583378632863362,"min":-0.5454220573107401}},{"name":"dense1/conv1/pointwise_filter","shape":[1,1,64,64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.00915846403907327,"min":-1.117332612766939}},{"name":"dense1/conv1/bias","shape":[64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.003091680419211294,"min":-0.5966943209077797}},{"name":"dense1/conv2/depthwise_filter","shape":[3,3,64,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.005407439727409214,"min":-0.708374604290607}},{"name":"dense1/conv2/pointwise_filter","shape":[1,1,64,64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.00946493943532308,"min":-1.2399070660273235}},{"name":"dense1/conv2/bias","shape":[64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.004409168514550901,"min":-0.9788354102303}},{"name":"dense1/conv3/depthwise_filter","shape":[3,3,64,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.004478132958505668,"min":-0.6493292789833219}},{"name":"dense1/conv3/pointwise_filter","shape":[1,1,64,64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.011063695888893277,"min":-1.2501976354449402}},{"name":"dense1/conv3/bias","shape":[64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.003909627596537272,"min":-0.6646366914113363}},{"name":"dense2/conv0/depthwise_filter","shape":[3,3,64,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.003213915404151468,"min":-0.3374611174359041}},{"name":"dense2/conv0/pointwise_filter","shape":[1,1,64,128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010917326048308728,"min":-1.4520043644250609}},{"name":"dense2/conv0/bias","shape":[128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.002800439152063108,"min":-0.38085972468058266}},{"name":"dense2/conv1/depthwise_filter","shape":[3,3,128,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0050568851770139206,"min":-0.6927932692509071}},{"name":"dense2/conv1/pointwise_filter","shape":[1,1,128,128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.01074961213504567,"min":-1.3222022926106174}},{"name":"dense2/conv1/bias","shape":[128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0030654204242369708,"min":-0.5487102559384177}},{"name":"dense2/conv2/depthwise_filter","shape":[3,3,128,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.00591809165244009,"min":-0.917304206128214}},{"name":"dense2/conv2/pointwise_filter","shape":[1,1,128,128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.01092823346455892,"min":-1.366029183069865}},{"name":"dense2/conv2/bias","shape":[128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.002681120470458386,"min":-0.36463238398234055}},{"name":"dense2/conv3/depthwise_filter","shape":[3,3,128,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0048311497650894465,"min":-0.5797379718107336}},{"name":"dense2/conv3/pointwise_filter","shape":[1,1,128,128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.011227761062921263,"min":-1.4483811771168429}},{"name":"dense2/conv3/bias","shape":[128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0034643323982463162,"min":-0.3360402426298927}},{"name":"dense3/conv0/depthwise_filter","shape":[3,3,128,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.003394978887894574,"min":-0.49227193874471326}},{"name":"dense3/conv0/pointwise_filter","shape":[1,1,128,256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010051267287310432,"min":-1.2765109454884247}},{"name":"dense3/conv0/bias","shape":[256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.003142924752889895,"min":-0.4588670139219247}},{"name":"dense3/conv1/depthwise_filter","shape":[3,3,256,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.00448304671867221,"min":-0.5872791201460595}},{"name":"dense3/conv1/pointwise_filter","shape":[1,1,256,256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.016063522357566685,"min":-2.3613377865623026}},{"name":"dense3/conv1/bias","shape":[256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.00287135781026354,"min":-0.47664539650374765}},{"name":"dense3/conv2/depthwise_filter","shape":[3,3,256,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.006002906724518421,"min":-0.7923836876364315}},{"name":"dense3/conv2/pointwise_filter","shape":[1,1,256,256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.017087187019048954,"min":-1.6061955797906016}},{"name":"dense3/conv2/bias","shape":[256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.003124481205846749,"min":-0.46242321846531886}},{"name":"dense3/conv3/depthwise_filter","shape":[3,3,256,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.006576311588287353,"min":-1.0193282961845398}},{"name":"dense3/conv3/pointwise_filter","shape":[1,1,256,256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.015590153955945782,"min":-1.99553970636106}},{"name":"dense3/conv3/bias","shape":[256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.004453541601405424,"min":-0.6546706154065973}},{"name":"fc/weights","shape":[256,136],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.010417488509533453,"min":-1.500118345372817}},{"name":"fc/bias","shape":[136],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0025084222648658005,"min":0.07683877646923065}}],"paths":["face_landmark_68_model-shard1"]}]
+</file>
+
+<file path="frontend/public/models/tiny_face_detector_model-weights_manifest.json">
+[{"weights":[{"name":"conv0/filters","shape":[3,3,3,16],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.009007044399485869,"min":-1.2069439495311063}},{"name":"conv0/bias","shape":[16],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.005263455241334205,"min":-0.9211046672334858}},{"name":"conv1/depthwise_filter","shape":[3,3,16,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.004001977630690033,"min":-0.5042491814669441}},{"name":"conv1/pointwise_filter","shape":[1,1,16,32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.013836609615999109,"min":-1.411334180831909}},{"name":"conv1/bias","shape":[32],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0015159862590771096,"min":-0.30926119685173037}},{"name":"conv2/depthwise_filter","shape":[3,3,32,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.002666276225856706,"min":-0.317286870876948}},{"name":"conv2/pointwise_filter","shape":[1,1,32,64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.015265831292844286,"min":-1.6792414422128714}},{"name":"conv2/bias","shape":[64],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0020280554598453,"min":-0.37113414915168985}},{"name":"conv3/depthwise_filter","shape":[3,3,64,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.006100742489683862,"min":-0.8907084034938438}},{"name":"conv3/pointwise_filter","shape":[1,1,64,128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.016276211832083907,"min":-2.0508026908425725}},{"name":"conv3/bias","shape":[128],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.003394414279975143,"min":-0.7637432129944072}},{"name":"conv4/depthwise_filter","shape":[3,3,128,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.006716050119961009,"min":-0.8059260143953211}},{"name":"conv4/pointwise_filter","shape":[1,1,128,256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.021875603993733724,"min":-2.8875797271728514}},{"name":"conv4/bias","shape":[256],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.0041141652009066415,"min":-0.8187188749804216}},{"name":"conv5/depthwise_filter","shape":[3,3,256,1],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.008423839597141042,"min":-0.9013508368940915}},{"name":"conv5/pointwise_filter","shape":[1,1,256,512],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.030007277283014035,"min":-3.8709387695088107}},{"name":"conv5/bias","shape":[512],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.008402082966823203,"min":-1.4871686851277068}},{"name":"conv8/filters","shape":[1,1,512,25],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.028336129469030042,"min":-4.675461362389957}},{"name":"conv8/bias","shape":[25],"dtype":"float32","quantization":{"dtype":"uint8","scale":0.002268134028303857,"min":-0.41053225912299807}}],"paths":["tiny_face_detector_model-shard1"]}]
+</file>
+
+<file path="frontend/public/vite.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="31.88" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 257"><defs><linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%"><stop offset="0%" stop-color="#41D1FF"></stop><stop offset="100%" stop-color="#BD34FE"></stop></linearGradient><linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%"><stop offset="0%" stop-color="#FFEA83"></stop><stop offset="8.333%" stop-color="#FFDD35"></stop><stop offset="100%" stop-color="#FFA800"></stop></linearGradient></defs><path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path><path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path></svg>
+</file>
+
+<file path="frontend/README.md">
+# React + Vite
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+</file>
+
+<file path="frontend/src/App.css">
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+</file>
+
+<file path="frontend/src/assets/react.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+</file>
+
+<file path="frontend/src/index.css">
+@import "tailwindcss";
+</file>
+
+<file path="frontend/src/main.jsx">
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+</file>
+
+<file path="frontend/src/pages/Auth.css">
+/* Auth.css */
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
+
+.auth-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: #FFF9F9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* 배경 장식 원형 */
+.bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.15;
+  animation: authPulse 4s infinite alternate;
+}
+
+.circle-1 { width: 400px; height: 400px; background-color: #F8C4B4; top: -100px; left: -100px; }
+.circle-2 { width: 500px; height: 500px; background-color: #B4E4F8; bottom: -150px; right: -150px; }
+
+@keyframes authPulse {
+  from { transform: scale(1); opacity: 0.1; }
+  to { transform: scale(1.1); opacity: 0.2; }
+}
+
+/* 중앙 카드 섹션 */
+.auth-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 450px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  padding: 60px 40px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+/* 타이틀 및 텍스트 */
+.auth-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 3.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: 500;
+  margin-bottom: 3rem;
+}
+
+.field-label {
+  display: block;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #F8C4B4;
+  margin-left: 15px;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+/* 입력 필드 */
+.input-wrapper {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.auth-input {
+  width: 100%;
+  height: 55px;
+  background: white;
+  border: 2px solid transparent;
+  border-radius: 50px;
+  padding: 0 25px;
+  font-size: 1rem;
+  transition: all 0.3s;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #F8C4B4;
+  box-shadow: 0 5px 20px rgba(248, 196, 180, 0.3);
+}
+
+/* 버튼 스타일 */
+.auth-btn-group {
+  margin-top: 2rem;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 18px 0;
+  border-radius: 50px;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-family: 'Black Han Sans', sans-serif;
+}
+
+.btn-primary {
+  background-color: #F8C4B4;
+  color: white;
+  box-shadow: 0 10px 25px rgba(248, 196, 180, 0.5);
+}
+
+.btn-primary:hover {
+  transform: translateY(-5px);
+  filter: brightness(1.05);
+}
+
+.btn-primary:disabled {
+  background-color: #ddd;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.link-btn:hover { color: #F8C4B4; text-decoration: underline; }
+
+/* 에러 메시지 */
+.error-text {
+  font-size: 0.75rem;
+  color: #f87171;
+  text-align: left;
+  margin-left: 15px;
+  margin-top: 5px;
+  font-weight: 600;
+}
+
+/* 중복 확인 버튼 전용 */
+.check-btn {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  bottom: 6px;
+  background-color: #B4E4F8;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 0 15px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+</file>
+
+<file path="frontend/src/pages/Home.css">
+/* Home.css */
+
+/* 타이틀이 공중에 떠 있는 듯한 효과  */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+h1 {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* 폰트 강조 (보고서에서 언급한 Black Han Sans 적용 추천) */
+h1, button, span {
+  font-family: 'Black Han Sans', sans-serif;
+  word-break: keep-all;
+}
+
+/* 버튼 클릭 시 팅기는 효과  */
+button:active {
+  transform: scale(0.95);
+}
+</file>
+
+<file path="frontend/src/pages/Ranking.jsx">
+import React from 'react';
+
+const Ranking = ({ data = [] }) => {
+  // 데이터가 로딩 중이거나 없을 경우 처리
+  if (!data || data.length === 0) {
+    return <div className="p-10 text-center">데이터를 불러오는 중입니다...</div>;
+  }
+
+  return (
+    <div className="flex flex-col items-center w-full min-h-screen bg-gray-50 p-6 font-sans">
+      {/* 헤더 섹션 */}
+      <div className="w-full max-w-2xl flex justify-between items-center mb-6 px-4">
+        <h1 className="text-2xl font-bold text-gray-400">랭킹</h1>
+        <div className="flex gap-4 text-gray-500 text-sm">
+          <span className="cursor-pointer">홈</span>
+          <span className="font-bold text-black border-b-2 border-black cursor-pointer">랭킹</span>
+          <span className="cursor-pointer">설정</span>
+        </div>
+      </div>
+
+      {/* 랭킹 리스트 영역 */}
+      <div className="w-full max-w-3xl overflow-y-auto max-h-[80vh] pr-2 scrollbar-hide">
+        {data.map((item) => (
+          <RankingItem key={`${item.userId}-${item.rank}`} item={item} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const RankingItem = ({ item }) => {
+  const isTop = item.rank === 1;
+
+  return (
+    <div className={`
+      relative flex items-center mb-4 p-4 rounded-[40px] border-4 transition-all duration-200 hover:scale-[1.01]
+      ${isTop ? 'border-[#F87171] bg-[#FFF5F5]' : 'border-[#93C5FD] bg-white'}
+      shadow-md
+    `}>
+      {/* 순위 번호 */}
+      <div className="flex items-center justify-center w-14 h-14 min-w-[3.5rem] rounded-full bg-white shadow-inner text-2xl font-black mr-6 border border-gray-100">
+        {item.rank}
+      </div>
+
+      {/* 사용자 아이디 */}
+      <div className="flex-1 text-2xl md:text-3xl font-black text-gray-800 truncate mr-4">
+        {item.userId}
+      </div>
+
+      {/* 곡 제목 및 점수 */}
+      <div className="text-right min-w-fit">
+        <div className={`text-xs md:text-sm font-bold mb-1 ${isTop ? 'text-red-400' : 'text-blue-400'}`}>
+          {item.songTitle}
+        </div>
+        <div className="flex items-baseline justify-end leading-none">
+          <span 
+            className="text-4xl md:text-5xl font-black italic tracking-tighter"
+            style={{
+              color: 'white',
+              WebkitTextStroke: isTop ? '2px #F87171' : '2px #60A5FA',
+              paintOrder: 'stroke fill',
+              filter: 'drop-shadow(2px 2px 0px rgba(0,0,0,0.1))'
+            }}
+          >
+            {item.score?.toLocaleString()}
+          </span>
+          <span className="text-lg md:text-xl ml-1 font-bold text-gray-700">점</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Ranking;
+</file>
+
+<file path="frontend/src/pages/setting.jsx">
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const Settings = () => {
+  const navigate = useNavigate();
+
+  // 설정 상태 관리 (이미지 예시의 84%로 초기값 설정)
+  const [volume, setVolume] = useState(84);
+
+  // [수정] 저장 버튼 핸들러: 이제 /select 페이지로 이동합니다.
+  const handleSave = () => {
+    const settings = { volume };
+    localStorage.setItem('gameSettings', JSON.stringify(settings));
+    alert("설정이 저장되었습니다! 🎵");
+    navigate('/select'); // App.jsx에 정의된 곡 선택 페이지 경로
+  };
+
+  // 로그아웃 핸들러
+  const handleLogout = () => {
+    if (window.confirm("로그아웃 하시겠습니까?")) {
+      localStorage.removeItem('user'); 
+      navigate('/Login');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col p-8 font-sans">
+      {/* 헤더 부분 */}
+      <header className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-8 w-8 text-gray-800 group-hover:text-black" 
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-3xl font-black cursor-pointer" onClick={() => navigate('/Home')}>
+            마그네슘 부족
+          </h1>
+        </div>
+        <div className="flex gap-6 text-sm text-gray-500 font-bold">
+          <button onClick={() => navigate('/Home')} className="hover:text-black">홈</button>
+          <button onClick={() => navigate('/Ranking')} className="hover:text-black">랭킹</button>
+          <span className="text-black border-b-2 border-[#F8C4B4]">설정</span>
+        </div>
+      </header>
+
+      {/* 메인 설정 영역 */}
+      <main className="flex-1 max-w-2xl mx-auto w-full flex flex-col gap-10">
+        <h2 className="text-4xl font-black text-[#333] mb-4 text-center">게임 설정</h2>
+
+        {/* 배경 음악 설정 카드 */}
+        <section className="bg-gray-50 p-8 rounded-[40px] shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-black">배경 음악</h3>
+            <span className="text-[#F8C4B4] font-black text-2xl">{volume}%</span>
+          </div>
+          <input 
+            type="range" 
+            min="0" max="100" 
+            value={volume}
+            onChange={(e) => setVolume(e.target.value)}
+            className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#F8C4B4]"
+          />
+        </section>
+
+        {/* 로그아웃 버튼 섹션 (흰색 배경, 빨간 글씨, 큰 디자인) */}
+        <section className="flex justify-center">
+          <button 
+            onClick={handleLogout}
+            className="px-24 py-6 text-3xl font-black rounded-[30px] shadow-xl transition-all active:scale-95 bg-white text-red-500 border-2 border-gray-100 hover:bg-gray-50"
+          >
+            로그아웃하기
+          </button>
+        </section>
+      </main>
+
+      {/* 하단 저장 버튼 */}
+      <footer className="py-8 flex justify-center">
+        <button 
+          onClick={handleSave}
+          className="px-24 py-6 text-3xl font-black rounded-[30px] shadow-2xl transition-all active:scale-95 bg-[#F8C4B4] text-white hover:brightness-105"
+        >
+          설정 저장하기
+        </button>
+      </footer>
+    </div>
+  );
+};
+
+export default Settings;
+</file>
+
+<file path="frontend/tailwind.config.js">
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  theme: { extend: {} },
+  plugins: [],
+}
+</file>
+
+<file path="frontend/vite.config.js">
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+})
+</file>
+
+<file path="backend/.gitignore">
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+</file>
+
+<file path="backend/src/main/java/com/facebeat/controller/ScoreController.java">
+package com.facebeat.controller;
+
+import com.facebeat.dto.request.ScoreRequest;
+import com.facebeat.dto.response.RankingResponse;
+import com.facebeat.service.ScoreService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/scores") // 주소 공통 부분
+public class ScoreController {
+
+    private final ScoreService scoreService;
+
+    // 1. 게임 끝났을 때 점수 저장 (POST /api/scores)
+    @PostMapping
+    public ResponseEntity<String> saveScore(@RequestBody ScoreRequest request) {
+        scoreService.saveScore(request);
+        return ResponseEntity.ok("점수가 저장되었습니다!");
+    }
+
+    // 2. 랭킹 조회 (GET /api/scores/ranking/{songId})
+    // 예: /api/scores/ranking/1 -> 1번 곡(Birthday Star) 랭킹 줘
+    @GetMapping("/ranking/{songId}")
+    public ResponseEntity<List<RankingResponse>> getRanking(@PathVariable Long songId) {
+        List<RankingResponse> ranking = scoreService.getRanking(songId);
+        return ResponseEntity.ok(ranking);
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/dto/request/SignupRequest.java">
+package com.facebeat.dto.request; // 1. 패키지는 무조건 맨 위로!
+
+// import lombok... (롬복을 안 쓰고 직접 메서드를 만드셨으니 import도 필요 없습니다)
+
+public class SignupRequest {
+
+    // 1. 로그인 ID
+    private String userId; 
+    
+    // 2. 사용자 이름
+    private String username; 
+    
+    // 3. 비밀번호
+    private String password;
+
+    // 기본 생성자
+    public SignupRequest() {}
+
+    // ==========================
+    // Getter 메서드들
+    // ==========================
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/dto/response/RankingResponse.java">
+package com.facebeat.dto.response;
+
+import com.facebeat.entity.Score;
+import lombok.Getter;
+
+@Getter
+public class RankingResponse {
+    private int rank;         // 등수 (1등, 2등...)
+    private String userId;
+    private String username;  // 유저 이름
+    private int score;        // 점수
+    private int combo;        // 콤보
+    private String grade;     // 등급
+
+    public RankingResponse(int rank, Score score) {
+        this.rank = rank;
+        this.userId = score.getUser().getUserId();
+        this.username = score.getUser().getUsername(); // User 엔티티에서 이름 꺼내기
+        this.score = score.getScore();
+        this.combo = score.getCombo();
+        this.grade = score.getGrade();
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/dto/response/TokenResponse.java">
+package com.facebeat.dto.response;
+
+public class TokenResponse {
+    private String token;
+
+    public TokenResponse() {}
+    public TokenResponse(String token) { this.token = token; }
+
+    public String getToken() { return token; }
+    public void setToken(String token) { this.token = token; }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/dto/response/UserResponse.java">
+package com.facebeat.dto.response;
+
+public class UserResponse {
+    private Long id;
+    private String username;
+
+    public UserResponse() {}
+    public UserResponse(Long id, String username) {
+        this.id = id;
+        this.username = username;
+    }
+
+    public Long getId() { return id; }
+    public String getUsername() { return username; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setUsername(String username) { this.username = username; }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/repository/SongNoteRepository.java">
+package com.facebeat.repository;
+
+import com.facebeat.entity.SongNote;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SongNoteRepository extends JpaRepository<SongNote, Long> {}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/repository/SongRepository.java">
+package com.facebeat.repository;
+
+import com.facebeat.entity.Song;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SongRepository extends JpaRepository<Song, Long> {}
+</file>
+
+<file path="backend/src/main/java/com/magnesium/springStarter/DemoApplication.java">
+// package com.magnesium.springStarter;
+
+// import org.springframework.boot.SpringApplication;
+// import org.springframework.boot.autoconfigure.SpringBootApplication;
+// import org.springframework.boot.autoconfigure.domain.EntityScan;
+// import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+// @SpringBootApplication(scanBasePackages = {"com.facebeat", "com.magnesium"})
+// @EnableJpaRepositories(basePackages = {"com.facebeat.repository", "com.magnesium"})
+// @EntityScan(basePackages = {"com.facebeat.entity", "com.magnesium"})
+// public class DemoApplication {
+//     public static void main(String[] args) {
+//         SpringApplication.run(DemoApplication.class, args);
+//     }
+// }
+</file>
+
+<file path="backend/src/main/resources/db/migration/V1__init.sql">
+-- V1__init.sql 최종본
+CREATE TABLE member (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,  -- 중복 방지
+    password VARCHAR(100) NOT NULL,        -- 필수 입력 (암호화 대비 100자)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+</file>
+
+<file path="backend/src/main/resources/db/migration/V7__dummy_users.sql">
+-- 더미 데이터 삽입 (테스트 유저 10명)
+-- 비밀번호는 모두 '1234' 입니다. (BCrypt로 암호화된 값: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy)
+-- username과 user_id를 동일하게 설정했습니다.
+
+INSERT INTO member (username, user_id, password) VALUES 
+('testuser1',  'testuser1',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser2',  'testuser2',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser3',  'testuser3',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser4',  'testuser4',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser5',  'testuser5',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser6',  'testuser6',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser7',  'testuser7',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser8',  'testuser8',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser9',  'testuser9',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser10', 'testuser10', '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC');
+</file>
+
+<file path="frontend/package.json">
+{
+  "name": "magnesium",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "face-api.js": "^0.22.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.11.0",
+    "react-webcam": "^7.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "vite": "^7.2.4"
+  }
+}
+</file>
+
+<file path="frontend/src/pages/AdminDashboard.jsx">
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const AdminDashboard = () => {
+  const navigate = useNavigate();
+  const [songs, setSongs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // 새 노래 입력을 위한 상태
+  const [newSong, setNewSong] = useState({
+    title: '',
+    artist: '',
+    bpm: '',
+    difficulty: 1,
+    file_path: '',
+    image_path: '', // DB schema에 추가 권장
+    duration: 0
+  });
+
+  const BACKEND_URL = 'http://localhost:8080';
+
+  // 1. 노래 목록 불러오기
+  const fetchSongs = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/songs`);
+      if (response.ok) {
+        const data = await response.json();
+        setSongs(data);
+      }
+    } catch (error) {
+      console.error("데이터 로딩 실패:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSongs();
+  }, []);
+
+  // 2. 입력 값 변경 처리
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewSong({ ...newSong, [name]: value });
+  };
+
+  // 3. 노래 추가 제출
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/songs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newSong),
+      });
+
+      if (response.ok) {
+        alert("새 노래가 등록되었습니다! 🎵");
+        setNewSong({ title: '', artist: '', bpm: '', difficulty: 1, file_path: '', image_path: '', duration: 0 });
+        fetchSongs(); // 목록 새로고침
+      }
+    } catch (error) {
+      alert("등록에 실패했습니다.");
+    }
+  };
+
+  // 4. 노래 삭제
+  const handleDelete = async (id) => {
+    if (!window.confirm("정말 이 곡을 삭제하시겠습니까?")) return;
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/songs/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        setSongs(songs.filter(song => song.id !== id));
+      }
+    } catch (error) {
+      console.error("삭제 실패:", error);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-8 font-sans text-[#333]">
+      {/* 헤더 */}
+      <header className="flex justify-between items-center mb-10 max-w-6xl mx-auto">
+        <div>
+          <h1 className="text-4xl font-black text-black mb-2">Admin Dashboard</h1>
+          <p className="text-gray-500 font-bold">리듬게임 콘텐츠 관리 시스템</p>
+        </div>
+        <button 
+          onClick={() => navigate('/Home')}
+          className="px-6 py-3 bg-white border-2 border-gray-200 rounded-2xl font-black hover:bg-gray-100 transition-all"
+        >
+          나가기
+        </button>
+      </header>
+
+      <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* 노래 추가 섹션 */}
+        <section className="lg:col-span-1">
+          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-black mb-6 flex items-center gap-2">
+              <span className="w-2 h-8 bg-[#F8C4B4] rounded-full"></span>
+              새 노래 등록
+            </h2>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">곡 제목</label>
+                <input name="title" value={newSong.title} onChange={handleInputChange} placeholder="ex) Moonlight" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" required />
+              </div>
+              <div>
+                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">아티스트</label>
+                <input name="artist" value={newSong.artist} onChange={handleInputChange} placeholder="아티스트 명" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-black text-gray-400 ml-2 mb-1">BPM</label>
+                  <input name="bpm" type="number" value={newSong.bpm} onChange={handleInputChange} placeholder="120" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-gray-400 ml-2 mb-1">난이도 (1-3)</label>
+                  <select name="difficulty" value={newSong.difficulty} onChange={handleInputChange} className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold appearance-none">
+                    <option value={1}>EASY</option>
+                    <option value={2}>NORMAL</option>
+                    <option value={3}>HARD</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">파일 경로 (.mp3)</label>
+                <input name="file_path" value={newSong.file_path} onChange={handleInputChange} placeholder="/songs/filename.mp3" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" required />
+              </div>
+              <div>
+                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">이미지 경로 (.png)</label>
+                <input name="image_path" value={newSong.image_path} onChange={handleInputChange} placeholder="/images/filename.png" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" />
+              </div>
+              <button type="submit" className="mt-4 w-full py-4 bg-[#F8C4B4] text-white rounded-2xl font-black text-lg shadow-lg shadow-[#F8C4B4]/30 hover:brightness-105 active:scale-95 transition-all">
+                노래 추가하기
+              </button>
+            </form>
+          </div>
+        </section>
+
+        {/* 노래 목록 테이블 섹션 */}
+        <section className="lg:col-span-2">
+          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 min-h-[600px]">
+            <h2 className="text-2xl font-black mb-6 flex items-center gap-2">
+              <span className="w-2 h-8 bg-gray-200 rounded-full"></span>
+              현재 노래 목록 ({songs.length})
+            </h2>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-separate border-spacing-y-3">
+                <thead>
+                  <tr className="text-gray-400 text-sm font-black">
+                    <th className="px-4 py-2">ID</th>
+                    <th className="px-4 py-2">곡 정보</th>
+                    <th className="px-4 py-2">난이도</th>
+                    <th className="px-4 py-2 text-right">관리</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {songs.map((song) => (
+                    <tr key={song.id} className="bg-gray-50 hover:bg-gray-100 transition-colors group">
+                      <td className="px-4 py-4 rounded-l-2xl font-bold text-gray-400">{song.id}</td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-white rounded-lg overflow-hidden border border-gray-200">
+                             <img src={`${BACKEND_URL}${song.image_path}`} alt="" className="w-full h-full object-cover" onError={(e)=>e.target.src='https://via.placeholder.com/40'}/>
+                          </div>
+                          <div>
+                            <p className="font-black text-black leading-tight">{song.title}</p>
+                            <p className="text-xs font-bold text-gray-400">{song.artist} | {song.bpm} BPM</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className={`text-[10px] font-black px-2 py-1 rounded-full ${
+                          song.difficulty === 3 ? 'bg-red-100 text-red-500' : 
+                          song.difficulty === 2 ? 'bg-blue-100 text-blue-500' : 'bg-green-100 text-green-500'
+                        }`}>
+                          {song.difficulty === 1 ? 'EASY' : song.difficulty === 2 ? 'NORMAL' : 'HARD'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 rounded-r-2xl text-right">
+                        <button 
+                          onClick={() => handleDelete(song.id)}
+                          className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {songs.length === 0 && !isLoading && (
+                <div className="text-center py-20 text-gray-400 font-bold">등록된 노래가 없습니다.</div>
+              )}
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  );
+};
+
+export default AdminDashboard;
+</file>
+
+<file path="frontend/src/pages/AuthSelection.jsx">
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const AuthSelection = () => {
+  const navigate = useNavigate();
+  const [serverStatus, setServerStatus] = useState("connecting"); // connecting, success, error
+  const [serverMessage, setServerMessage] = useState("서버 연결 확인 중...");
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/test")
+      .then((res) => res.json())
+      .then((data) => {
+        setServerMessage(data.message);
+        setServerStatus("success");
+      })
+      .catch((err) => {
+        console.error(err);
+        setServerMessage("서버 오프라인");
+        setServerStatus("error");
+      });
+  }, []);
+
+  return (
+    <div className="relative min-h-screen bg-[#FFF9F9] flex flex-col items-center justify-center overflow-hidden">
+      
+      {/* --- 배경 장식 (파스텔 원형 엘리먼트) --- */}
+      <div className="absolute -top-20 -left-20 w-80 h-80 bg-[#F8C4B4] opacity-20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#B4E4F8] opacity-20 rounded-full blur-3xl animate-pulse" />
+
+      {/* --- 상단 서버 상태 표시 (트렌디한 캡슐형) --- */}
+      <div className="absolute top-10 flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-md rounded-full shadow-sm border border-white/50">
+        <div className={`w-2 h-2 rounded-full ${
+          serverStatus === "success" ? "bg-green-400 animate-ping" : 
+          serverStatus === "error" ? "bg-red-400" : "bg-yellow-400"
+        }`} />
+        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+          {serverMessage}
+        </span>
+      </div>
+
+      {/* --- 메인 타이틀 섹션 --- */}
+      <div className="text-center z-10">
+        <div className="inline-block px-4 py-1 mb-6 bg-[#F8C4B4] text-white text-sm font-black rounded-lg transform -rotate-2">
+          NEW RHYTHM GAME
+        </div>
+        <h1 className="text-8xl font-black text-[#333] mb-4 tracking-tighter">
+          마그네슘 <span className="text-[#F8C4B4]">부족</span>
+        </h1>
+        <p className="text-gray-400 font-medium mb-16 tracking-wide">
+          당신의 표정이 리듬이 되는 순간
+        </p>
+      </div>
+      
+      {/* --- 버튼 그룹 --- */}
+      <div className="flex gap-8 z-10">
+        <button 
+          onClick={() => navigate('/Login')} 
+          className="group relative w-56 py-6 bg-white rounded-[30px] shadow-[0_15px_35px_rgba(248,196,180,0.4)] transition-all hover:-translate-y-2 active:translate-y-0"
+        >
+          <div className="absolute inset-0 bg-[#F8C4B4] rounded-[30px] opacity-0 group-hover:opacity-100 transition-opacity" />
+          <span className="relative text-2xl font-black text-[#F8C4B4] group-hover:text-white transition-colors">
+            로그인
+          </span>
+        </button>
+
+        <button 
+          onClick={() => navigate('/Signup')} 
+          className="group w-56 py-6 bg-white/40 backdrop-blur-sm border-2 border-white rounded-[30px] shadow-xl transition-all hover:bg-white hover:border-[#F8C4B4]"
+        >
+          <span className="text-2xl font-black text-gray-400 group-hover:text-[#F8C4B4] transition-colors">
+            회원가입
+          </span>
+        </button>
+      </div>
+
+      {/* --- 하단 푸터 느낌의 장식 --- */}
+      <div className="absolute bottom-10 text-gray-300 text-sm font-bold">
+        © 2026 Team Magnesium Deficiency. All rights reserved.
+      </div>
+
+    </div>
+  );
+};
+
+export default AuthSelection;
+</file>
+
+<file path="backend/build.gradle">
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.0.1'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'magnesium'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    // 스프링 부트 핵심 기능
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web' // webmvc 대신 이거 하나면 충분합니다.
+
+    // ⭐ Flyway 설정 (이 두 줄로 꼭 바꿔주세요)
+    implementation 'org.springframework.boot:spring-boot-starter-flyway' // 스프링 부트용 플라이웨이 스타터
+    implementation 'org.flywaydb:flyway-mysql' // MySQL 지원 라이브러리
+
+    // 데이터베이스 드라이버
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    testImplementation 'com.h2database:h2'
+
+    // 편의 기능 및 도구
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // 테스트 관련
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/config/SecurityConfig.java">
+package com.facebeat.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity // 스프링 시큐리티 활성화
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            // 1. CSRF 보안 끄기 (Rest API에서는 보통 끕니다)
+            .csrf(AbstractHttpConfigurer::disable)
+            
+            // 2. 요청 주소별 권한 설정
+            .authorizeHttpRequests(auth -> auth
+                // "/api/users/**" 로 시작하는 주소(로그인, 회원가입)는 누구나 접속 가능!
+                .requestMatchers("/api/users/**").permitAll()
+                // 그 외 다른 요청도 일단은 다 허용 (개발 편의상)
+                // 나중에 .anyRequest().authenticated()로 바꾸면 로그인한 사람만 가능해짐
+                .anyRequest().permitAll()
+            );
+
+        return http.build();
+    }
+
+    // 아까 만든 비밀번호 암호화 기계
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/dto/request/RegisterRequest.java">
+package com.facebeat.dto.request;
+
+public class RegisterRequest {
+    private String userId;
+    private String password;
+
+    public RegisterRequest() {}
+
+    public String getUsername() { return userId; }
+    public String getPassword() { return password; }
+
+    public void setUsername(String userId) { this.userId = userId; }
+    public void setPassword(String password) { this.password = password; }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/entity/Song.java">
+package com.facebeat.entity;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "music")
+public class Song {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String title;
+
+    private String artist;
+
+    @Column(name = "file_path", nullable = false)
+    private String file_path;
+
+    private Integer bpm;
+    private Integer duration;
+    private Integer difficulty;
+    private String image_path;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private LocalDateTime created_at;
+
+    public Song() {}
+
+    public Long getId() { return id; }
+    public String getTitle() { return title; }
+    public String getArtist() { return artist; }
+    public String getFile_path() { return file_path; }
+    public Integer getBpm() { return bpm; }
+    public Integer getDuration() { return duration; }
+    public Integer getDifficulty() { return difficulty; }
+    public LocalDateTime getCreated_at() { return created_at; }
+    public String getImage_path() { return image_path; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setTitle(String title) { this.title = title; }
+    public void setArtist(String artist) { this.artist = artist; }
+    public void setFile_path(String file_path) { this.file_path = file_path; }
+    public void setBpm(Integer bpm) { this.bpm = bpm; }
+    public void setDuration(Integer duration) { this.duration = duration; }
+    public void setDifficulty(Integer difficulty) { this.difficulty = difficulty; }
+    public void setImage_path(String image_path) { this.image_path = image_path; }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/entity/SongNote.java">
+package com.facebeat.entity;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "song_notes")
+public class SongNote {
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "song_id")
+    private Song song;
+
+    // 노트 시간(ms) 같은 용도
+    private Integer time_ms;
+
+    // 예: lane(1~4)
+    private Integer lane;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private LocalDateTime created_at;
+
+    public SongNote() {}
+
+    public Long getId() { return id; }
+    public Song getSong() { return song; }
+    public Integer getTime_ms() { return time_ms; }
+    public Integer getLane() { return lane; }
+    public LocalDateTime getCreated_at() { return created_at; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setSong(Song song) { this.song = song; }
+    public void setTime_ms(Integer time_ms) { this.time_ms = time_ms; }
+    public void setLane(Integer lane) { this.lane = lane; }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/entity/User.java">
+package com.facebeat.entity;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "member")
+public class User {
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // ✅ [신규 추가] 로그인용 아이디 (DB 컬럼: user_id)
+    @Column(name = "user_id", unique = true, nullable = false, length = 50)
+    private String userId;
+    
+    @Column(unique = true, nullable = false, length = 50)
+    private String username;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private LocalDateTime created_at;
+
+    public User() {}
+
+    // 회원가입 등을 위해 모든 정보를 받는 생성자
+    public User(String userId, String username, String password) {
+        this.userId = userId;     // 로그인 ID
+        this.username = username; // 사용자 이름
+        this.password = password; // 비밀번호
+    }
+
+    public Long getId() { return id; }
+    public String getUserId() { return userId; }   // ✅ 추가됨
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+    public LocalDateTime getCreated_at() { return created_at; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setUserId(String userId) { this.userId = userId; } // ✅ 추가됨
+    public void setUsername(String username) { this.username = username; }
+    public void setPassword(String password) { this.password = password; }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/repository/UserRepository.java">
+package com.facebeat.repository;
+
+import com.facebeat.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    
+    // ✅ 로그인용: user_id 컬럼으로 찾기
+    Optional<User> findByUserId(String userId);
+
+    // (참고) 만약 이름으로 찾을 일이 있다면 남겨둡니다 (로그인엔 안 씀)
+    Optional<User> findByUsername(String username);
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/controller/UserController.java">
+package com.facebeat.controller;
+
+import com.facebeat.dto.request.LoginRequest;
+import com.facebeat.dto.request.SignupRequest;
+import com.facebeat.entity.User;
+import com.facebeat.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/users") // ✅ 기본 주소: http://localhost:8080/api/users
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+
+    // 1. 아이디 중복 확인 (GET /api/users/check-id?userId=test)
+    @GetMapping("/check-id")
+    public ResponseEntity<?> checkId(@RequestParam String userId) {
+        // 방금 UserService에 추가한 함수를 여기서 사용합니다!
+        boolean isDuplicate = userService.checkIdDuplicate(userId);
+
+        if (isDuplicate) {
+            // 409 Conflict: 이미 있어서 충돌남
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 존재하는 아이디입니다.");
+        } else {
+            // 200 OK: 사용 가능
+            return ResponseEntity.ok("사용 가능한 아이디입니다.");
+        }
+    }
+
+    // 2. 회원가입 (POST /api/users/signup)
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest) {
+        try {
+            userService.signup(signupRequest);
+            return ResponseEntity.ok("회원가입 성공!");
+        } catch (IllegalArgumentException e) {
+            // UserService에서 "이미 존재하는 아이디입니다"라고 에러를 던지면 여기서 잡아서 보여줌
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 3. 로그인 (POST /api/users/login)
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        // UserService의 login 기능 호출
+        User user = userService.login(loginRequest.getUserId(), loginRequest.getPassword());
+
+        if (user != null) {
+            // 로그인 성공 시: 프론트엔드에 넘겨줄 정보 포장
+            Map<String, Object> response = new HashMap<>();
+            response.put("userId", user.getUserId());
+            response.put("userName", user.getUsername());
+            response.put("message", "로그인 성공");
+            
+            return ResponseEntity.ok(response);
+        } else {
+            // 로그인 실패 시: 401 Unauthorized 에러 반환
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("아이디 또는 비밀번호가 일치하지 않습니다.");
+        }
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/entity/Score.java">
+package com.facebeat.entity;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import lombok.Builder;
+
+@Entity
+@Table(name = "scores")
+public class Score {
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // 누가
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    // 어떤 곡
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "song_id")
+    private Song song;
+
+    // 점수
+    @Column(name = "score_value")
+    private Integer score;
+
+    private Integer combo;
+    private String grade;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    public Score() {}
+
+    // 생성자 추가 
+    @Builder
+    public Score(User user, Song song, Integer score, Integer combo, String grade) {
+        this.user = user;
+        this.song = song;
+        this.score = score;
+        this.combo = combo;
+        this.grade = grade;
+    }
+
+    public Long getId() { return id; }
+    public User getUser() { return user; }
+    public Song getSong() { return song; }
+    public Integer getScore() { return score; }
+    public Integer getCombo() { return combo; }
+    public String getGrade() { return grade; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setUser(User user) { this.user = user; }
+    public void setSong(Song song) { this.song = song; }
+    public void setScore(Integer score) { this.score = score; }
+    public void setCombo(Integer combo) { this.combo = combo; }
+    public void setGrade(String grade) { this.grade = grade; }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/repository/ScoreRepository.java">
+package com.facebeat.repository;
+
+import com.facebeat.entity.Score;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
+
+public interface ScoreRepository extends JpaRepository<Score, Long> {
+    List<Score> findBySongIdOrderByScoreDesc(Long songId);
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/service/ScoreService.java">
+package com.facebeat.service;
+
+import com.facebeat.dto.request.ScoreRequest;
+import com.facebeat.dto.response.RankingResponse;
+import com.facebeat.entity.Score;
+import com.facebeat.entity.Song;
+import com.facebeat.entity.User;
+import com.facebeat.repository.ScoreRepository;
+import com.facebeat.repository.SongRepository; // SongRepository 필요
+import com.facebeat.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ScoreService {
+
+    private final ScoreRepository scoreRepository;
+    private final UserRepository userRepository;
+    private final SongRepository songRepository; // SongRepository가 없으면 만들어야 함!
+
+    // 1. 점수 저장하기
+    @Transactional
+    public void saveScore(ScoreRequest request) {
+        // 유저 찾기
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        // 노래 찾기
+        Song song = songRepository.findById(request.getSongId())
+                .orElseThrow(() -> new IllegalArgumentException("노래를 찾을 수 없습니다."));
+
+        // 점수 객체 생성
+        Score score = Score.builder()
+                .user(user)
+                .song(song)
+                .score(request.getScore())
+                .combo(request.getCombo())
+                .grade(request.getGrade())
+                .build();
+
+        // 저장!
+        scoreRepository.save(score);
+    }
+
+    // 2. 랭킹 조회하기
+    @Transactional(readOnly = true)
+    public List<RankingResponse> getRanking(Long songId) {
+        // DB에서 점수 모두 가져오기
+        List<Score> scores = scoreRepository.findBySongIdOrderByScoreDesc(songId);
+
+        // 랭킹 번호표 붙여서 내보내기
+        List<RankingResponse> responseList = new ArrayList<>();
+        for (int i = 0; i < scores.size(); i++) {
+            // i는 0부터 시작하니까 +1 해서 등수(1등, 2등...) 매김
+            responseList.add(new RankingResponse(i + 1, scores.get(i)));
+        }
+
+        return responseList;
+    }
+}
+</file>
+
+<file path="backend/src/main/resources/db/migration/V3__insert_music.sql">
+-- V3__insert_music.sql
+
+INSERT INTO music
+(title, artist, file_path, bpm, duration, difficulty)
+VALUES
+(
+  'Birthday Star',
+  'soyun',
+  '/songs/birthday_star.mp3',
+  90,
+  104,
+  2
+),
+(
+  'Combo',
+  'gongju',
+  '/songs/combo.mp3',
+  88,
+  60,
+  1
+),
+(
+  'Rock',
+  'onepearl',
+  '/songs/rock.mp3',
+  116,
+  65,
+  2
+),
+(
+  'Sungsimdang',
+  'jjooya',
+  '/songs/sungsimdang.mp3',
+  130,
+  69,
+  3
+);
+</file>
+
+<file path="frontend/src/pages/Home.jsx">
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const Home = () => {
+  const navigate = useNavigate();
+  const [serverStatus, setServerStatus] = useState("connecting"); // connecting, success, error
+  const [serverMessage, setServerMessage] = useState("서버 연결 확인 중...");
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/test")
+      .then((res) => res.json())
+      .then((data) => {
+        setServerMessage(data.message);
+        setServerStatus("success");
+      })
+      .catch((err) => {
+        console.error(err);
+        setServerMessage("서버 오프라인");
+        setServerStatus("error");
+      });
+  }, []);
+
+  return (
+    <div className="relative min-h-screen bg-[#FFF9F9] flex flex-col items-center justify-center overflow-hidden">
+      
+      {/* --- 상단 헤더 (우측 정렬 로직 핵심) --- */}
+      <header className="absolute top-0 left-0 right-0 w-full p-8 flex justify-end items-center z-20">
+        {/* 좌측 로고 영역: justify-between에 의해 왼쪽 끝 고정 */}
+
+        {/* 우측 네비게이션 영역: justify-between에 의해 오른쪽 끝 고정 */}
+        <nav className="flex gap-8 text-sm text-gray-500 font-bold">
+          <button 
+            onClick={() => navigate('/Ranking')} 
+            className="hover:text-black hover:scale-105 transition-all"
+          >
+            랭킹
+          </button>
+          <button 
+            onClick={() => navigate('/Settings')} 
+            className="hover:text-black hover:scale-105 transition-all"
+          >
+            설정
+          </button>
+        </nav>
+      </header>
+
+      {/* --- 배경 장식 (파스텔 원형 엘리먼트) --- */}
+      <div className="absolute -top-20 -left-20 w-80 h-80 bg-[#F8C4B4] opacity-20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#B4E4F8] opacity-20 rounded-full blur-3xl animate-pulse" />
+      
+
+      {/* --- 서버 상태 표시 --- */}
+      <div className="absolute top-28 flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-md rounded-full shadow-sm border border-white/50">
+        <div className={`w-2 h-2 rounded-full ${
+          serverStatus === "success" ? "bg-green-400 animate-ping" : 
+          serverStatus === "error" ? "bg-red-400" : "bg-yellow-400"
+        }`} />
+        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+          {serverMessage}
+        </span>
+      </div>
+      
+
+      {/* --- 메인 타이틀 섹션 --- */}
+      <div className="text-center z-10 mt-12">
+        <div className="inline-block px-4 py-1 mb-6 bg-[#F8C4B4] text-white text-sm font-black rounded-lg transform -rotate-2">
+          NEW RHYTHM GAME
+        </div>
+        <h1 className="text-8xl font-black text-[#333] mb-4 tracking-tighter">
+          마그네슘 <span className="text-[#F8C4B4]">부족</span>
+        </h1>
+        <p className="text-gray-400 font-medium mb-16 tracking-wide">
+          당신의 표정이 리듬이 되는 순간
+        </p>
+      </div>
+      
+      {/* --- 버튼 그룹 --- */}
+      <div className="flex gap-8 z-10">
+        <button 
+          onClick={() => navigate('/select')} 
+          className="group relative w-56 py-6 bg-white rounded-[30px] shadow-[0_15px_35px_rgba(248,196,180,0.4)] transition-all hover:-translate-y-2 active:translate-y-0"
+        >
+          <div className="absolute inset-0 bg-[#F8C4B4] rounded-[30px] opacity-0 group-hover:opacity-100 transition-opacity" />
+          <span className="relative text-2xl font-black text-[#F8C4B4] group-hover:text-white transition-colors">
+            게임 시작
+          </span>
+        </button>
+
+        <button 
+          onClick={() => navigate('/tutorial')} 
+          className="group w-56 py-6 bg-white/40 backdrop-blur-sm border-2 border-white rounded-[30px] shadow-xl transition-all hover:bg-white hover:border-[#F8C4B4]"
+        >
+          <span className="text-2xl font-black text-gray-400 group-hover:text-[#F8C4B4] transition-colors">
+            튜토리얼
+          </span>
+        </button>
+      </div>
+
+      {/* --- 하단 푸터 --- */}
+      <div className="absolute bottom-10 text-gray-300 text-sm font-bold">
+        © 2026 Team Magnesium Deficiency. All rights reserved.
+      </div>
+
+    </div>
+  );
+};
+
+export default Home;
+</file>
+
+<file path="README.md">
+# magnesium-deficiency
+학습동아리입니다.
+</file>
+
+<file path="backend/src/main/java/com/facebeat/service/UserService.java">
+package com.facebeat.service;
+
+import com.facebeat.dto.request.SignupRequest;
+import com.facebeat.entity.User;
+import com.facebeat.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    // ✨ [추가됨] 0. 아이디 중복 확인 (Controller에서 사용)
+    @Transactional(readOnly = true)
+    public boolean checkIdDuplicate(String userId) {
+        // 아이디로 조회했을 때 존재하면 true, 없으면 false 반환
+        return userRepository.findByUserId(userId).isPresent();
+    }
+
+    // 1. 회원가입
+    @Transactional
+    public void signup(SignupRequest request) {
+        // 중복 체크 (혹시 몰라 한 번 더 안전장치)
+        if (userRepository.findByUserId(request.getUserId()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
+        }
+
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+        // User 엔티티 생성 및 저장
+        // UserId = UserName
+        User user = new User(request.getUserId(), request.getUserId(), encodedPassword);
+        userRepository.save(user);
+    }
+
+    // 2. 로그인
+    @Transactional(readOnly = true)
+    public User login(String userId, String password) {
+        // 1. 아이디로 찾기
+        User user = userRepository.findByUserId(userId)
+                .orElse(null);
+
+        // 2. 비밀번호 검증 (DB의 암호화된 비번과 비교)
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            return user;
+        }
+
+        return null; // 로그인 실패
+    }
+}
+</file>
+
+<file path="frontend/src/App.jsx">
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import AuthSelection from './pages/AuthSelection';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Home from './pages/Home';
+import SongSelection from './pages/SongSelection';
+import Tutorial from './pages/Tutorial';
+import RhythmGame from './pages/RhythmGame';
+import Ranking from './pages/Ranking';
+import Settings from './pages/setting';
+// [추가] 관리자 페이지 import
+import AdminDashboard from './pages/AdminDashboard'; 
+
+/**
+ * [추가] 관리자 전용 라우트 보호 컴포넌트
+ * 로그인 상태와 권한(Role)을 확인하여 접근을 제어합니다.
+ */
+const AdminRoute = ({ children }) => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const userRole = localStorage.getItem('userRole');
+
+  if (!isLoggedIn || userRole !== 'ADMIN') {
+    // 권한이 없으면 알림을 띄우고 로그인 페이지로 리다이렉트
+    alert("관리자 권한이 필요한 페이지입니다.");
+    return <Navigate to="/Login" replace />;
+  }
+
+  return children;
+};
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        {/* 일반 공개 경로 */}
+        <Route path="/" element={<AuthSelection />} />
+        <Route path="/Login" element={<Login />} />
+        <Route path="/Signup" element={<Signup />} />
+        
+        {/* 일반 사용자 경로 */}
+        <Route path="/Home" element={<Home />} />
+        <Route path="/select" element={<SongSelection />} />
+        <Route path="/tutorial" element={<Tutorial />} />
+        <Route path="/RhythmGame" element={<RhythmGame />} />
+        <Route path="/Settings" element={<Settings />} />
+        <Route path="/Ranking" element={<Ranking />} />
+
+        {/* [추가] 관리자 전용 경로 (보호됨) */}
+        <Route 
+          path="/AdminDashboard" 
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          } 
+        />
+
+        {/* <Route path="/game" element={<GamePlay />} /> */}
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+</file>
+
+<file path="frontend/src/pages/Login.jsx">
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Auth.css';
+
+const Login = () => {
+  const navigate = useNavigate();
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
+
+  // 기존 허용 정규표현식 (영문, 숫자, 특수문자)
+  const validRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+  // 한글 감지 정규표현식
+  const koreanRegex = /[ㄱ-ㅎㅏ-ㅣ가-힣]/;
+
+  // 입력 핸들러 함수
+  const handleInputChange = (e, setter) => {
+    const value = e.target.value;
+
+    // 1. 한글이 포함되어 있는지 먼저 검사
+    if (koreanRegex.test(value)) {
+      alert('한글은 입력할 수 없습니다.');
+      return; // 한글이 있으면 여기서 중단하여 setter를 실행하지 않음
+    }
+
+    // 2. 한글이 없고, 기존 validRegex(특수문자/영문/숫자)를 통과할 때만 상태 업데이트
+    if (value === '' || validRegex.test(value)) {
+      setter(value);
+    }
+  };
+
+  const handleLogin = async () => {
+    if (!userId || !password) {
+      alert('아이디와 비밀번호를 모두 입력해 주세요.');
+      return;
+    }
+
+    const isAdmin = userId === 'admin123';
+    const API_URL = isAdmin 
+      ? 'http://localhost:8080/api/admin/login' 
+      : 'http://localhost:8080/api/users/login';
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(isAdmin ? { id: userId, password } : { userId, password }),
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        
+        if (isAdmin) {
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userRole', 'ADMIN');
+          localStorage.setItem('userId', userId);
+          alert("관리자님, 환영합니다!");
+          navigate('/AdminDashboard');
+        } else {
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userRole', 'USER');
+          localStorage.setItem('userId', userData.userId);
+          alert(`${userData.userId}님, 환영합니다!`);
+          navigate('/Home');
+        }
+      } else {
+        const errorData = await response.text();
+        alert(errorData || '아이디 또는 비밀번호가 일치하지 않습니다.');
+      }
+    } catch (err) {
+      console.error('로그인 에러:', err);
+      alert('서버 연결 실패');
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <div className="bg-circle circle-1"></div>
+      <div className="bg-circle circle-2"></div>
+
+      <div className="auth-card">
+        <h1 className="auth-title">로그인</h1>
+        <p className="auth-subtitle">Welcome back to Magnesium Deficiency!</p>
+
+        <div className="input-group">
+          <div className="input-wrapper">
+            <label className="field-label">USER ID</label>
+            <input 
+              type="text" 
+              value={userId}
+              // handleInputChange를 사용하도록 수정
+              onChange={(e) => handleInputChange(e, setUserId)}
+              placeholder="아이디를 입력하세요"
+              className="auth-input"
+            />
+          </div>
+
+          <div className="input-wrapper">
+            <label className="field-label">PASSWORD</label>
+            <input 
+              type="password" 
+              value={password}
+              // handleInputChange를 사용하도록 수정
+              onChange={(e) => handleInputChange(e, setPassword)}
+              placeholder="비밀번호를 입력하세요"
+              className="auth-input"
+            />
+          </div>
+        </div>
+
+        <div className="auth-btn-group">
+          <button onClick={handleLogin} className="auth-btn btn-primary">
+            LOGIN
+          </button>
+          <button onClick={() => navigate('/signup')} className="link-btn">
+            아직 계정이 없으신가요? 회원가입하기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
+</file>
+
+<file path="frontend/src/pages/Signup.jsx">
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Auth.css';
+
+const Signup = () => {
+  const navigate = useNavigate();
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
+  const [idError, setIdError] = useState('');
+  const [pwError, setPwError] = useState('');
+  const [isIdChecked, setIsIdChecked] = useState(false);
+  const [isIdAvailable, setIsIdAvailable] = useState(false);
+
+  const validRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+
+  const handleIdChange = (e) => {
+    const value = e.target.value;
+    if (!validRegex.test(value)) {
+      setIdError('허용되지 않는 문자입니다.');
+      return;
+    }
+    setUserId(value);
+    setIsIdChecked(false);
+    setIsIdAvailable(false);
+
+    if (value.length > 0 && (value.length < 6 || value.length > 12)) {
+      setIdError('아이디는 6~12자 사이여야 합니다.');
+    } else {
+      setIdError('');
+    }
+  };
+
+  const handlePwChange = (e) => {
+    const value = e.target.value;
+    if (!validRegex.test(value)) return;
+    setPassword(value);
+    if (value.length > 0 && value.length < 8) {
+      setPwError('비밀번호는 8자 이상을 추천합니다.');
+    } else {
+      setPwError('');
+    }
+  };
+
+  const checkDuplicate = async () => {
+    if (userId.length < 6 || userId.length > 12) {
+      alert('아이디 길이를 확인하세요 (6~12자)');
+      return;
+    }
+    try {
+      const response = await fetch(`http://localhost:8080/api/users/check-id?userId=${userId}`);
+      if (response.ok) {
+        // 상태 코드 200 (OK)
+        alert("사용 가능한 아이디입니다! (Available)");
+        setIsIdAvailable(true);
+        setIsIdChecked(true);
+      } else if (response.status === 409) {
+        // 🔥 상태 코드 409 (지금 보시는 화면)
+        alert("이미 존재하는 아이디입니다. 다른 걸 써주세요.");
+        setIsIdAvailable(false);
+      } else {
+        // 그 외 진짜 에러
+        alert("서버 오류가 발생했습니다.");
+      }
+    } catch (error) {
+      alert('통신 오류');
+    }
+  };
+
+  const handleSignup = async () => {
+    if (!isIdChecked || !isIdAvailable) {
+      alert('중복 검사를 완료해 주세요.');
+      return;
+    }
+    try {
+      const response = await fetch('http://localhost:8080/api/users/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, password }),
+      });
+      if (response.ok) {
+        alert('가입을 축하합니다!');
+        navigate('/login');
+      }
+    } catch (error) {
+      alert('가입 실패');
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <div className="bg-circle circle-1"></div>
+      <div className="bg-circle circle-2"></div>
+
+      <div className="auth-card">
+        <h1 className="auth-title">회원가입</h1>
+        <p className="auth-subtitle">Join the rhythm movement!</p>
+
+        <div className="input-group">
+          <div className="input-wrapper">
+            <label className="field-label">NEW ID</label>
+            <div style={{ position: 'relative' }}>
+              <input 
+                type="text" 
+                value={userId}
+                onChange={handleIdChange}
+                placeholder="6~12자 영문/숫자"
+                className="auth-input"
+                style={{ paddingRight: '100px' }}
+              />
+              <button onClick={checkDuplicate} className="check-btn">중복확인</button>
+            </div>
+            {idError && <p className="error-text">{idError}</p>}
+          </div>
+
+          <div className="input-wrapper">
+            <label className="field-label">PASSWORD</label>
+            <input 
+              type="password" 
+              value={password}
+              onChange={handlePwChange}
+              placeholder="8자 이상 권장"
+              className="auth-input"
+            />
+            {pwError && <p className="error-text">{pwError}</p>}
+          </div>
+        </div>
+
+        <div className="auth-btn-group">
+          <button 
+            onClick={handleSignup} 
+            disabled={!(isIdChecked && isIdAvailable && password.length >= 4 && !pwError)}
+            className="auth-btn btn-primary"
+          >
+            SIGN UP
+          </button>
+          <button onClick={() => navigate('/login')} className="link-btn">
+            이미 계정이 있나요? 로그인하기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Signup;
+</file>
+
+<file path="frontend/src/pages/Tutorial.jsx">
+import React, { useState, useEffect, useRef } from 'react';
+import Webcam from "react-webcam";
+import { useNavigate } from 'react-router-dom';
+import * as faceapi from 'face-api.js';
+
+const Tutorial = () => {
+  const expressionsList = [
+    { key: 'surprised', label: '놀람', emoji: '😲' },
+    { key: 'happy', label: '기쁨', emoji: '😊' },
+    { key: 'sad', label: '슬픔', emoji: '😢' },
+    { key: 'angry', label: '분노', emoji: '😡' },
+    { key: 'neutral', label: '무표정', emoji: '😐' }
+  ];
+
+  const [target, setTarget] = useState(null);
+  const [currentScore, setCurrentScore] = useState(""); 
+  const [isFinished, setIsFinished] = useState(false);
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
+  
+  const webcamRef = useRef(null);
+  const navigate = useNavigate();
+  const isFinishedRef = useRef(false);
+
+  useEffect(() => {
+    const loadModels = async () => {
+      const MODEL_URL = '/models'; 
+      try {
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+          faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
+        ]);
+        const randomIndex = Math.floor(Math.random() * expressionsList.length);
+        setTarget(expressionsList[randomIndex]);
+        setIsModelLoaded(true);
+      } catch (error) {
+        console.error("❌ 모델 로드 실패", error);
+      }
+    };
+    loadModels();
+  }, []);
+
+  useEffect(() => {
+    let interval;
+    if (isModelLoaded && target && !isFinished) {
+      interval = setInterval(async () => {
+        if (isFinishedRef.current) return;
+
+        if (webcamRef.current && webcamRef.current.video.readyState === 4) {
+          const video = webcamRef.current.video;
+          const detections = await faceapi
+            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceExpressions();
+
+          if (isFinishedRef.current || !detections || detections.length === 0) return;
+
+          const prob = detections[0].expressions[target.key];
+          const perfectThreshold = target.key === 'neutral' ? 0.95 : 0.8;
+
+          if (prob >= perfectThreshold) {
+            isFinishedRef.current = true;
+            setIsFinished(true);
+            setCurrentScore("Perfect");
+            
+            setTimeout(() => {
+              navigate('/Home');
+            }, 4000);
+
+          } else if (!isFinishedRef.current) {
+            if (prob >= 0.5) {
+              setCurrentScore("Good");
+            } else {
+              setCurrentScore("MISS");
+            }
+          }
+        }
+      }, 100); 
+    }
+    return () => clearInterval(interval);
+  }, [isModelLoaded, isFinished, target, navigate]);
+
+  if (!target) return <div className="bg-[#FFF9F9] min-h-screen flex items-center justify-center font-black text-[#F8C4B4] text-2xl">준비 중...</div>;
+
+  return (
+    <div className="relative min-h-screen bg-[#FFF9F9] overflow-hidden font-sans text-[#333]">
+      {/* 배경 원형 장식 */}
+      <div className="absolute -top-20 -right-20 w-96 h-96 bg-[#B4E4F8] opacity-20 rounded-full blur-3xl" />
+      <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-[#F8C4B4] opacity-20 rounded-full blur-3xl" />
+
+      {/* 카메라 영역 (좌우반전 적용) */}
+      <div className="absolute inset-0 flex items-center justify-center p-10">
+        <div className="relative w-full h-full max-w-5xl rounded-[40px] overflow-hidden shadow-2xl border-8 border-white bg-white">
+          <Webcam 
+            audio={false} 
+            ref={webcamRef} 
+            mirrored={true} // 좌우반전 핵심 속성
+            className="w-full h-full object-cover" 
+          />
+          {/* 카메라 오버레이 어둡게 (인식률 시각화 보조) */}
+          <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+        </div>
+      </div>
+
+      {/* 상단 헤더 UI */}
+      <header className="absolute top-0 w-full p-10 z-20 flex justify-between items-start">
+        <div className="flex items-center gap-6">
+          <button 
+            onClick={() => navigate('/Home')} 
+            className="p-4 bg-white shadow-lg rounded-full hover:bg-gray-50 transition-all group"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#333]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="bg-white/90 backdrop-blur-md px-10 py-5 rounded-[30px] shadow-xl border-4 border-[#F8C4B4]">
+          <p className="text-sm font-black text-gray-400 uppercase tracking-widest mb-1">Mission</p>
+          <h2 className="text-4xl font-black text-[#333] flex items-center gap-3">
+            {target.label} <span className="text-5xl">{target.emoji}</span>
+          </h2>
+        </div>
+      </header>
+
+      {/* 중앙 판정 UI */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
+        {currentScore && (
+          <h2 className={`text-[12rem] font-black italic tracking-tighter drop-shadow-2xl transition-all duration-100
+            ${currentScore === 'Perfect' ? 'text-[#F8C4B4] scale-110' : 
+              currentScore === 'Good' ? 'text-[#B4E4F8]' : 'text-gray-300 opacity-50 scale-90'}`}>
+            {currentScore}{currentScore === 'Perfect' ? '!' : ''}
+          </h2>
+        )}
+      </div>
+
+      {/* 하단 안내 캡슐 UI */}
+      <div className="absolute bottom-16 w-full flex flex-col items-center z-20">
+        <div className={`px-16 py-6 rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.1)] transition-all duration-500 border-4
+          ${isFinished ? 'bg-[#F8C4B4] border-white text-white scale-105' : 'bg-white border-[#B4E4F8] text-[#333]'}`}>
+          <p className="text-2xl font-black flex items-center gap-4">
+            {isFinished 
+              ? "🎉 튜토리얼 완료! 잠시 후 홈으로 이동합니다." 
+              : <>
+                  <span className="w-4 h-4 bg-[#B4E4F8] rounded-full animate-ping" />
+                  {currentScore === "Perfect" ? "와우! 완벽해요!" : "표정을 더 크게 지어보세요!"}
+                </>
+            }
+          </p>
+        </div>
+        
+        {/* 서버 상태 느낌의 안내 문구 */}
+        {!isFinished && (
+            <p className="mt-4 text-sm font-bold text-gray-400 bg-white/50 px-4 py-1 rounded-full">
+                정확한 인식을 위해 밝은 곳에서 플레이해주세요.
+            </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Tutorial;
+</file>
+
+<file path="backend/src/main/java/com/facebeat/dto/request/LoginRequest.java">
+package com.facebeat.dto.request;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+public class LoginRequest {
+    private String userId;
+    private String password;
+
+    public String getUserId() { return userId; }
+    public String getPassword() { return password; }
+}
+</file>
+
+<file path="frontend/src/pages/RhythmGame.css">
+.game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+  font-family: 'Pretendard', sans-serif;
+  z-index: 1;
+}
+
+.webcam-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  z-index: 2;
+  opacity: 0.5;
+}
+
+.lane-container {
+  display: flex;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+.lane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative; /* 자식인 note-stream의 기준 */
+  transition: background 0.15s ease-in-out;
+  overflow: hidden;
+}
+
+.lane.active { 
+  background: var(--lane-color); 
+  opacity: 1; 
+  box-shadow: inset 0 0 100px rgba(255, 255, 255, 0.2);
+}
+
+.lane.inactive { background: transparent; opacity: 0.15; }
+
+.lane.happy { --lane-color: rgba(255, 235, 59, 0.45); }
+.lane.sad { --lane-color: rgba(33, 150, 243, 0.45); }
+.lane.angry { --lane-color: rgba(244, 67, 54, 0.5); }
+.lane.neutral { --lane-color: rgba(255, 255, 255, 0.5); }
+.lane.surprised { --lane-color: rgba(156, 39, 176, 0.45); }
+
+.target-emoji { font-size: 4.5rem; margin-top: 50px; z-index: 20; position: relative; }
+
+/* 노드가 지나가는 길 - 레인 전체를 채워야 함 */
+.note-stream {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.note-emoji.rising {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 4.5rem;
+  z-index: 15;
+  animation-name: moveUpSmooth;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+/* 판정된 이모지는 자연스럽게 사라짐 */
+.note-emoji.rising.judged {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* 아래에서 위 타겟까지 올라가는 애니메이션 */
+@keyframes moveUpSmooth {
+  from { bottom: -10%; }
+  to { bottom: 100%; } /* 타겟 이모지 위치를 지나 화면 끝까지 */
+}
+
+.ui-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 150;
+  pointer-events: none;
+}
+
+.score-capsule {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 10px 35px;
+  border-radius: 999px;
+  border: 4px solid #F8C4B4;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+  animation: scoreBounce 2s ease-in-out infinite;
+}
+
+@keyframes scoreBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-10px); }
+}
+
+.score-value { font-size: 2.2rem; font-weight: 900; color: #333; min-width: 60px; text-align: center; }
+.score-label { font-size: 1rem; font-weight: 900; color: #F8C4B4; }
+
+.judgement-display {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 7rem;
+  font-weight: 900;
+  text-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+.judgement-display.perfect { color: #ffff33; }
+.judgement-display.good { color: #33ccff; }
+.judgement-display.miss { color: #ff3333; }
+
+.final-score-text {
+  font-size: 10rem;
+  font-weight: 900;
+  color: #F8C4B4;
+  text-shadow: 0 0 50px rgba(248, 196, 180, 0.5);
+  margin-bottom: 50px;
+}
+
+.time-limit-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 8px;
+  background: #F8C4B4;
+  z-index: 300;
+  animation: timerShrink 30s linear forwards;
+}
+
+@keyframes timerShrink { from { width: 100%; } to { width: 0%; } }
+
+.overlay-screen {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+
+/* 시간바 컨테이너 */
+.progress-bar-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px; /* 바의 두께 */
+  background: rgba(255, 255, 255, 0.2); /* 배경 트랙 색상 */
+  z-index: 200; /* 모든 요소 위에 표시 */
+}
+
+/* 실제 줄어드는 바 */
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff7e5f, #feb47b); /* 예쁜 그라데이션 */
+  box-shadow: 0 0 10px rgba(255, 126, 95, 0.8);
+  transition: width 0.1s linear; /* 부드럽게 움직이게 함 */
+}
+
+/* 기존 스타일들... */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: black;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 300;
+}
+
+/* 일시정지 아이콘 버튼 (플레이 중 우측 상단) */
+.pause-icon-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 150;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.pause-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+
+/* 일시정지 메뉴 오버레이 */
+.pause-menu {
+  background: rgba(0, 0, 0, 0.85) !important;
+}
+
+.menu-title {
+  font-size: 4rem;
+  color: #F8C4B4;
+  margin-bottom: 40px;
+  letter-spacing: 5px;
+  text-shadow: 0 0 15px rgba(248, 196, 180, 0.5);
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 300px;
+}
+
+/* 일시정지 시 노트 애니메이션 멈춤 */
+.note-emoji.paused {
+  animation-play-state: paused !important;
+}
+
+/* PAUSE 전용 버튼 스타일링 */
+.menu-btn.resume { background: #4CAF50; color: white; }
+.menu-btn.restart { background: #FF9800; color: white; }
+.menu-btn.select { background: #2196F3; color: white; }
+.menu-btn { padding: 15px 45px; font-size: 1.3rem; font-weight: 800; border: none; border-radius: 50px; cursor: pointer; transition: 0.2s; margin: 10px; }
+.menu-btn.start, .menu-btn.retry { background: #F8C4B4; color: white; }
+.menu-btn.home { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid white; }
+.menu-btn:hover { transform: scale(1.1); }
+</file>
+
+<file path="frontend/src/pages/SongSelection.jsx">
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const SongSelection = () => {
+  const [songs, setSongs] = useState([]);
+  const [selectedSongId, setSelectedSongId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  // [필수 1] 백엔드 주소 상수 정의
+  const BACKEND_URL = 'http://localhost:8080';
+
+  // [필수 2] 이미지 경로 앞에 백엔드 주소를 붙여주는 함수
+  const getResourceUrl = (path) => {
+    if (!path) return '/G54d4NraAAAAx6y.jpg'; // 경로가 없으면 기본 이미지
+    // 이미 http로 시작하면(외부 이미지면) 그대로 두고, 아니면 백엔드 주소 붙이기
+    return path.startsWith('http') ? path : `${BACKEND_URL}${path}`;
+  };
+
+  const difficultyLabel = (difficulty) => {
+    if (difficulty === 1) return "EASY";
+    if (difficulty === 2) return "NORMAL";
+    if (difficulty === 3) return "HARD";
+    return "UNKNOWN";
+  };
+
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/songs`); 
+        if (!response.ok) throw new Error('네트워크 응답 에러');
+        
+        const data = await response.json();
+        setSongs(data);
+        if (data.length > 0) setSelectedSongId(data[0].id);
+      } catch (error) {
+        console.error("데이터 로딩 실패:", error);
+        
+        // [필수 3] 더미 데이터 키 이름을 'image_path'로 통일 (img_path 아님!)
+        setSongs([
+          {
+            id: 1,
+            title: '생일 축하 노래',
+            artist: '마그네슘 부족',
+            bpm: 100,
+            difficulty: 1,
+            file_path: '/birthday_star.mp3',
+            image_path: '/birthday_star.png', // 여기 수정됨
+          }
+        ]);
+        setSelectedSongId(1);
+
+      } finally {
+        setIsLoading(false); 
+      }
+    };
+
+    fetchSongs();
+  }, []);
+
+  // [핵심 수정] 카드 클릭 시 선택/해제 토글 로직
+  const handleSelectSong = (id) => {
+    if (selectedSongId === id) {
+      setSelectedSongId(null); // 이미 선택된 곡을 다시 누르면 해제 (기본색/크기로 복원)
+    } else {
+      setSelectedSongId(id); // 다른 곡을 누르면 해당 곡 선택
+    }
+  };
+
+  const handleStartGame = () => {
+    const selectedSongData = songs.find((s) => s.id === selectedSongId);
+    
+    // 곡이 선택되지 않았을 때의 예외 처리
+    if (!selectedSongData) {
+      alert("플레이할 노래를 선택해 주세요! 😊");
+      return;
+    }
+
+    navigate('/RhythmGame', {
+      state: {
+        song: {
+          id: selectedSongData.id,
+          title: selectedSongData.title,
+          artist: selectedSongData.artist,
+          bpm: selectedSongData.bpm,
+          difficulty: selectedSongData.difficulty,
+          file_path: selectedSongData.file_path,
+          image_path: selectedSongData.image_path,
+        },
+      },
+    });
+  };
+
+  if (isLoading) return <div className="min-h-screen bg-white flex items-center justify-center font-black text-2xl">데이터 불러오는 중...</div>;
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col p-8">
+      <header className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate('/Home')} 
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-8 w-8 text-gray-800 group-hover:text-black" 
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-3xl font-black cursor-pointer" onClick={() => navigate('/Home')}>
+            마그네슘 부족
+          </h1>
+        </div>
+        <div className="flex gap-6 text-sm text-gray-500 font-bold">
+          <button onClick={() => navigate('/Home')} className="hover:text-black">홈</button>
+          <button onClick={() => navigate('/Ranking')} className="hover:text-black">랭킹</button>
+          <button onClick={() => navigate('/Settings')} className="hover:text-black">설정</button>
+        </div>
+      </header>
+      
+      <main className="flex-1 grid grid-cols-2 gap-10 px-10 overflow-y-auto">
+        {songs.map((song) => (
+          <div 
+            key={song.id}
+            onClick={() => handleSelectSong(song.id)}
+            className={`p-6 rounded-[40px] cursor-pointer transition-all duration-300 transform ${
+              selectedSongId === song.id 
+              ? 'bg-[#F8C4B4] shadow-[0_20px_40px_rgba(248,196,180,0.4)] scale-105 border-4 border-white' 
+              : 'bg-gray-50 hover:bg-gray-100 border-4 border-transparent'
+            }`}
+          >
+            <div className="w-full aspect-video rounded-2xl mb-4 overflow-hidden bg-gray-200 relative">
+              
+              {/* [필수 4] getResourceUrl 함수로 감싸서 이미지를 불러옴 */}
+              <img 
+                src={getResourceUrl(song.image_path)}
+                alt={song.title} 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = '/G54d4NraAAAAx6y.jpg';
+                }}
+              />
+              
+            </div>
+            <div className="flex justify-between items-end">
+              <div>
+                <h3 className={`text-2xl font-black mb-1 ${selectedSongId === song.id ? 'text-white' : 'text-[#333]'}`}>
+                  {song.title}
+                </h3>
+                <p className={`text-sm font-bold ${selectedSongId === song.id ? 'text-white/80' : 'text-gray-400'}`}>
+                  {song.bpm} BPM
+                </p>
+              </div>
+              <div className="text-right">
+                <p className={`font-black text-lg mb-2 ${selectedSongId === song.id ? 'text-white' : 'text-[#333]'}`}>
+                  {song.artist}
+                </p>
+                <span className={`text-xs font-black px-3 py-1 rounded-full ${
+                  selectedSongId === song.id ? 'bg-white text-[#F8C4B4]' : 'bg-gray-200 text-gray-500'
+                }`}>
+                  {difficultyLabel(song.difficulty)}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </main>
+      
+      <footer className="py-8 flex justify-center">
+        <button 
+          onClick={handleStartGame} 
+          className={`px-24 py-6 text-3xl font-black rounded-[30px] shadow-2xl transition-all active:scale-95 ${
+            selectedSongId 
+            ? 'bg-[#F8C4B4] text-white hover:brightness-105' 
+            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          게임 시작
+        </button>
+      </footer>
+    </div>
+  );
+};
+
+export default SongSelection;
+</file>
+
+<file path="frontend/src/pages/RhythmGame.jsx">
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import * as faceapi from 'face-api.js';
+import './RhythmGame.css';
+
+// 설정 상수
+const EMOTION_CONFIG = {
+  neutral:   { weight: 6.0, perfect: 0.90, good: 0.50 }, 
+  happy:     { weight: 1.5, perfect: 0.80, good: 0.45 }, 
+  surprised: { weight: 1.3, perfect: 0.75, good: 0.40 }, 
+  angry:     { weight: 1.6, perfect: 0.60, good: 0.30 }, 
+  sad:       { weight: 0.5, perfect: 0.55, good: 0.25 }  
+};
+const EMOTIONS = Object.keys(EMOTION_CONFIG);
+const EMOJI_MAP = { happy: '😊', sad: '😭', angry: '😡', neutral: '😐', surprised: '😮' };
+const BACKEND_URL = 'http://localhost:8080';
+
+const RhythmGame = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // 1. 상태 관리
+  const [gameState, setGameState] = useState('ready'); // ready, playing, paused, finished
+  const [currentEmotion, setCurrentEmotion] = useState('neutral');
+  const [notes, setNotes] = useState([]); 
+  const [score, setScore] = useState(0);
+  const [judgement, setJudgement] = useState(null);
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [progress, setProgress] = useState(100);
+
+  // 2. 타이머 및 외부 객체 관리
+  const videoRef = useRef(null);
+  const audioRef = useRef(new Audio()); 
+  const gameLoopRef = useRef(null);
+  const noteTimeoutRef = useRef(null);
+  const endTimerRef = useRef(null);
+  const latestExpressionsRef = useRef({});
+  const isDetecting = useRef(false);
+
+  // 3. 노래 데이터 처리
+  const selectedSong = useMemo(() => location.state?.song || { 
+    title: "기본 곡", artist: "Artist", bpm: 120, difficulty: 2, file_path: "song_30s.mp3" 
+  }, [location.state]);
+
+  const settings = useMemo(() => {
+    const bpm = selectedSong.bpm || 120;
+    const diff = selectedSong.difficulty;
+    const diffLabel = (diff === 1 || diff === 'Easy') ? "EASY" : (diff === 3 || diff === 'Hard') ? "HARD" : "NORMAL";
+    let baseTiming = (60000 / bpm) * 4; 
+    const config = { 'EASY': 1.5, 'NORMAL': 1.0, 'HARD': 0.7 }[diffLabel];
+    return { hitTiming: baseTiming * config, spawnRange: [1000, 2000] };
+  }, [selectedSong]);
+
+  // 4. 기능 함수들
+  const stopAllTimers = useCallback(() => {
+    if (gameLoopRef.current) clearInterval(gameLoopRef.current);
+    if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
+    if (endTimerRef.current) clearTimeout(endTimerRef.current);
+    gameLoopRef.current = null;
+    noteTimeoutRef.current = null;
+    audioRef.current.pause();
+  }, []);
+
+  const spawnNote = useCallback(() => {
+    // 일시정지 상태면 노트를 생성하지 않음
+    if (gameState !== 'playing') return;
+
+    const randomEm = EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)];
+    const now = Date.now();
+    
+    setNotes(prev => [...prev, { 
+      id: `${now}-${Math.random()}`, 
+      emotion: randomEm, 
+      hitTime: now + settings.hitTiming, 
+      judged: false 
+    }]);
+
+    const nextDelay = Math.random() * (settings.spawnRange[1] - settings.spawnRange[0]) + settings.spawnRange[0];
+    noteTimeoutRef.current = setTimeout(spawnNote, nextDelay);
+  }, [gameState, settings]);
+
+  // 5. 초기 모델 초기화
+  useEffect(() => {
+    const initFaceApi = async () => {
+      try {
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+          faceapi.nets.faceExpressionNet.loadFromUri('/models')
+        ]);
+        setIsModelLoaded(true);
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) videoRef.current.srcObject = stream;
+      } catch (err) { console.error("Init Error:", err); }
+    };
+    initFaceApi();
+    return () => stopAllTimers();
+  }, [stopAllTimers]);
+
+  // 6. 감정 감지 루프
+  const detectExpressions = useCallback(async () => {
+    if (!videoRef.current || videoRef.current.paused || isDetecting.current) return;
+    isDetecting.current = true;
+    const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.3 })).withFaceExpressions();
+    if (detections.length > 0) {
+      const expressions = detections[0].expressions;
+      latestExpressionsRef.current = expressions;
+      let bestEmotion = 'neutral';
+      let maxScore = -1;
+      EMOTIONS.forEach(em => {
+        const weighted = (expressions[em] || 0) * EMOTION_CONFIG[em].weight;
+        if (weighted > maxScore) { maxScore = weighted; bestEmotion = em; }
+      });
+      setCurrentEmotion(bestEmotion); 
+    }
+    isDetecting.current = false;
+    requestAnimationFrame(detectExpressions);
+  }, []);
+
+  // 7. 게임 엔진 제어 (일시정지 로직 통합)
+  useEffect(() => {
+    if (gameState === 'playing') {
+      gameLoopRef.current = setInterval(() => {
+        const now = Date.now();
+        
+        if (audioRef.current.duration) {
+          const currentProgress = ((audioRef.current.duration - audioRef.current.currentTime) / audioRef.current.duration) * 100;
+          setProgress(Math.max(0, currentProgress));
+        }
+
+        setNotes(prev => prev.map(note => {
+          if (!note.judged && now >= note.hitTime) {
+            const rawProb = latestExpressionsRef.current[note.emotion] || 0;
+            const config = EMOTION_CONFIG[note.emotion];
+            let res = { text: 'Miss', type: 'miss', add: 0 };
+            if (rawProb >= config.perfect) res = { text: 'Perfect!', type: 'perfect', add: 100 };
+            else if (rawProb >= config.good) res = { text: 'Good!', type: 'good', add: 50 };
+            setScore(p => p + res.add);
+            setJudgement({ text: res.text, type: res.type });
+            setTimeout(() => setJudgement(null), 500);
+            return { ...note, judged: true };
+          }
+          return note;
+        }).filter(note => now < note.hitTime + 1000));
+      }, 16);
+      spawnNote();
+    } else {
+      // playing 상태가 아니면 타이머 제거 (일시정지 포함)
+      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
+      if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
+    }
+    return () => {
+      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
+      if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
+    };
+  }, [gameState, spawnNote, stopAllTimers]);
+
+  // 8. 제어 함수들
+  const startGame = () => {
+    const audio = audioRef.current;
+    const cleanPath = selectedSong.file_path.startsWith('/') ? selectedSong.file_path.substring(1) : selectedSong.file_path;
+    audio.src = `${BACKEND_URL}/${cleanPath}`;
+    audio.crossOrigin = "anonymous";
+
+    audio.play().then(() => {
+      setNotes([]);
+      setScore(0);
+      setGameState('playing');
+      audio.onended = () => { setGameState('finished'); stopAllTimers(); };
+    }).catch(err => { alert("오디오 재생 실패"); });
+  };
+
+  const pauseGame = () => {
+    if (gameState !== 'playing') return;
+    setGameState('paused');
+    audioRef.current.pause(); // 음악 중지
+  };
+
+  const resumeGame = () => {
+    if (gameState !== 'paused') return;
+    audioRef.current.play().then(() => {
+      setGameState('playing'); // 엔진 자동 재시작
+    });
+  };
+
+  const restartGame = () => {
+    stopAllTimers();
+    startGame();
+  };
+
+  const goToSongSelection = () => {
+    stopAllTimers();
+    navigate('/select'); // 노래 선택 페이지 경로에 맞게 수정
+  };
+
+  return (
+    <div className="game-container">
+      {!isModelLoaded && <div className="loading-overlay">모델 로딩 중...</div>}
+      <video ref={videoRef} autoPlay playsInline muted onPlay={() => requestAnimationFrame(detectExpressions)} className="webcam-bg" />
+      
+      {/* 상단 시간바 */}
+      {(gameState === 'playing' || gameState === 'paused') && (
+        <div className="progress-bar-container">
+          <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+        </div>
+      )}
+
+      {/* 게임 대기 화면 */}
+      {gameState === 'ready' && (
+        <div className="overlay-screen">
+          <h1 className="game-title">Emotion Rhythm</h1>
+          <div className="song-detail-box">
+             <p className="song-title-text">{selectedSong.title}</p>
+             <p className="song-sub-text">{selectedSong.artist}</p>
+          </div>
+          <button className="menu-btn start" onClick={startGame}>START</button>
+        </div>
+      )}
+
+      {/* [신규] 일시정지 오버레이 메뉴 */}
+      {gameState === 'paused' && (
+        <div className="overlay-screen pause-menu">
+          <h1 className="menu-title">PAUSED</h1>
+          <div className="button-group">
+            <button className="menu-btn resume" onClick={resumeGame}>이어서 하기</button>
+            <button className="menu-btn restart" onClick={restartGame}>다시 하기</button>
+            <button className="menu-btn select" onClick={goToSongSelection}>곡 선택하러 가기</button>
+          </div>
+        </div>
+      )}
+
+      {/* 결과 화면 */}
+      {gameState === 'finished' && (
+        <div className="overlay-screen result-screen">
+          <h1 className="final-score-text">{score}</h1>
+          <button className="menu-btn retry" onClick={() => setGameState('ready')}>RETRY</button>
+        </div>
+      )}
+
+      {/* 인게임 요소 */}
+      {(gameState === 'playing' || gameState === 'paused' || gameState === 'ready') && (
+        <>
+          {gameState === 'playing' && (
+            <button className="pause-icon-btn" onClick={pauseGame}>❚❚</button>
+          )}
+          
+          <div className="lane-container">
+            {EMOTIONS.map((emotion) => (
+              <div key={emotion} className={`lane ${emotion} ${currentEmotion === emotion ? 'active' : 'inactive'}`}>
+                <div className="target-emoji">{EMOJI_MAP[emotion]}</div>
+                <div className="note-stream">
+                  {notes.filter(n => n.emotion === emotion && !n.judged).map(note => (
+                    <div 
+                      key={note.id} 
+                      className={`note-emoji rising ${gameState === 'paused' ? 'paused' : ''}`} 
+                      style={{ animationDuration: `${settings.hitTiming}ms` }}
+                    >
+                      {EMOJI_MAP[note.emotion]}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {gameState === 'playing' && (
+        <div className="ui-layer">
+          <div className="score-capsule">SCORE: {score}</div>
+          {judgement && <div className={`judgement-display ${judgement.type}`}>{judgement.text}</div>}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default RhythmGame;
+</file>
+
+</files>

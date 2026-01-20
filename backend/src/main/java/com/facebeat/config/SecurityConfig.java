@@ -8,30 +8,53 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
-@EnableWebSecurity // 스프링 시큐리티 활성화
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // 1. CSRF 보안 끄기 (Rest API에서는 보통 끕니다)
+            // 1. CORS 설정 (가장 먼저 적용)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
+            // 2. CSRF 보안 끄기
             .csrf(AbstractHttpConfigurer::disable)
             
-            // 2. 요청 주소별 권한 설정
+            // 3. 요청 주소별 권한 설정
             .authorizeHttpRequests(auth -> auth
-                // "/api/users/**" 로 시작하는 주소(로그인, 회원가입)는 누구나 접속 가능!
-                .requestMatchers("/api/users/**").permitAll()
-                // 그 외 다른 요청도 일단은 다 허용 (개발 편의상)
-                // 나중에 .anyRequest().authenticated()로 바꾸면 로그인한 사람만 가능해짐
+                .requestMatchers("/api/users/**", "/api/admin/**").permitAll()
                 .anyRequest().permitAll()
             );
 
         return http.build();
     }
 
-    // 아까 만든 비밀번호 암호화 기계
+    // 전역 CORS 설정 Bean
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // React 앱의 주소 허용
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        // 허용할 HTTP 메서드
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        // 허용할 HTTP 헤더
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        // 자격 증명(쿠키 등) 허용
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // 모든 경로에 대해 위 설정 적용
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

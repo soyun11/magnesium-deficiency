@@ -8,13 +8,10 @@ const SongSelection = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // [필수 1] 백엔드 주소 상수 정의
   const BACKEND_URL = 'http://localhost:8080';
 
-  // [필수 2] 이미지 경로 앞에 백엔드 주소를 붙여주는 함수
   const getResourceUrl = (path) => {
-    if (!path) return '/G54d4NraAAAAx6y.jpg'; // 경로가 없으면 기본 이미지
-    // 이미 http로 시작하면(외부 이미지면) 그대로 두고, 아니면 백엔드 주소 붙이기
+    if (!path) return '/G54d4NraAAAAx6y.jpg';
     return path.startsWith('http') ? path : `${BACKEND_URL}${path}`;
   };
 
@@ -37,7 +34,6 @@ const SongSelection = () => {
       } catch (error) {
         console.error("데이터 로딩 실패:", error);
         
-        // [필수 3] 더미 데이터 키 이름을 'image_path'로 통일 (img_path 아님!)
         setSongs([
           {
             id: 1,
@@ -45,8 +41,8 @@ const SongSelection = () => {
             artist: '마그네슘 부족',
             bpm: 100,
             difficulty: 1,
-            file_path: '/birthday_star.mp3',
-            image_path: '/birthday_star.png', // 여기 수정됨
+            filePath: '/birthday_star.mp3',
+            imagePath: '/birthday_star.png',
           }
         ]);
         setSelectedSongId(1);
@@ -59,21 +55,19 @@ const SongSelection = () => {
     fetchSongs();
   }, []);
 
-  // [핵심 수정] 카드 클릭 시 선택/해제 토글 로직
   const handleSelectSong = (id) => {
     if (selectedSongId === id) {
-      setSelectedSongId(null); // 이미 선택된 곡을 다시 누르면 해제 (기본색/크기로 복원)
+      setSelectedSongId(null);
     } else {
-      setSelectedSongId(id); // 다른 곡을 누르면 해당 곡 선택
+      setSelectedSongId(id);
     }
   };
 
   const handleStartGame = () => {
     const selectedSongData = songs.find((s) => s.id === selectedSongId);
     
-    // 곡이 선택되지 않았을 때의 예외 처리
     if (!selectedSongData) {
-      alert("플레이할 노래를 선택해 주세요! 😊");
+      alert("플레이할 노래를 선택해 주세요! ");
       return;
     }
 
@@ -85,8 +79,8 @@ const SongSelection = () => {
           artist: selectedSongData.artist,
           bpm: selectedSongData.bpm,
           difficulty: selectedSongData.difficulty,
-          file_path: selectedSongData.file_path,
-          image_path: selectedSongData.image_path,
+          filePath: selectedSongData.filePath,
+          imagePath: selectedSongData.imagePath,
         },
       },
     });
@@ -134,9 +128,8 @@ const SongSelection = () => {
           >
             <div className="w-full aspect-video rounded-2xl mb-4 overflow-hidden bg-gray-200 relative">
               
-              {/* [필수 4] getResourceUrl 함수로 감싸서 이미지를 불러옴 */}
               <img 
-                src={getResourceUrl(song.image_path)}
+                src={getResourceUrl(song.imagePath)}
                 alt={song.title} 
                 className="w-full h-full object-cover"
                 onError={(e) => {

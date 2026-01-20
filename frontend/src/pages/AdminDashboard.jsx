@@ -12,10 +12,9 @@ const AdminDashboard = () => {
     artist: '',
     bpm: '',
     difficulty: 1,
-    file_path: '',
-    image_path: '', // DB schema에 추가 권장
-    duration: 0
   });
+  const [songFile, setSongFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
   const BACKEND_URL = 'http://localhost:8080';
 
@@ -38,42 +37,79 @@ const AdminDashboard = () => {
     fetchSongs();
   }, []);
 
-  // 2. 입력 값 변경 처리
+  // 2. 텍스트 입력 값 변경 처리
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewSong({ ...newSong, [name]: value });
   };
 
-  // 3. 노래 추가 제출
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/songs`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newSong),
-      });
-
-      if (response.ok) {
-        alert("새 노래가 등록되었습니다! 🎵");
-        setNewSong({ title: '', artist: '', bpm: '', difficulty: 1, file_path: '', image_path: '', duration: 0 });
-        fetchSongs(); // 목록 새로고침
-      }
-    } catch (error) {
-      alert("등록에 실패했습니다.");
+  // 3. 파일 입력 값 변경 처리
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    if (name === 'songFile') {
+      setSongFile(files[0]);
+    } else if (name === 'imageFile') {
+      setImageFile(files[0]);
     }
   };
 
-  // 4. 노래 삭제
+  // 4. 노래 추가 제출
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!songFile) {
+      alert('MP3 파일을 선택해주세요.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', newSong.title);
+    formData.append('artist', newSong.artist);
+    formData.append('bpm', newSong.bpm);
+    formData.append('difficulty', newSong.difficulty);
+    formData.append('songFile', songFile);
+    if (imageFile) {
+      formData.append('imageFile', imageFile);
+    }
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/songs`, {
+        method: 'POST',
+        body: formData, // FormData 사용 시 Content-Type 헤더는 브라우저가 자동으로 설정
+      });
+
+      if (response.ok) {
+        alert("새 노래가 등록되었습니다!");
+        // 입력 필드 초기화
+        setNewSong({ title: '', artist: '', bpm: '', difficulty: 1 });
+        setSongFile(null);
+        setImageFile(null);
+        document.getElementById('song-form').reset(); // 폼 리셋
+        fetchSongs(); // 목록 새로고침
+      } else {
+        const errorData = await response.json();
+        alert(`등록에 실패했습니다: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error("등록 실패:", error);
+      alert("등록 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 5. 노래 삭제
   const handleDelete = async (id) => {
-    if (!window.confirm("정말 이 곡을 삭제하시겠습니까?")) return;
+    if (!window.confirm("정말 이 곡을 삭제하시겠습니까? DB와 서버에서 파일이 모두 삭제됩니다.")) return;
     try {
       const response = await fetch(`${BACKEND_URL}/api/songs/${id}`, { method: 'DELETE' });
       if (response.ok) {
-        setSongs(songs.filter(song => song.id !== id));
+        alert('노래가 삭제되었습니다.');
+        fetchSongs(); // 목록 새로고침
+      } else {
+        const errorData = await response.json();
+        alert(`삭제에 실패했습니다: ${errorData.message}`);
       }
     } catch (error) {
       console.error("삭제 실패:", error);
+      alert("삭제 중 오류가 발생했습니다.");
     }
   };
 
@@ -102,7 +138,7 @@ const AdminDashboard = () => {
               <span className="w-2 h-8 bg-[#F8C4B4] rounded-full"></span>
               새 노래 등록
             </h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form id="song-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div>
                 <label className="block text-xs font-black text-gray-400 ml-2 mb-1">곡 제목</label>
                 <input name="title" value={newSong.title} onChange={handleInputChange} placeholder="ex) Moonlight" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" required />
@@ -126,12 +162,12 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">파일 경로 (.mp3)</label>
-                <input name="file_path" value={newSong.file_path} onChange={handleInputChange} placeholder="/songs/filename.mp3" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" required />
+                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">음악 파일 (.mp3)</label>
+                <input type="file" name="songFile" onChange={handleFileChange} accept=".mp3" className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#F8C4B4]/20 file:text-[#F8C4B4] hover:file:bg-[#F8C4B4]/30" required />
               </div>
               <div>
-                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">이미지 경로 (.png)</label>
-                <input name="image_path" value={newSong.image_path} onChange={handleInputChange} placeholder="/images/filename.png" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" />
+                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">커버 이미지 (.png, .jpg)</label>
+                <input type="file" name="imageFile" onChange={handleFileChange} accept="image/*" className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#F8C4B4]/20 file:text-[#F8C4B4] hover:file:bg-[#F8C4B4]/30" />
               </div>
               <button type="submit" className="mt-4 w-full py-4 bg-[#F8C4B4] text-white rounded-2xl font-black text-lg shadow-lg shadow-[#F8C4B4]/30 hover:brightness-105 active:scale-95 transition-all">
                 노래 추가하기
@@ -165,7 +201,7 @@ const AdminDashboard = () => {
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-white rounded-lg overflow-hidden border border-gray-200">
-                             <img src={`${BACKEND_URL}${song.image_path}`} alt="" className="w-full h-full object-cover" onError={(e)=>e.target.src='https://via.placeholder.com/40'}/>
+                             <img src={`${BACKEND_URL}${song.imagePath}`} alt={song.title} className="w-full h-full object-cover" onError={(e)=>e.target.src='https://placehold.co/40'}/>
                           </div>
                           <div>
                             <p className="font-black text-black leading-tight">{song.title}</p>
