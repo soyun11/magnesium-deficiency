@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-const userId = localStorage.getItem('userId');
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -23,6 +22,7 @@ const Settings = () => {
       navigate('/Login');
     }
   };
+const userId = localStorage.getItem('userId');
 
   return (
     <div className="min-h-screen bg-white flex flex-col p-8 font-sans">
