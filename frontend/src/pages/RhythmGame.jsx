@@ -3,8 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import * as faceapi from 'face-api.js';
 import './RhythmGame.css';
 
+<<<<<<< HEAD
 const userId = localStorage.getItem('userId');
 
+=======
+>>>>>>> feat/be-signup-soyun
 const EMOTION_CONFIG = {
   neutral:   { weight: 6.0, perfect: 0.90, good: 0.50 }, 
   happy:     { weight: 1.5, perfect: 0.80, good: 0.45 }, 
@@ -107,29 +110,42 @@ const RhythmGame = () => {
     };
   }, [stopAllTimers]);
 
+  // [수정] DB 점수 저장 로직
   useEffect(() => {
+    // 게임이 끝났고, 아직 저장을 안했다면
     if (gameState === 'finished' && !hasUpdatedScore.current) {
+      const userId = localStorage.getItem('userId');
+
+      // 로그인이 안 되어 있으면 저장 안 함.
+      if (!userId){
+        console.log("로그인 필요 - 점수 저장 안 함");
+        hasUpdatedScore.current = true; // 중복 실행 방지
+        return;
+      }
+
       const saveScoreToDB = async () => {
         try {
-          const response = await fetch(`${BACKEND_URL}/api/scores/best?user_id=${userId}&song_id=${selectedSong.id}`);
-          let prevBest = 0;
+          console.log("점수 저장 시도 중...");
+
+          // 1. [삭제] 기존 최고 점수 확인 로직은 백엔드 구현 전까지 제거합니다.
+          // 없는 API(/api/scores/best)를 호출하지 않도록 수정합니다.
+          const response = await fetch(`${BACKEND_URL}/api/scores`,{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: userId,
+              songId: selectedSong.id,
+              score: score
+            }),
+          });
+          
           if (response.ok) {
-            const data = await response.json();
-            prevBest = data.score_value || 0;
+            console.log("점수 저장 성공!");
+            setIsNewRecord(true); // 일단 저장되면 배지 띄워주기(임시)
+          } else {
+            console.error("점수 저장 실패:", await response.text());
           }
-          if (score > prevBest) {
-            await fetch(`${BACKEND_URL}/api/scores`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                user_id: parseInt(userId),
-                song_id: selectedSong.id,
-                score_value: score
-              }),
-            });
-            setIsNewRecord(true);
-          }
-        } catch (err) { console.error(err); }
+        } catch (err) { console.error("DB 저장 에러:", err); }
         finally { hasUpdatedScore.current = true; }
       };
       saveScoreToDB();

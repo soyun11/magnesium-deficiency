@@ -25,23 +25,20 @@ public class ScoreService {
 
     /* 1. 점수 저장 기능 추가 */
     @Transactional
-    public Long saveScore(ScoreRequest request){
-        // 1-1. 유저 확인
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-        // 1-2. 노래 확인
-        Song song = songRepository.findById(request.getSongId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노래입니다."));
-        // 1-3. 엔티티 생성 (Builder 사용)
-        Score score = Score.builder()
-                .user(user)
-                .song(song)
-                .score(request.getScore())
-                .build();
-        // 1-4. DB 저장
-        scoreRepository.save(score);
+    public void saveScore(ScoreRequest request) {
+    // 1. 노래 조회 (노래는 그대로 숫자로 찾음)
+    Song song = songRepository.findById(request.getSongId())
+            .orElseThrow(() -> new IllegalArgumentException("노래가 없습니다."));
 
-        return score.getId();
+    // 2. 점수 엔티티 생성 (여기가 중요!)
+    Score score = Score.builder()
+            .userId(request.getUserId()) // 👈 [핵심] 이제 String(문자열)을 그대로 넣습니다!
+            .song(song)
+            .score(request.getScore())
+            .build();
+
+    // 3. 저장
+    scoreRepository.save(score);
     }
     @Transactional(readOnly = true)
     public List<RankingResponse> getTop10Ranking() {
@@ -53,7 +50,7 @@ public class ScoreService {
         // 2. DTO로 변환
         for (Score s : scores) {
             responseList.add(RankingResponse.builder()
-                .userId(s.getUser().getUserId())     // 유저 아이디
+                .userId(s.getUserId())     // 유저 아이디
                 .songTitle(s.getSong().getTitle())   // 🔥 [수정] getSong().getTitle()
                 .score(s.getScore())                 // 🔥 [수정] getScore()
                 .build());
