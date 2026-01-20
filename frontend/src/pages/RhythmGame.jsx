@@ -17,6 +17,14 @@ const EMOTIONS = Object.keys(EMOTION_CONFIG);
 const EMOJI_MAP = { happy: '😊', sad: '😭', angry: '😡', neutral: '😐', surprised: '😮' };
 const BACKEND_URL = 'http://localhost:8080';
 
+// [추가] 리소스 URL을 생성하는 헬퍼 함수
+const getResourceUrl = (path) => {
+  if (!path) return ''; // 경로가 없으면 빈 문자열 반환
+  // 이미 http로 시작하면(외부 URL이면) 그대로 두고, 아니면 백엔드 주소 붙이기
+  return path.startsWith('http') ? path : `${BACKEND_URL}${path}`;
+};
+
+
 const RhythmGame = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,12 +46,11 @@ const RhythmGame = () => {
   const isDetecting = useRef(false);
   const hasUpdatedScore = useRef(false);
   const pauseStartTimeRef = useRef(0);
-
-  // [핵심 추가] 이미 판정된 노트 ID를 추적하는 Ref (리액트 렌더링과 별개로 즉시 반영됨)
   const judgedNotesRef = useRef(new Set());
 
+  // [수정] location.state.song이 없을 경우의 기본값에 filePath, imagePath 사용
   const selectedSong = useMemo(() => location.state?.song || { 
-    id: 1, title: "기본 곡", artist: "Artist", bpm: 120, difficulty: 2, file_path: "song_30s.mp3" 
+    id: 1, title: "기본 곡", artist: "Artist", bpm: 120, difficulty: 2, filePath: "song_30s.mp3", imagePath: "" 
   }, [location.state]);
 
   const settings = useMemo(() => {
@@ -136,7 +143,6 @@ const RhythmGame = () => {
     }
   }, [gameState, score, selectedSong.id]);
 
-  // 점수 판정 로직 (Perfect 200점 유지)
   const handleJudgement = useCallback((noteEmotion) => {
     const rawProb = latestExpressionsRef.current[noteEmotion] || 0; 
     const config = EMOTION_CONFIG[noteEmotion];
@@ -176,9 +182,8 @@ const RhythmGame = () => {
         }
         
         setNotes(prev => prev.map(n => {
-          // [수정] judged 상태뿐만 아니라 judgedNotesRef를 동시에 확인하여 즉각 중복 방지
           if (!n.judged && now >= n.hitTime && !judgedNotesRef.current.has(n.id)) {
-            judgedNotesRef.current.add(n.id); // 즉시 셋에 추가
+            judgedNotesRef.current.add(n.id);
             handleJudgement(n.emotion);
             return { ...n, judged: true };
           }
@@ -227,18 +232,25 @@ const RhythmGame = () => {
     requestAnimationFrame(detectExpressions);
   }, []);
 
+  // [수정] getResourceUrl 헬퍼와 selectedSong.filePath 사용
   const startGame = () => {
     const audio = audioRef.current;
-    const cleanPath = selectedSong.file_path.startsWith('/') ? selectedSong.file_path.substring(1) : selectedSong.file_path;
-    audio.src = `${BACKEND_URL}/${cleanPath}`;
+    const songUrl = getResourceUrl(selectedSong.filePath);
+
+    if (!songUrl) {
+      alert("노래 파일 경로가 올바르지 않습니다.");
+      return;
+    }
+
+    audio.src = songUrl;
     audio.crossOrigin = "anonymous";
     audio.play().then(() => {
       setNotes([]); setScore(0);
-      judgedNotesRef.current.clear(); // [추가] 시작 시 판정 기록 초기화
+      judgedNotesRef.current.clear();
       setIsNewRecord(false); hasUpdatedScore.current = false;
       setGameState('playing');
       audio.onended = () => { setGameState('finished'); stopAllTimers(); };
-    }).catch(err => alert("재생 실패"));
+    }).catch(err => alert("오디오 재생에 실패했습니다. 파일을 확인해주세요."));
   };
 
   return (
