@@ -23,11 +23,11 @@ public class ScoreController {
         return ResponseEntity.ok("점수가 저장되었습니다!");
     }
 
-    // 2. 랭킹 조회 (GET /api/scores/ranking/{songId})
-    // 예: /api/scores/ranking/1 -> 1번 곡(Birthday Star) 랭킹 줘
-    @GetMapping("/ranking/{songId}")
-    public ResponseEntity<List<RankingResponse>> getRanking(@PathVariable Long songId) {
-        List<RankingResponse> ranking = scoreService.getRanking(songId);
+    // 2. 랭킹 조회 (GET /api/scores/ranking)
+    // 예: /api/scores/ranking -> Top 10 랭킹 반환
+    @GetMapping("/ranking")
+    public ResponseEntity<List<RankingResponse>> getRanking() {
+        List<RankingResponse> ranking = scoreService.getTop10Ranking();
         return ResponseEntity.ok(ranking);
     }
 }
