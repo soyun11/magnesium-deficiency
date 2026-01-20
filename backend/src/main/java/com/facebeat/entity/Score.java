@@ -9,48 +9,33 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter
-@NoArgsConstructor // 기본 생성자 추가
+@NoArgsConstructor
 @Table(name = "scores")
 public class Score {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 누가
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    // 🔥 [핵심 수정] 객체 연결(@ManyToOne)을 끊고, 단순 문자열 ID로 저장!
+    @Column(name = "user_id", nullable = false)
+    private String userId;
 
-    // 어떤 곡
+    // 노래는 여전히 ID(숫자)로 연결 유지
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "song_id")
     private Song song;
 
-    // 점수
     @Column(name = "score_value")
     private Integer score;
-
-    //[삭제됨] combo, grade 변수 불필요해서 삭제함.
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // 생성자 추가 
+    // 생성자 (서비스에서 저장할 때 사용)
     @Builder
-    public Score(User user, Song song, Integer score) { //[삭제됨] combo, grade 삭제.
-        this.user = user;
+    public Score(String userId, Song song, Integer score) {
+        this.userId = userId;
         this.song = song;
         this.score = score;
     }
-
-    public Long getId() { return id; }
-    public User getUser() { return user; }
-    public Song getSong() { return song; }
-    public Integer getScore() { return score; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-
-    public void setId(Long id) { this.id = id; }
-    public void setUser(User user) { this.user = user; }
-    public void setSong(Song song) { this.song = song; }
-    public void setScore(Integer score) { this.score = score; }
 }

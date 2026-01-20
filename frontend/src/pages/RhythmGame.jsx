@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import * as faceapi from 'face-api.js';
 import './RhythmGame.css';
-const userId = localStorage.getItem('userId');
-// 감정 설정 (변경 없음)
+
 const EMOTION_CONFIG = {
   neutral:   { weight: 6.0, perfect: 0.90, good: 0.50 }, 
   happy:     { weight: 1.5, perfect: 0.80, good: 0.45 }, 
@@ -55,40 +54,93 @@ const RhythmGame = () => {
     };
   }, [selectedSong]);
 
-  // --- [수정] DB 저장 로직: combo와 grade 제외 ---
+  const stopAllTimers = useCallback(() => {
+    if (gameLoopRef.current) clearInterval(gameLoopRef.current);
+    if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
+    gameLoopRef.current = null;
+    noteTimeoutRef.current = null;
+    audioRef.current.pause();
+  }, []);
+
+  const handlePause = useCallback(() => {
+    if (gameState !== 'playing') return;
+    pauseStartTimeRef.current = Date.now();
+    stopAllTimers();
+    setGameState('paused');
+  }, [gameState, stopAllTimers]);
+
+  const handleResume = useCallback(() => {
+    if (gameState !== 'paused') return;
+    const pauseDuration = Date.now() - pauseStartTimeRef.current;
+    setNotes(prev => prev.map(n => ({
+      ...n,
+      hitTime: n.hitTime + pauseDuration
+    })));
+    setGameState('playing');
+    audioRef.current.play();
+  }, [gameState]);
+
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (gameState === 'playing') handlePause();
+        else if (gameState === 'paused') handleResume();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, handlePause, handleResume]);
+
+  useEffect(() => {
+    return () => {
+      stopAllTimers();
+      if (audioRef.current) {
+        audioRef.current.src = "";
+        audioRef.current.load();
+      }
+      if (videoRef.current && videoRef.current.srcObject) {
+        videoRef.current.srcObject.getTracks().forEach(t => t.stop());
+      }
+    };
+  }, [stopAllTimers]);
+
+  // [수정] DB 점수 저장 로직
+  useEffect(() => {
+    // 게임이 끝났고, 아직 저장을 안했다면
     if (gameState === 'finished' && !hasUpdatedScore.current) {
-      const userId = localStorage.getItem('userId'); 
-      if (!userId) return;
+      const userId = localStorage.getItem('userId');
+
+      // 로그인이 안 되어 있으면 저장 안 함.
+      if (!userId){
+        console.log("로그인 필요 - 점수 저장 안 함");
+        hasUpdatedScore.current = true; // 중복 실행 방지
+        return;
+      }
 
       const saveScoreToDB = async () => {
         try {
-          // 1. 기존 최고 점수 확인 (score_value만 비교)
-          const response = await fetch(`${BACKEND_URL}/api/scores/best?user_id=${userId}&song_id=${selectedSong.id}`);
-          let prevBest = 0;
-          if (response.ok) {
-            const data = await response.json();
-            prevBest = data.score_value || 0;
-          }
+          console.log("점수 저장 시도 중...");
 
-          // 2. 현재 점수가 기록 경신일 때만 핵심 데이터(3개) 전송
-          if (score > prevBest) {
-            await fetch(`${BACKEND_URL}/api/scores`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                user_id: parseInt(userId),      // BIGINT
-                song_id: selectedSong.id,       // BIGINT
-                score_value: score              // INT
-              }),
-            });
-            setIsNewRecord(true);
+          // 1. [삭제] 기존 최고 점수 확인 로직은 백엔드 구현 전까지 제거합니다.
+          // 없는 API(/api/scores/best)를 호출하지 않도록 수정합니다.
+          const response = await fetch(`${BACKEND_URL}/api/scores`,{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: userId,
+              songId: selectedSong.id,
+              score: score
+            }),
+          });
+          
+          if (response.ok) {
+            console.log("점수 저장 성공!");
+            setIsNewRecord(true); // 일단 저장되면 배지 띄워주기(임시)
+          } else {
+            console.error("점수 저장 실패:", await response.text());
           }
-        } catch (err) {
-          console.error("DB 저장 에러:", err);
-        } finally {
-          hasUpdatedScore.current = true;
-        }
+        } catch (err) { console.error("DB 저장 에러:", err); }
+        finally { hasUpdatedScore.current = true; }
       };
       saveScoreToDB();
     }
@@ -110,15 +162,6 @@ const RhythmGame = () => {
     setJudgement({ text: res.text, type: res.type });
     setScore(p => p + res.add);
     setTimeout(() => setJudgement(null), 500);
-  }, []);
-
-  // 5. 유틸리티 및 초기화 (이전과 동일)
-  const stopAllTimers = useCallback(() => {
-    if (gameLoopRef.current) clearInterval(gameLoopRef.current);
-    if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
-    gameLoopRef.current = null;
-    noteTimeoutRef.current = null;
-    audioRef.current.pause();
   }, []);
 
   const spawnNote = useCallback(() => {
