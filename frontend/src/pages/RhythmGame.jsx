@@ -17,10 +17,8 @@ const EMOTIONS = Object.keys(EMOTION_CONFIG);
 const EMOJI_MAP = { happy: '😊', sad: '😭', angry: '😡', neutral: '😐', surprised: '😮' };
 const BACKEND_URL = 'http://localhost:8080';
 
-// [추가] 리소스 URL을 생성하는 헬퍼 함수
 const getResourceUrl = (path) => {
-  if (!path) return ''; // 경로가 없으면 빈 문자열 반환
-  // 이미 http로 시작하면(외부 URL이면) 그대로 두고, 아니면 백엔드 주소 붙이기
+  if (!path) return ''; 
   return path.startsWith('http') ? path : `${BACKEND_URL}${path}`;
 };
 
@@ -48,9 +46,9 @@ const RhythmGame = () => {
   const pauseStartTimeRef = useRef(0);
   const judgedNotesRef = useRef(new Set());
 
-  // [수정] location.state.song이 없을 경우의 기본값에 filePath, imagePath 사용
+  // [수정] API 데이터 형식(camelCase)에 맞게 filePath, imagePath를 사용
   const selectedSong = useMemo(() => location.state?.song || { 
-    id: 1, title: "기본 곡", artist: "Artist", bpm: 120, difficulty: 2, filePath: "song_30s.mp3", imagePath: "" 
+    id: 1, title: "기본 곡", artist: "Artist", bpm: 120, difficulty: 2, filePath: "/songs/song_30s.mp3", imagePath: "" 
   }, [location.state]);
 
   const settings = useMemo(() => {
@@ -232,7 +230,7 @@ const RhythmGame = () => {
     requestAnimationFrame(detectExpressions);
   }, []);
 
-  // [수정] getResourceUrl 헬퍼와 selectedSong.filePath 사용
+  // [수정] API 데이터 형식(camelCase)에 맞게 selectedSong.filePath 사용
   const startGame = () => {
     const audio = audioRef.current;
     const songUrl = getResourceUrl(selectedSong.filePath);
