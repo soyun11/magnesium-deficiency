@@ -3,8 +3,13 @@ package com.facebeat.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter @Setter
+@NoArgsConstructor // 기본 생성자 추가
 @Table(name = "scores")
 public class Score {
 
@@ -25,36 +30,27 @@ public class Score {
     @Column(name = "score_value")
     private Integer score;
 
-    private Integer combo;
-    private String grade;
+    //[삭제됨] combo, grade 변수 불필요해서 삭제함.
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Score() {}
-
     // 생성자 추가 
     @Builder
-    public Score(User user, Song song, Integer score, Integer combo, String grade) {
+    public Score(User user, Song song, Integer score) { //[삭제됨] combo, grade 삭제.
         this.user = user;
         this.song = song;
         this.score = score;
-        this.combo = combo;
-        this.grade = grade;
     }
 
     public Long getId() { return id; }
     public User getUser() { return user; }
     public Song getSong() { return song; }
     public Integer getScore() { return score; }
-    public Integer getCombo() { return combo; }
-    public String getGrade() { return grade; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
     public void setId(Long id) { this.id = id; }
     public void setUser(User user) { this.user = user; }
     public void setSong(Song song) { this.song = song; }
     public void setScore(Integer score) { this.score = score; }
-    public void setCombo(Integer combo) { this.combo = combo; }
-    public void setGrade(String grade) { this.grade = grade; }
 }
