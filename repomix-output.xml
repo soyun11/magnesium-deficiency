@@ -51,6 +51,7 @@ backend/settings.gradle
 backend/src/main/java/com/Application.java
 backend/src/main/java/com/facebeat/config/CorsConfig.java
 backend/src/main/java/com/facebeat/config/SecurityConfig.java
+backend/src/main/java/com/facebeat/controller/AdminController.java
 backend/src/main/java/com/facebeat/controller/ScoreController.java
 backend/src/main/java/com/facebeat/controller/SongController.java
 backend/src/main/java/com/facebeat/controller/UserController.java
@@ -72,6 +73,8 @@ backend/src/main/java/com/facebeat/repository/SongRepository.java
 backend/src/main/java/com/facebeat/repository/UserRepository.java
 backend/src/main/java/com/facebeat/service/AuthService.java
 backend/src/main/java/com/facebeat/service/ScoreService.java
+backend/src/main/java/com/facebeat/service/SongService.java
+backend/src/main/java/com/facebeat/service/StorageService.java
 backend/src/main/java/com/facebeat/service/UserService.java
 backend/src/main/java/com/facebeat/util/JwtUtil.java
 backend/src/main/java/com/magnesium/springStarter/DemoApplication.java
@@ -136,10 +139,70 @@ README.md
 <files>
 This section contains the contents of the repository's files.
 
+<file path="backend/src/main/java/com/facebeat/config/CorsConfig.java">
+
+</file>
+
+<file path="backend/src/main/java/com/facebeat/service/AuthService.java">
+
+</file>
+
+<file path="backend/src/main/java/com/facebeat/util/JwtUtil.java">
+
+</file>
+
+<file path="backend/src/main/resources/application.yml">
+
+</file>
+
+<file path="frontend/example.tsx">
+
+</file>
+
 <file path="backend/.gitattributes">
 /gradlew text eol=lf
 *.bat text eol=crlf
 *.jar binary
+</file>
+
+<file path="backend/.gitignore">
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
 </file>
 
 <file path="backend/gradle/wrapper/gradle-wrapper.properties">
@@ -517,33 +580,65 @@ public class Application {
 }
 </file>
 
-<file path="backend/src/main/java/com/facebeat/config/CorsConfig.java">
-
-</file>
-
-<file path="backend/src/main/java/com/facebeat/controller/SongController.java">
+<file path="backend/src/main/java/com/facebeat/controller/AdminController.java">
 package com.facebeat.controller;
 
-import com.facebeat.entity.Song;
-import com.facebeat.repository.SongRepository;
+import com.facebeat.dto.request.AdminLoginRequest;
+import com.facebeat.entity.User;
+import com.facebeat.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder; // [필수 임포트]
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:5173") // Vite 기본 포트
-public class SongController {
+@RequestMapping("/api/admin")
+@RequiredArgsConstructor
+public class AdminController {
 
-    private final SongRepository songRepository;
+    private final UserRepository userRepository;
+    
+    // [수정 1] 비밀번호 암호화 비교를 위한 인코더 주입
+    private final PasswordEncoder passwordEncoder;
 
-    public SongController(SongRepository songRepository) {
-        this.songRepository = songRepository;
-    }
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AdminLoginRequest request) {
+        
+        // 디버깅용 로그는 이제 지우셔도 됩니다.
+        
+        // 1. 아이디로 유저 찾기 (String 아이디 기준)
+        Optional<User> userOptional = userRepository.findByUserId(request.getId());
 
-    @GetMapping("/songs")
-    public List<Song> getSongs() {
-        return songRepository.findAll();
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            // [수정 2] 단순 문자열 비교(.equals) 대신 matches() 사용
+            // passwordEncoder.matches(입력받은비번, DB의암호화된비번)
+            if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                
+                // 추가 검증 (관리자 아이디인지 확인)
+                if (!"admin123".equals(user.getUserId())) {
+                     return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자 권한이 없습니다.");
+                }
+
+                // 로그인 성공 처리
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("role", "ADMIN");
+                response.put("userId", user.getUserId());
+                response.put("message", "관리자 로그인 성공");
+
+                return ResponseEntity.ok(response);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("관리자 계정이 없거나 비밀번호가 틀립니다.");
     }
 }
 </file>
@@ -561,29 +656,191 @@ public class AdminLoginRequest {
 }
 </file>
 
-<file path="backend/src/main/java/com/facebeat/dto/request/ScoreRequest.java">
-package com.facebeat.dto.request;
+<file path="backend/src/main/java/com/facebeat/dto/response/TokenResponse.java">
+package com.facebeat.dto.response;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+public class TokenResponse {
+    private String token;
 
-@Getter
-@NoArgsConstructor
-public class ScoreRequest {
-    private Long userId;   // 누가 (테스트를 위해 ID를 직접 받음)
-    private Long songId;   // 어떤 노래
-    private int score;     // 점수
-    private int combo;     // 콤보
-    private String grade;  // 등급
+    public TokenResponse() {}
+    public TokenResponse(String token) { this.token = token; }
+
+    public String getToken() { return token; }
+    public void setToken(String token) { this.token = token; }
 }
 </file>
 
-<file path="backend/src/main/java/com/facebeat/service/AuthService.java">
+<file path="backend/src/main/java/com/facebeat/dto/response/UserResponse.java">
+package com.facebeat.dto.response;
 
+public class UserResponse {
+    private Long id;
+    private String username;
+
+    public UserResponse() {}
+    public UserResponse(Long id, String username) {
+        this.id = id;
+        this.username = username;
+    }
+
+    public Long getId() { return id; }
+    public String getUsername() { return username; }
+
+    public void setId(Long id) { this.id = id; }
+    public void setUsername(String username) { this.username = username; }
+}
 </file>
 
-<file path="backend/src/main/java/com/facebeat/util/JwtUtil.java">
+<file path="backend/src/main/java/com/facebeat/repository/SongNoteRepository.java">
+package com.facebeat.repository;
 
+import com.facebeat.entity.SongNote;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SongNoteRepository extends JpaRepository<SongNote, Long> {}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/repository/SongRepository.java">
+package com.facebeat.repository;
+
+import com.facebeat.entity.Song;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SongRepository extends JpaRepository<Song, Long> {}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/service/SongService.java">
+package com.facebeat.service;
+
+import com.facebeat.entity.Song;
+import com.facebeat.repository.SongRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class SongService {
+
+    private final SongRepository songRepository;
+    private final StorageService storageService;
+
+    @Transactional
+    public Song addSong(Song song, MultipartFile songFile, MultipartFile imageFile) {
+        // 1. 파일 저장
+        String songPath = storageService.store(songFile, "song");
+        String imagePath = storageService.store(imageFile, "image");
+
+        // 2. 파일 경로를 엔티티에 설정
+        song.setFilePath(songPath);
+        song.setImagePath(imagePath);
+
+        // 3. DB에 엔티티 저장
+        return songRepository.save(song);
+    }
+
+    @Transactional
+    public void deleteSong(Long id) {
+        // 1. ID로 노래 정보 조회
+        Song song = songRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid song Id:" + id));
+
+        // 2. 실제 파일 삭제
+        storageService.delete(song.getFilePath());
+        storageService.delete(song.getImagePath());
+
+        // 3. DB에서 레코드 삭제
+        songRepository.delete(song);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Song> getAllSongs() {
+        return songRepository.findAll();
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/service/StorageService.java">
+package com.facebeat.service;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+
+@Service
+public class StorageService {
+
+    @Value("${storage.location}/images")
+    private String imageUploadPath;
+
+    @Value("${storage.location}/songs")
+    private String songUploadPath;
+
+    public String store(MultipartFile file, String type) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+        String storedFilename = UUID.randomUUID().toString() + extension;
+
+        Path destinationPath;
+        String subPath;
+
+        if ("image".equals(type)) {
+            destinationPath = Paths.get(imageUploadPath);
+            subPath = "/images/";
+        } else if ("song".equals(type)) {
+            destinationPath = Paths.get(songUploadPath);
+            subPath = "/songs/";
+        } else {
+            throw new IllegalArgumentException("Invalid file type specified.");
+        }
+
+        try {
+            if (!Files.exists(destinationPath)) {
+                Files.createDirectories(destinationPath);
+            }
+            try (InputStream inputStream = file.getInputStream()) {
+                Path destinationFile = destinationPath.resolve(storedFilename);
+                Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+            return subPath + storedFilename; // DB에 저장될 경로
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file.", e);
+        }
+    }
+
+    public void delete(String filePath) {
+        if (filePath == null || filePath.isEmpty()) {
+            return;
+        }
+        try {
+            // filePath는 /images/file.png 와 같은 형태이므로 앞의 /를 제거해야 함
+            String cleanPath = filePath.startsWith("/") ? filePath.substring(1) : filePath;
+            Path fileToDelete = Paths.get("src/main/resources/static").resolve(cleanPath);
+            Files.deleteIfExists(fileToDelete);
+        } catch (IOException e) {
+            // 파일 삭제 실패 시 로깅만 하고 에러를 던지지 않을 수 있음 (선택)
+            System.err.println("Failed to delete file: " + filePath);
+        }
+    }
+}
 </file>
 
 <file path="backend/src/main/java/com/magnesium/springStarter/MemberController.java">
@@ -623,22 +880,6 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 }
-</file>
-
-<file path="backend/src/main/resources/application.properties">
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-spring.datasource.url=jdbc:mysql://localhost:3306/magnesium_db?serverTimezone=Asia/Seoul
-spring.datasource.username=root
-spring.datasource.password=${DB_PASSWORD}
-
-spring.flyway.enabled=true
-
-# 이 줄이 가장 중요합니다. 뒤에 다른 글자가 붙지 않게 주의하세요!
-spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-</file>
-
-<file path="backend/src/main/resources/application.yml">
-
 </file>
 
 <file path="backend/src/main/resources/db/migration/V2__create_music_table.sql">
@@ -769,10 +1010,6 @@ export default defineConfig([
     },
   },
 ])
-</file>
-
-<file path="frontend/example.tsx">
-
 </file>
 
 <file path="frontend/index.html">
@@ -1100,183 +1337,6 @@ button:active {
 }
 </file>
 
-<file path="frontend/src/pages/Ranking.jsx">
-import React from 'react';
-
-const Ranking = ({ data = [] }) => {
-  // 데이터가 로딩 중이거나 없을 경우 처리
-  if (!data || data.length === 0) {
-    return <div className="p-10 text-center">데이터를 불러오는 중입니다...</div>;
-  }
-
-  return (
-    <div className="flex flex-col items-center w-full min-h-screen bg-gray-50 p-6 font-sans">
-      {/* 헤더 섹션 */}
-      <div className="w-full max-w-2xl flex justify-between items-center mb-6 px-4">
-        <h1 className="text-2xl font-bold text-gray-400">랭킹</h1>
-        <div className="flex gap-4 text-gray-500 text-sm">
-          <span className="cursor-pointer">홈</span>
-          <span className="font-bold text-black border-b-2 border-black cursor-pointer">랭킹</span>
-          <span className="cursor-pointer">설정</span>
-        </div>
-      </div>
-
-      {/* 랭킹 리스트 영역 */}
-      <div className="w-full max-w-3xl overflow-y-auto max-h-[80vh] pr-2 scrollbar-hide">
-        {data.map((item) => (
-          <RankingItem key={`${item.userId}-${item.rank}`} item={item} />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const RankingItem = ({ item }) => {
-  const isTop = item.rank === 1;
-
-  return (
-    <div className={`
-      relative flex items-center mb-4 p-4 rounded-[40px] border-4 transition-all duration-200 hover:scale-[1.01]
-      ${isTop ? 'border-[#F87171] bg-[#FFF5F5]' : 'border-[#93C5FD] bg-white'}
-      shadow-md
-    `}>
-      {/* 순위 번호 */}
-      <div className="flex items-center justify-center w-14 h-14 min-w-[3.5rem] rounded-full bg-white shadow-inner text-2xl font-black mr-6 border border-gray-100">
-        {item.rank}
-      </div>
-
-      {/* 사용자 아이디 */}
-      <div className="flex-1 text-2xl md:text-3xl font-black text-gray-800 truncate mr-4">
-        {item.userId}
-      </div>
-
-      {/* 곡 제목 및 점수 */}
-      <div className="text-right min-w-fit">
-        <div className={`text-xs md:text-sm font-bold mb-1 ${isTop ? 'text-red-400' : 'text-blue-400'}`}>
-          {item.songTitle}
-        </div>
-        <div className="flex items-baseline justify-end leading-none">
-          <span 
-            className="text-4xl md:text-5xl font-black italic tracking-tighter"
-            style={{
-              color: 'white',
-              WebkitTextStroke: isTop ? '2px #F87171' : '2px #60A5FA',
-              paintOrder: 'stroke fill',
-              filter: 'drop-shadow(2px 2px 0px rgba(0,0,0,0.1))'
-            }}
-          >
-            {item.score?.toLocaleString()}
-          </span>
-          <span className="text-lg md:text-xl ml-1 font-bold text-gray-700">점</span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Ranking;
-</file>
-
-<file path="frontend/src/pages/setting.jsx">
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-const Settings = () => {
-  const navigate = useNavigate();
-
-  // 설정 상태 관리 (이미지 예시의 84%로 초기값 설정)
-  const [volume, setVolume] = useState(84);
-
-  // [수정] 저장 버튼 핸들러: 이제 /select 페이지로 이동합니다.
-  const handleSave = () => {
-    const settings = { volume };
-    localStorage.setItem('gameSettings', JSON.stringify(settings));
-    alert("설정이 저장되었습니다! 🎵");
-    navigate('/select'); // App.jsx에 정의된 곡 선택 페이지 경로
-  };
-
-  // 로그아웃 핸들러
-  const handleLogout = () => {
-    if (window.confirm("로그아웃 하시겠습니까?")) {
-      localStorage.removeItem('user'); 
-      navigate('/Login');
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-white flex flex-col p-8 font-sans">
-      {/* 헤더 부분 */}
-      <header className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => navigate(-1)} 
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-8 w-8 text-gray-800 group-hover:text-black" 
-              fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-3xl font-black cursor-pointer" onClick={() => navigate('/Home')}>
-            마그네슘 부족
-          </h1>
-        </div>
-        <div className="flex gap-6 text-sm text-gray-500 font-bold">
-          <button onClick={() => navigate('/Home')} className="hover:text-black">홈</button>
-          <button onClick={() => navigate('/Ranking')} className="hover:text-black">랭킹</button>
-          <span className="text-black border-b-2 border-[#F8C4B4]">설정</span>
-        </div>
-      </header>
-
-      {/* 메인 설정 영역 */}
-      <main className="flex-1 max-w-2xl mx-auto w-full flex flex-col gap-10">
-        <h2 className="text-4xl font-black text-[#333] mb-4 text-center">게임 설정</h2>
-
-        {/* 배경 음악 설정 카드 */}
-        <section className="bg-gray-50 p-8 rounded-[40px] shadow-sm">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-black">배경 음악</h3>
-            <span className="text-[#F8C4B4] font-black text-2xl">{volume}%</span>
-          </div>
-          <input 
-            type="range" 
-            min="0" max="100" 
-            value={volume}
-            onChange={(e) => setVolume(e.target.value)}
-            className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#F8C4B4]"
-          />
-        </section>
-
-        {/* 로그아웃 버튼 섹션 (흰색 배경, 빨간 글씨, 큰 디자인) */}
-        <section className="flex justify-center">
-          <button 
-            onClick={handleLogout}
-            className="px-24 py-6 text-3xl font-black rounded-[30px] shadow-xl transition-all active:scale-95 bg-white text-red-500 border-2 border-gray-100 hover:bg-gray-50"
-          >
-            로그아웃하기
-          </button>
-        </section>
-      </main>
-
-      {/* 하단 저장 버튼 */}
-      <footer className="py-8 flex justify-center">
-        <button 
-          onClick={handleSave}
-          className="px-24 py-6 text-3xl font-black rounded-[30px] shadow-2xl transition-all active:scale-95 bg-[#F8C4B4] text-white hover:brightness-105"
-        >
-          설정 저장하기
-        </button>
-      </footer>
-    </div>
-  );
-};
-
-export default Settings;
-</file>
-
 <file path="frontend/tailwind.config.js">
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
@@ -1293,582 +1353,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
 })
-</file>
-
-<file path="backend/.gitignore">
-HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
-</file>
-
-<file path="backend/src/main/java/com/facebeat/controller/ScoreController.java">
-package com.facebeat.controller;
-
-import com.facebeat.dto.request.ScoreRequest;
-import com.facebeat.dto.response.RankingResponse;
-import com.facebeat.service.ScoreService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-@RestController
-@RequiredArgsConstructor
-@RequestMapping("/api/scores") // 주소 공통 부분
-public class ScoreController {
-
-    private final ScoreService scoreService;
-
-    // 1. 게임 끝났을 때 점수 저장 (POST /api/scores)
-    @PostMapping
-    public ResponseEntity<String> saveScore(@RequestBody ScoreRequest request) {
-        scoreService.saveScore(request);
-        return ResponseEntity.ok("점수가 저장되었습니다!");
-    }
-
-    // 2. 랭킹 조회 (GET /api/scores/ranking/{songId})
-    // 예: /api/scores/ranking/1 -> 1번 곡(Birthday Star) 랭킹 줘
-    @GetMapping("/ranking/{songId}")
-    public ResponseEntity<List<RankingResponse>> getRanking(@PathVariable Long songId) {
-        List<RankingResponse> ranking = scoreService.getRanking(songId);
-        return ResponseEntity.ok(ranking);
-    }
-}
-</file>
-
-<file path="backend/src/main/java/com/facebeat/dto/request/SignupRequest.java">
-package com.facebeat.dto.request; // 1. 패키지는 무조건 맨 위로!
-
-// import lombok... (롬복을 안 쓰고 직접 메서드를 만드셨으니 import도 필요 없습니다)
-
-public class SignupRequest {
-
-    // 1. 로그인 ID
-    private String userId; 
-    
-    // 2. 사용자 이름
-    private String username; 
-    
-    // 3. 비밀번호
-    private String password;
-
-    // 기본 생성자
-    public SignupRequest() {}
-
-    // ==========================
-    // Getter 메서드들
-    // ==========================
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-}
-</file>
-
-<file path="backend/src/main/java/com/facebeat/dto/response/RankingResponse.java">
-package com.facebeat.dto.response;
-
-import com.facebeat.entity.Score;
-import lombok.Getter;
-
-@Getter
-public class RankingResponse {
-    private int rank;         // 등수 (1등, 2등...)
-    private String userId;
-    private String username;  // 유저 이름
-    private int score;        // 점수
-    private int combo;        // 콤보
-    private String grade;     // 등급
-
-    public RankingResponse(int rank, Score score) {
-        this.rank = rank;
-        this.userId = score.getUser().getUserId();
-        this.username = score.getUser().getUsername(); // User 엔티티에서 이름 꺼내기
-        this.score = score.getScore();
-        this.combo = score.getCombo();
-        this.grade = score.getGrade();
-    }
-}
-</file>
-
-<file path="backend/src/main/java/com/facebeat/dto/response/TokenResponse.java">
-package com.facebeat.dto.response;
-
-public class TokenResponse {
-    private String token;
-
-    public TokenResponse() {}
-    public TokenResponse(String token) { this.token = token; }
-
-    public String getToken() { return token; }
-    public void setToken(String token) { this.token = token; }
-}
-</file>
-
-<file path="backend/src/main/java/com/facebeat/dto/response/UserResponse.java">
-package com.facebeat.dto.response;
-
-public class UserResponse {
-    private Long id;
-    private String username;
-
-    public UserResponse() {}
-    public UserResponse(Long id, String username) {
-        this.id = id;
-        this.username = username;
-    }
-
-    public Long getId() { return id; }
-    public String getUsername() { return username; }
-
-    public void setId(Long id) { this.id = id; }
-    public void setUsername(String username) { this.username = username; }
-}
-</file>
-
-<file path="backend/src/main/java/com/facebeat/repository/SongNoteRepository.java">
-package com.facebeat.repository;
-
-import com.facebeat.entity.SongNote;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface SongNoteRepository extends JpaRepository<SongNote, Long> {}
-</file>
-
-<file path="backend/src/main/java/com/facebeat/repository/SongRepository.java">
-package com.facebeat.repository;
-
-import com.facebeat.entity.Song;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface SongRepository extends JpaRepository<Song, Long> {}
-</file>
-
-<file path="backend/src/main/java/com/magnesium/springStarter/DemoApplication.java">
-// package com.magnesium.springStarter;
-
-// import org.springframework.boot.SpringApplication;
-// import org.springframework.boot.autoconfigure.SpringBootApplication;
-// import org.springframework.boot.autoconfigure.domain.EntityScan;
-// import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
-// @SpringBootApplication(scanBasePackages = {"com.facebeat", "com.magnesium"})
-// @EnableJpaRepositories(basePackages = {"com.facebeat.repository", "com.magnesium"})
-// @EntityScan(basePackages = {"com.facebeat.entity", "com.magnesium"})
-// public class DemoApplication {
-//     public static void main(String[] args) {
-//         SpringApplication.run(DemoApplication.class, args);
-//     }
-// }
-</file>
-
-<file path="backend/src/main/resources/db/migration/V1__init.sql">
--- V1__init.sql 최종본
-CREATE TABLE member (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,  -- 중복 방지
-    password VARCHAR(100) NOT NULL,        -- 필수 입력 (암호화 대비 100자)
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-</file>
-
-<file path="backend/src/main/resources/db/migration/V7__dummy_users.sql">
--- 더미 데이터 삽입 (테스트 유저 10명)
--- 비밀번호는 모두 '1234' 입니다. (BCrypt로 암호화된 값: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy)
--- username과 user_id를 동일하게 설정했습니다.
-
-INSERT INTO member (username, user_id, password) VALUES 
-('testuser1',  'testuser1',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
-('testuser2',  'testuser2',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
-('testuser3',  'testuser3',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
-('testuser4',  'testuser4',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
-('testuser5',  'testuser5',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
-('testuser6',  'testuser6',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
-('testuser7',  'testuser7',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
-('testuser8',  'testuser8',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
-('testuser9',  'testuser9',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
-('testuser10', 'testuser10', '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC');
-</file>
-
-<file path="frontend/package.json">
-{
-  "name": "magnesium",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
-    "face-api.js": "^0.22.2",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-router-dom": "^7.11.0",
-    "react-webcam": "^7.2.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "autoprefixer": "^10.4.23",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.18",
-    "vite": "^7.2.4"
-  }
-}
-</file>
-
-<file path="frontend/src/pages/AdminDashboard.jsx">
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-const AdminDashboard = () => {
-  const navigate = useNavigate();
-  const [songs, setSongs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // 새 노래 입력을 위한 상태
-  const [newSong, setNewSong] = useState({
-    title: '',
-    artist: '',
-    bpm: '',
-    difficulty: 1,
-    file_path: '',
-    image_path: '', // DB schema에 추가 권장
-    duration: 0
-  });
-
-  const BACKEND_URL = 'http://localhost:8080';
-
-  // 1. 노래 목록 불러오기
-  const fetchSongs = async () => {
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/songs`);
-      if (response.ok) {
-        const data = await response.json();
-        setSongs(data);
-      }
-    } catch (error) {
-      console.error("데이터 로딩 실패:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSongs();
-  }, []);
-
-  // 2. 입력 값 변경 처리
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewSong({ ...newSong, [name]: value });
-  };
-
-  // 3. 노래 추가 제출
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/songs`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newSong),
-      });
-
-      if (response.ok) {
-        alert("새 노래가 등록되었습니다! 🎵");
-        setNewSong({ title: '', artist: '', bpm: '', difficulty: 1, file_path: '', image_path: '', duration: 0 });
-        fetchSongs(); // 목록 새로고침
-      }
-    } catch (error) {
-      alert("등록에 실패했습니다.");
-    }
-  };
-
-  // 4. 노래 삭제
-  const handleDelete = async (id) => {
-    if (!window.confirm("정말 이 곡을 삭제하시겠습니까?")) return;
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/songs/${id}`, { method: 'DELETE' });
-      if (response.ok) {
-        setSongs(songs.filter(song => song.id !== id));
-      }
-    } catch (error) {
-      console.error("삭제 실패:", error);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 p-8 font-sans text-[#333]">
-      {/* 헤더 */}
-      <header className="flex justify-between items-center mb-10 max-w-6xl mx-auto">
-        <div>
-          <h1 className="text-4xl font-black text-black mb-2">Admin Dashboard</h1>
-          <p className="text-gray-500 font-bold">리듬게임 콘텐츠 관리 시스템</p>
-        </div>
-        <button 
-          onClick={() => navigate('/Home')}
-          className="px-6 py-3 bg-white border-2 border-gray-200 rounded-2xl font-black hover:bg-gray-100 transition-all"
-        >
-          나가기
-        </button>
-      </header>
-
-      <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* 노래 추가 섹션 */}
-        <section className="lg:col-span-1">
-          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-black mb-6 flex items-center gap-2">
-              <span className="w-2 h-8 bg-[#F8C4B4] rounded-full"></span>
-              새 노래 등록
-            </h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div>
-                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">곡 제목</label>
-                <input name="title" value={newSong.title} onChange={handleInputChange} placeholder="ex) Moonlight" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" required />
-              </div>
-              <div>
-                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">아티스트</label>
-                <input name="artist" value={newSong.artist} onChange={handleInputChange} placeholder="아티스트 명" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-black text-gray-400 ml-2 mb-1">BPM</label>
-                  <input name="bpm" type="number" value={newSong.bpm} onChange={handleInputChange} placeholder="120" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" />
-                </div>
-                <div>
-                  <label className="block text-xs font-black text-gray-400 ml-2 mb-1">난이도 (1-3)</label>
-                  <select name="difficulty" value={newSong.difficulty} onChange={handleInputChange} className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold appearance-none">
-                    <option value={1}>EASY</option>
-                    <option value={2}>NORMAL</option>
-                    <option value={3}>HARD</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">파일 경로 (.mp3)</label>
-                <input name="file_path" value={newSong.file_path} onChange={handleInputChange} placeholder="/songs/filename.mp3" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" required />
-              </div>
-              <div>
-                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">이미지 경로 (.png)</label>
-                <input name="image_path" value={newSong.image_path} onChange={handleInputChange} placeholder="/images/filename.png" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" />
-              </div>
-              <button type="submit" className="mt-4 w-full py-4 bg-[#F8C4B4] text-white rounded-2xl font-black text-lg shadow-lg shadow-[#F8C4B4]/30 hover:brightness-105 active:scale-95 transition-all">
-                노래 추가하기
-              </button>
-            </form>
-          </div>
-        </section>
-
-        {/* 노래 목록 테이블 섹션 */}
-        <section className="lg:col-span-2">
-          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 min-h-[600px]">
-            <h2 className="text-2xl font-black mb-6 flex items-center gap-2">
-              <span className="w-2 h-8 bg-gray-200 rounded-full"></span>
-              현재 노래 목록 ({songs.length})
-            </h2>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-separate border-spacing-y-3">
-                <thead>
-                  <tr className="text-gray-400 text-sm font-black">
-                    <th className="px-4 py-2">ID</th>
-                    <th className="px-4 py-2">곡 정보</th>
-                    <th className="px-4 py-2">난이도</th>
-                    <th className="px-4 py-2 text-right">관리</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {songs.map((song) => (
-                    <tr key={song.id} className="bg-gray-50 hover:bg-gray-100 transition-colors group">
-                      <td className="px-4 py-4 rounded-l-2xl font-bold text-gray-400">{song.id}</td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-white rounded-lg overflow-hidden border border-gray-200">
-                             <img src={`${BACKEND_URL}${song.image_path}`} alt="" className="w-full h-full object-cover" onError={(e)=>e.target.src='https://via.placeholder.com/40'}/>
-                          </div>
-                          <div>
-                            <p className="font-black text-black leading-tight">{song.title}</p>
-                            <p className="text-xs font-bold text-gray-400">{song.artist} | {song.bpm} BPM</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className={`text-[10px] font-black px-2 py-1 rounded-full ${
-                          song.difficulty === 3 ? 'bg-red-100 text-red-500' : 
-                          song.difficulty === 2 ? 'bg-blue-100 text-blue-500' : 'bg-green-100 text-green-500'
-                        }`}>
-                          {song.difficulty === 1 ? 'EASY' : song.difficulty === 2 ? 'NORMAL' : 'HARD'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 rounded-r-2xl text-right">
-                        <button 
-                          onClick={() => handleDelete(song.id)}
-                          className="p-2 text-gray-300 hover:text-red-500 transition-colors"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {songs.length === 0 && !isLoading && (
-                <div className="text-center py-20 text-gray-400 font-bold">등록된 노래가 없습니다.</div>
-              )}
-            </div>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  );
-};
-
-export default AdminDashboard;
-</file>
-
-<file path="frontend/src/pages/AuthSelection.jsx">
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-const AuthSelection = () => {
-  const navigate = useNavigate();
-  const [serverStatus, setServerStatus] = useState("connecting"); // connecting, success, error
-  const [serverMessage, setServerMessage] = useState("서버 연결 확인 중...");
-
-  useEffect(() => {
-    fetch("http://localhost:8080/api/test")
-      .then((res) => res.json())
-      .then((data) => {
-        setServerMessage(data.message);
-        setServerStatus("success");
-      })
-      .catch((err) => {
-        console.error(err);
-        setServerMessage("서버 오프라인");
-        setServerStatus("error");
-      });
-  }, []);
-
-  return (
-    <div className="relative min-h-screen bg-[#FFF9F9] flex flex-col items-center justify-center overflow-hidden">
-      
-      {/* --- 배경 장식 (파스텔 원형 엘리먼트) --- */}
-      <div className="absolute -top-20 -left-20 w-80 h-80 bg-[#F8C4B4] opacity-20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#B4E4F8] opacity-20 rounded-full blur-3xl animate-pulse" />
-
-      {/* --- 상단 서버 상태 표시 (트렌디한 캡슐형) --- */}
-      <div className="absolute top-10 flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-md rounded-full shadow-sm border border-white/50">
-        <div className={`w-2 h-2 rounded-full ${
-          serverStatus === "success" ? "bg-green-400 animate-ping" : 
-          serverStatus === "error" ? "bg-red-400" : "bg-yellow-400"
-        }`} />
-        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-          {serverMessage}
-        </span>
-      </div>
-
-      {/* --- 메인 타이틀 섹션 --- */}
-      <div className="text-center z-10">
-        <div className="inline-block px-4 py-1 mb-6 bg-[#F8C4B4] text-white text-sm font-black rounded-lg transform -rotate-2">
-          NEW RHYTHM GAME
-        </div>
-        <h1 className="text-8xl font-black text-[#333] mb-4 tracking-tighter">
-          마그네슘 <span className="text-[#F8C4B4]">부족</span>
-        </h1>
-        <p className="text-gray-400 font-medium mb-16 tracking-wide">
-          당신의 표정이 리듬이 되는 순간
-        </p>
-      </div>
-      
-      {/* --- 버튼 그룹 --- */}
-      <div className="flex gap-8 z-10">
-        <button 
-          onClick={() => navigate('/Login')} 
-          className="group relative w-56 py-6 bg-white rounded-[30px] shadow-[0_15px_35px_rgba(248,196,180,0.4)] transition-all hover:-translate-y-2 active:translate-y-0"
-        >
-          <div className="absolute inset-0 bg-[#F8C4B4] rounded-[30px] opacity-0 group-hover:opacity-100 transition-opacity" />
-          <span className="relative text-2xl font-black text-[#F8C4B4] group-hover:text-white transition-colors">
-            로그인
-          </span>
-        </button>
-
-        <button 
-          onClick={() => navigate('/Signup')} 
-          className="group w-56 py-6 bg-white/40 backdrop-blur-sm border-2 border-white rounded-[30px] shadow-xl transition-all hover:bg-white hover:border-[#F8C4B4]"
-        >
-          <span className="text-2xl font-black text-gray-400 group-hover:text-[#F8C4B4] transition-colors">
-            회원가입
-          </span>
-        </button>
-      </div>
-
-      {/* --- 하단 푸터 느낌의 장식 --- */}
-      <div className="absolute bottom-10 text-gray-300 text-sm font-bold">
-        © 2026 Team Magnesium Deficiency. All rights reserved.
-      </div>
-
-    </div>
-  );
-};
-
-export default AuthSelection;
 </file>
 
 <file path="backend/build.gradle">
@@ -1928,44 +1412,97 @@ tasks.named('test') {
 }
 </file>
 
-<file path="backend/src/main/java/com/facebeat/config/SecurityConfig.java">
-package com.facebeat.config;
+<file path="backend/src/main/java/com/facebeat/controller/ScoreController.java">
+package com.facebeat.controller;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
+import com.facebeat.dto.request.ScoreRequest;
+import com.facebeat.dto.response.RankingResponse;
+import com.facebeat.service.ScoreService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@Configuration
-@EnableWebSecurity // 스프링 시큐리티 활성화
-public class SecurityConfig {
+import java.util.List;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            // 1. CSRF 보안 끄기 (Rest API에서는 보통 끕니다)
-            .csrf(AbstractHttpConfigurer::disable)
-            
-            // 2. 요청 주소별 권한 설정
-            .authorizeHttpRequests(auth -> auth
-                // "/api/users/**" 로 시작하는 주소(로그인, 회원가입)는 누구나 접속 가능!
-                .requestMatchers("/api/users/**").permitAll()
-                // 그 외 다른 요청도 일단은 다 허용 (개발 편의상)
-                // 나중에 .anyRequest().authenticated()로 바꾸면 로그인한 사람만 가능해짐
-                .anyRequest().permitAll()
-            );
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/scores") // 주소 공통 부분
+public class ScoreController {
 
-        return http.build();
+    private final ScoreService scoreService;
+
+    // 1. 게임 끝났을 때 점수 저장 (POST /api/scores)
+    @PostMapping
+    public ResponseEntity<String> saveScore(@RequestBody ScoreRequest request) {
+        scoreService.saveScore(request);
+        return ResponseEntity.ok("점수가 저장되었습니다!");
     }
 
-    // 아까 만든 비밀번호 암호화 기계
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    // 2. 랭킹 조회 (GET /api/scores/ranking)
+    // 예: /api/scores/ranking -> Top 10 랭킹 반환
+    @GetMapping("/ranking")
+    public ResponseEntity<List<RankingResponse>> getRanking() {
+        List<RankingResponse> ranking = scoreService.getTop10Ranking();
+        return ResponseEntity.ok(ranking);
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/controller/SongController.java">
+package com.facebeat.controller;
+
+import com.facebeat.entity.Song;
+import com.facebeat.service.SongService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173") // React 앱 주소
+@RequiredArgsConstructor
+public class SongController {
+
+    private final SongService songService;
+
+    @GetMapping("/songs")
+    public ResponseEntity<List<Song>> getSongs() {
+        List<Song> songs = songService.getAllSongs();
+        return ResponseEntity.ok(songs);
+    }
+
+    @PostMapping("/songs")
+    public ResponseEntity<Song> addSong(
+            @RequestParam("title") String title,
+            @RequestParam("artist") String artist,
+            @RequestParam("bpm") int bpm,
+            @RequestParam("difficulty") int difficulty,
+            @RequestParam("songFile") MultipartFile songFile,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+
+        Song newSong = new Song();
+        newSong.setTitle(title);
+        newSong.setArtist(artist);
+        newSong.setBpm(bpm);
+        newSong.setDifficulty(difficulty);
+
+        Song savedSong = songService.addSong(newSong, songFile, imageFile);
+        return new ResponseEntity<>(savedSong, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/songs/{id}")
+    public ResponseEntity<Void> deleteSong(@PathVariable Long id) {
+        try {
+            songService.deleteSong(id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            // ID에 해당하는 노래가 없을 경우
+            return ResponseEntity.notFound().build();
+        }
     }
 }
 </file>
@@ -1987,56 +1524,56 @@ public class RegisterRequest {
 }
 </file>
 
-<file path="backend/src/main/java/com/facebeat/entity/Song.java">
-package com.facebeat.entity;
+<file path="backend/src/main/java/com/facebeat/dto/request/ScoreRequest.java">
+package com.facebeat.dto.request;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "music")
-public class Song {
+@Getter
+@NoArgsConstructor
+public class ScoreRequest {
+    private Long userId;   // 누가 (테스트를 위해 ID를 직접 받음)
+    private Long songId;   // 어떤 노래
+    private int score;     // 점수
+//[삭제됨] combo, grade 변수 불필요해서 삭제함.
+}
+</file>
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+<file path="backend/src/main/java/com/facebeat/dto/request/SignupRequest.java">
+package com.facebeat.dto.request; // 1. 패키지는 무조건 맨 위로!
 
-    @Column(nullable = false)
-    private String title;
+// import lombok... (롬복을 안 쓰고 직접 메서드를 만드셨으니 import도 필요 없습니다)
 
-    private String artist;
+public class SignupRequest {
 
-    @Column(name = "file_path", nullable = false)
-    private String file_path;
+    // 1. 로그인 ID
+    private String userId; 
+    
+    // 2. 사용자 이름
+    private String username; 
+    
+    // 3. 비밀번호
+    private String password;
 
-    private Integer bpm;
-    private Integer duration;
-    private Integer difficulty;
-    private String image_path;
+    // 기본 생성자
+    public SignupRequest() {}
 
-    @Column(name = "created_at", insertable = false, updatable = false)
-    private LocalDateTime created_at;
+    // ==========================
+    // Getter 메서드들
+    // ==========================
 
-    public Song() {}
+    public String getUserId() {
+        return userId;
+    }
 
-    public Long getId() { return id; }
-    public String getTitle() { return title; }
-    public String getArtist() { return artist; }
-    public String getFile_path() { return file_path; }
-    public Integer getBpm() { return bpm; }
-    public Integer getDuration() { return duration; }
-    public Integer getDifficulty() { return difficulty; }
-    public LocalDateTime getCreated_at() { return created_at; }
-    public String getImage_path() { return image_path; }
+    public String getUsername() {
+        return username;
+    }
 
-    public void setId(Long id) { this.id = id; }
-    public void setTitle(String title) { this.title = title; }
-    public void setArtist(String artist) { this.artist = artist; }
-    public void setFile_path(String file_path) { this.file_path = file_path; }
-    public void setBpm(Integer bpm) { this.bpm = bpm; }
-    public void setDuration(Integer duration) { this.duration = duration; }
-    public void setDifficulty(Integer difficulty) { this.difficulty = difficulty; }
-    public void setImage_path(String image_path) { this.image_path = image_path; }
+    public String getPassword() {
+        return password;
+    }
 }
 </file>
 
@@ -2146,6 +1683,851 @@ public interface UserRepository extends JpaRepository<User, Long> {
 }
 </file>
 
+<file path="backend/src/main/java/com/magnesium/springStarter/DemoApplication.java">
+// package com.magnesium.springStarter;
+
+// import org.springframework.boot.SpringApplication;
+// import org.springframework.boot.autoconfigure.SpringBootApplication;
+// import org.springframework.boot.autoconfigure.domain.EntityScan;
+// import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+// @SpringBootApplication(scanBasePackages = {"com.facebeat", "com.magnesium"})
+// @EnableJpaRepositories(basePackages = {"com.facebeat.repository", "com.magnesium"})
+// @EntityScan(basePackages = {"com.facebeat.entity", "com.magnesium"})
+// public class DemoApplication {
+//     public static void main(String[] args) {
+//         SpringApplication.run(DemoApplication.class, args);
+//     }
+// }
+</file>
+
+<file path="backend/src/main/resources/application.properties">
+# =================================================
+# ================ DATABASE CONFIG ================
+# =================================================
+# DB 연결을 위한 URL (your_db_name을 실제 DB 이름으로 변경해주세요)
+spring.datasource.url=jdbc:mysql://localhost:3306/magnesium_db?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+
+# DB 사용자 이름 (실제 이름으로 변경해주세요)
+spring.datasource.username=root
+
+# DB 비밀번호 (실제 비밀번호로 변경해주세요)
+spring.datasource.password=magnesium!
+
+# MySQL 드라이버 클래스 지정
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+
+# =================================================
+# =================== JPA CONFIG ==================
+# =================================================
+# 엔티티를 기준으로 DB 테이블을 자동 업데이트
+spring.jpa.hibernate.ddl-auto=update
+# 실행되는 SQL 쿼리를 로그에 표시
+spring.jpa.show-sql=true
+# SQL 쿼리를 보기 좋게 포맷팅
+spring.jpa.properties.hibernate.format_sql=true
+
+
+# =================================================
+# ================ FILE STORAGE ===================
+# =================================================
+# 파일이 저장될 기본 위치
+storage.location=src/main/resources/static
+
+
+# =================================================
+# ================= SERVER CONFIG =================
+# =================================================
+# 서버 포트 설정
+server.port=8080
+
+# =================================================
+# ================= RESOURCE HANDLER ==============
+# =================================================
+# 개발 시 src/main/resources/static 경로를 직접 바라보도록 설정
+spring.web.resources.static-locations=classpath:/static/,file:src/main/resources/static/
+
+# =================================================
+# ================ MULTIPART CONFIG ===============
+# =================================================
+# 최대 개별 파일 사이즈 (기본 1MB)
+spring.servlet.multipart.max-file-size=10MB
+# 전체 요청 사이즈 (기본 10MB)
+spring.servlet.multipart.max-request-size=10MB
+</file>
+
+<file path="backend/src/main/resources/db/migration/V1__init.sql">
+-- V1__init.sql 최종본
+CREATE TABLE member (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,  -- 중복 방지
+    password VARCHAR(100) NOT NULL,        -- 필수 입력 (암호화 대비 100자)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+</file>
+
+<file path="backend/src/main/resources/db/migration/V7__dummy_users.sql">
+-- 더미 데이터 삽입 (테스트 유저 10명)
+-- 비밀번호는 모두 '1234' 입니다. (BCrypt로 암호화된 값: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy)
+-- username과 user_id를 동일하게 설정했습니다.
+
+INSERT INTO member (username, user_id, password) VALUES 
+('testuser1',  'testuser1',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser2',  'testuser2',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser3',  'testuser3',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser4',  'testuser4',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser5',  'testuser5',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser6',  'testuser6',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser7',  'testuser7',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser8',  'testuser8',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser9',  'testuser9',  '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC'),
+('testuser10', 'testuser10', '$2a$12$DYCjarPyLFmt7hBj3sGg.Okj8Fpa6BSrmR6HPc1ViBNOrIfekxKGC');
+</file>
+
+<file path="frontend/package.json">
+{
+  "name": "magnesium",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "face-api.js": "^0.22.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.11.0",
+    "react-webcam": "^7.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "vite": "^7.2.4"
+  }
+}
+</file>
+
+<file path="frontend/src/pages/AuthSelection.jsx">
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const AuthSelection = () => {
+  const navigate = useNavigate();
+  const [serverStatus, setServerStatus] = useState("connecting"); // connecting, success, error
+  const [serverMessage, setServerMessage] = useState("서버 연결 확인 중...");
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/test")
+      .then((res) => res.json())
+      .then((data) => {
+        setServerMessage(data.message);
+        setServerStatus("success");
+      })
+      .catch((err) => {
+        console.error(err);
+        setServerMessage("서버 오프라인");
+        setServerStatus("error");
+      });
+  }, []);
+
+  return (
+    <div className="relative min-h-screen bg-[#FFF9F9] flex flex-col items-center justify-center overflow-hidden">
+      
+      {/* --- 배경 장식 (파스텔 원형 엘리먼트) --- */}
+      <div className="absolute -top-20 -left-20 w-80 h-80 bg-[#F8C4B4] opacity-20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#B4E4F8] opacity-20 rounded-full blur-3xl animate-pulse" />
+
+      {/* --- 상단 서버 상태 표시 (트렌디한 캡슐형) --- */}
+      <div className="absolute top-10 flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-md rounded-full shadow-sm border border-white/50">
+        <div className={`w-2 h-2 rounded-full ${
+          serverStatus === "success" ? "bg-green-400 animate-ping" : 
+          serverStatus === "error" ? "bg-red-400" : "bg-yellow-400"
+        }`} />
+        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+          {serverMessage}
+        </span>
+      </div>
+
+      {/* --- 메인 타이틀 섹션 --- */}
+      <div className="text-center z-10">
+        <div className="inline-block px-4 py-1 mb-6 bg-[#F8C4B4] text-white text-sm font-black rounded-lg transform -rotate-2">
+          NEW RHYTHM GAME
+        </div>
+        <h1 className="text-8xl font-black text-[#333] mb-4 tracking-tighter">
+          마그네슘 <span className="text-[#F8C4B4]">부족</span>
+        </h1>
+        <p className="text-gray-400 font-medium mb-16 tracking-wide">
+          당신의 표정이 리듬이 되는 순간
+        </p>
+      </div>
+      
+      {/* --- 버튼 그룹 --- */}
+      <div className="flex gap-8 z-10">
+        <button 
+          onClick={() => navigate('/Login')} 
+          className="group relative w-56 py-6 bg-white rounded-[30px] shadow-[0_15px_35px_rgba(248,196,180,0.4)] transition-all hover:-translate-y-2 active:translate-y-0"
+        >
+          <div className="absolute inset-0 bg-[#F8C4B4] rounded-[30px] opacity-0 group-hover:opacity-100 transition-opacity" />
+          <span className="relative text-2xl font-black text-[#F8C4B4] group-hover:text-white transition-colors">
+            로그인
+          </span>
+        </button>
+
+        <button 
+          onClick={() => navigate('/Signup')} 
+          className="group w-56 py-6 bg-white/40 backdrop-blur-sm border-2 border-white rounded-[30px] shadow-xl transition-all hover:bg-white hover:border-[#F8C4B4]"
+        >
+          <span className="text-2xl font-black text-gray-400 group-hover:text-[#F8C4B4] transition-colors">
+            회원가입
+          </span>
+        </button>
+      </div>
+
+      {/* --- 하단 푸터 느낌의 장식 --- */}
+      <div className="absolute bottom-10 text-gray-300 text-sm font-bold">
+        © 2026 Team Magnesium Deficiency. All rights reserved.
+      </div>
+
+    </div>
+  );
+};
+
+export default AuthSelection;
+</file>
+
+<file path="frontend/src/pages/Ranking.jsx">
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const BACKEND_URL = 'http://localhost:8080';
+
+const Ranking = () => {
+  const navigate = useNavigate();
+  const [rankings, setRankings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRankings = async () => {
+      try {
+        // 백엔드에서 랭킹 데이터를 가져옵니다.
+        // API는 내부적으로 score_value 기준 DESC 정렬 및 LIMIT 10 처리가 되어 있어야 합니다.
+        const response = await fetch(`${BACKEND_URL}/api/scores/ranking`);
+        if (!response.ok) throw new Error('데이터 로딩 실패');
+        
+        const data = await response.json();
+        setRankings(data); // data 예시: [{ userId: 'user1', songTitle: '노래1', score: 2500 }, ...]
+      } catch (error) {
+        console.error("랭킹 호출 에러:", error);
+        // 에러 시 보여줄 더미 데이터 (테스트용)
+        setRankings([
+          { userId: 'Magnesium_Master', songTitle: '생일 축하 노래', score: 3200 },
+          { userId: 'Rhythm_King', songTitle: '기본 곡', score: 2800 },
+          { userId: 'Face_Expert', songTitle: '생일 축하 노래', score: 2100 },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRankings();
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center w-full min-h-screen bg-[#FFF9F9] p-6 font-sans overflow-hidden">
+      {/* 배경 장식 (Home과 일관성 유지) */}
+      <div className="absolute -top-20 -left-20 w-80 h-80 bg-[#F8C4B4] opacity-20 rounded-full blur-3xl" />
+      <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#B4E4F8] opacity-20 rounded-full blur-3xl" />
+
+      {/* 헤더 섹션 (로고 좌측, 메뉴 우측) */}
+      <header className="w-full max-w-5xl flex justify-between items-center mb-12 px-4 z-10">
+        <h1 
+          className="text-2xl font-black text-[#333] cursor-pointer" 
+          onClick={() => navigate('/Home')}
+        >
+          마그네슘 부족
+        </h1>
+        <div className="flex gap-8 text-sm text-gray-500 font-bold">
+          <button onClick={() => navigate('/Home')} className="hover:text-black transition-all">홈</button>
+          <button onClick={() => navigate('/Ranking')} className="text-black border-b-2 border-[#F8C4B4] pb-1">랭킹</button>
+          <button onClick={() => navigate('/Settings')} className="hover:text-black transition-all">설정</button>
+        </div>
+      </header>
+
+      {/* 메인 타이틀 */}
+      <div className="text-center z-10 mb-10">
+        <h2 className="text-5xl font-black text-[#333] tracking-tighter">
+          TOP 10 <span className="text-[#F8C4B4]">HALL OF FAME</span>
+        </h2>
+        <p className="text-gray-400 font-bold mt-2">최고의 표정술사들을 확인하세요</p>
+      </div>
+
+      {/* 랭킹 리스트 영역 */}
+      <div className="w-full max-w-3xl z-10 overflow-y-auto max-h-[70vh] pr-2 scrollbar-hide">
+        {isLoading ? (
+          <div className="text-center py-20 font-black text-gray-300 text-2xl animate-pulse">
+            RANKING LOADING...
+          </div>
+        ) : (
+          rankings.map((item, index) => (
+            <RankingItem 
+              key={`${item.userId}-${index}`} 
+              item={{ ...item, rank: index + 1 }} 
+            />
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
+const RankingItem = ({ item }) => {
+  const isTop = item.rank === 1;
+
+  return (
+    <div className={`
+      relative flex items-center mb-5 p-5 rounded-[40px] border-4 transition-all duration-300 hover:scale-[1.02]
+      ${isTop ? 'border-[#F8C4B4] bg-white shadow-[0_15px_30px_rgba(248,196,180,0.3)]' : 'border-white bg-white/60 shadow-sm'}
+    `}>
+      {/* 순위 번호 (Peach 색상 강조) */}
+      <div className={`flex items-center justify-center w-16 h-16 min-w-[4rem] rounded-full text-3xl font-black mr-8 shadow-sm
+        ${isTop ? 'bg-[#F8C4B4] text-white' : 'bg-gray-100 text-gray-400'}`}>
+        {item.rank}
+      </div>
+
+      {/* 사용자 아이디 */}
+      <div className="flex-1 text-3xl font-black text-[#333] truncate mr-4 tracking-tighter">
+        {item.userId}
+      </div>
+
+      {/* 곡 제목 및 점수 */}
+      <div className="text-right min-w-fit">
+        <div className={`text-sm font-black mb-1 ${isTop ? 'text-[#F8C4B4]' : 'text-[#B4E4F8]'}`}>
+          {item.songTitle}
+        </div>
+        <div className="flex items-baseline justify-end leading-none">
+          <span 
+            className="text-5xl font-black italic tracking-tighter"
+            style={{
+              color: 'white',
+              WebkitTextStroke: isTop ? '2.5px #F8C4B4' : '2.5px #B4E4F8',
+              paintOrder: 'stroke fill',
+              filter: 'drop-shadow(3px 3px 0px rgba(0,0,0,0.05))'
+            }}
+          >
+            {item.score?.toLocaleString()}
+          </span>
+          <span className="text-xl ml-1 font-black text-[#333]">점</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Ranking;
+</file>
+
+<file path="README.md">
+# magnesium-deficiency
+학습동아리입니다.
+</file>
+
+<file path="backend/src/main/java/com/facebeat/config/SecurityConfig.java">
+package com.facebeat.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            // 1. CORS 설정 (가장 먼저 적용)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
+            // 2. CSRF 보안 끄기
+            .csrf(AbstractHttpConfigurer::disable)
+            
+            // 3. 요청 주소별 권한 설정
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/users/**", "/api/admin/**").permitAll()
+                .anyRequest().permitAll()
+            );
+
+        return http.build();
+    }
+
+    // 전역 CORS 설정 Bean
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // React 앱의 주소 허용
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        // 허용할 HTTP 메서드
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        // 허용할 HTTP 헤더
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        // 자격 증명(쿠키 등) 허용
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // 모든 경로에 대해 위 설정 적용
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/dto/response/RankingResponse.java">
+package com.facebeat.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class RankingResponse {
+    // 프론트엔드에서 item.userId로 사용함
+    private String userId; 
+    
+    // 프론트엔드에서 item.songTitle로 사용함
+    private String songTitle; 
+    
+    // 프론트엔드에서 item.score로 사용함
+    private int score;
+}
+</file>
+
+<file path="backend/src/main/java/com/facebeat/entity/Song.java">
+package com.facebeat.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "music")
+@Getter
+@Setter
+@NoArgsConstructor
+public class Song {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String title;
+
+    private String artist;
+
+    @Column(name = "file_path", nullable = false)
+    private String filePath;
+
+    @Column(name = "image_path")
+    private String imagePath;
+
+    private Integer bpm;
+
+    private Integer difficulty;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+}
+</file>
+
+<file path="frontend/src/pages/AdminDashboard.jsx">
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const AdminDashboard = () => {
+  const navigate = useNavigate();
+  const [songs, setSongs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // 새 노래 입력을 위한 상태
+  const [newSong, setNewSong] = useState({
+    title: '',
+    artist: '',
+    bpm: '',
+    difficulty: 1,
+  });
+  const [songFile, setSongFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+
+  const BACKEND_URL = 'http://localhost:8080';
+
+  // 1. 노래 목록 불러오기
+  const fetchSongs = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/songs`);
+      if (response.ok) {
+        const data = await response.json();
+        setSongs(data);
+      }
+    } catch (error) {
+      console.error("데이터 로딩 실패:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSongs();
+  }, []);
+
+  // 2. 텍스트 입력 값 변경 처리
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewSong({ ...newSong, [name]: value });
+  };
+
+  // 3. 파일 입력 값 변경 처리
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    if (name === 'songFile') {
+      setSongFile(files[0]);
+    } else if (name === 'imageFile') {
+      setImageFile(files[0]);
+    }
+  };
+
+  // 4. 노래 추가 제출
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!songFile) {
+      alert('MP3 파일을 선택해주세요.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', newSong.title);
+    formData.append('artist', newSong.artist);
+    formData.append('bpm', newSong.bpm);
+    formData.append('difficulty', newSong.difficulty);
+    formData.append('songFile', songFile);
+    if (imageFile) {
+      formData.append('imageFile', imageFile);
+    }
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/songs`, {
+        method: 'POST',
+        body: formData, // FormData 사용 시 Content-Type 헤더는 브라우저가 자동으로 설정
+      });
+
+      if (response.ok) {
+        alert("새 노래가 등록되었습니다!");
+        // 입력 필드 초기화
+        setNewSong({ title: '', artist: '', bpm: '', difficulty: 1 });
+        setSongFile(null);
+        setImageFile(null);
+        document.getElementById('song-form').reset(); // 폼 리셋
+        fetchSongs(); // 목록 새로고침
+      } else {
+        const errorData = await response.json();
+        alert(`등록에 실패했습니다: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error("등록 실패:", error);
+      alert("등록 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 5. 노래 삭제
+  const handleDelete = async (id) => {
+    if (!window.confirm("정말 이 곡을 삭제하시겠습니까? DB와 서버에서 파일이 모두 삭제됩니다.")) return;
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/songs/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        alert('노래가 삭제되었습니다.');
+        fetchSongs(); // 목록 새로고침
+      } else {
+        const errorData = await response.json();
+        alert(`삭제에 실패했습니다: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error("삭제 실패:", error);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-8 font-sans text-[#333]">
+      {/* 헤더 */}
+      <header className="flex justify-between items-center mb-10 max-w-6xl mx-auto">
+        <div>
+          <h1 className="text-4xl font-black text-black mb-2">Admin Dashboard</h1>
+          <p className="text-gray-500 font-bold">리듬게임 콘텐츠 관리 시스템</p>
+        </div>
+        <button 
+          onClick={() => navigate('/Home')}
+          className="px-6 py-3 bg-white border-2 border-gray-200 rounded-2xl font-black hover:bg-gray-100 transition-all"
+        >
+          나가기
+        </button>
+      </header>
+
+      <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* 노래 추가 섹션 */}
+        <section className="lg:col-span-1">
+          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-black mb-6 flex items-center gap-2">
+              <span className="w-2 h-8 bg-[#F8C4B4] rounded-full"></span>
+              새 노래 등록
+            </h2>
+            <form id="song-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">곡 제목</label>
+                <input name="title" value={newSong.title} onChange={handleInputChange} placeholder="ex) Moonlight" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" required />
+              </div>
+              <div>
+                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">아티스트</label>
+                <input name="artist" value={newSong.artist} onChange={handleInputChange} placeholder="아티스트 명" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-black text-gray-400 ml-2 mb-1">BPM</label>
+                  <input name="bpm" type="number" value={newSong.bpm} onChange={handleInputChange} placeholder="120" className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold" />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-gray-400 ml-2 mb-1">난이도 (1-3)</label>
+                  <select name="difficulty" value={newSong.difficulty} onChange={handleInputChange} className="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#F8C4B4] outline-none font-bold appearance-none">
+                    <option value={1}>EASY</option>
+                    <option value={2}>NORMAL</option>
+                    <option value={3}>HARD</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">음악 파일 (.mp3)</label>
+                <input type="file" name="songFile" onChange={handleFileChange} accept=".mp3" className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#F8C4B4]/20 file:text-[#F8C4B4] hover:file:bg-[#F8C4B4]/30" required />
+              </div>
+              <div>
+                <label className="block text-xs font-black text-gray-400 ml-2 mb-1">커버 이미지 (.png, .jpg)</label>
+                <input type="file" name="imageFile" onChange={handleFileChange} accept="image/*" className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#F8C4B4]/20 file:text-[#F8C4B4] hover:file:bg-[#F8C4B4]/30" />
+              </div>
+              <button type="submit" className="mt-4 w-full py-4 bg-[#F8C4B4] text-white rounded-2xl font-black text-lg shadow-lg shadow-[#F8C4B4]/30 hover:brightness-105 active:scale-95 transition-all">
+                노래 추가하기
+              </button>
+            </form>
+          </div>
+        </section>
+
+        {/* 노래 목록 테이블 섹션 */}
+        <section className="lg:col-span-2">
+          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 min-h-[600px]">
+            <h2 className="text-2xl font-black mb-6 flex items-center gap-2">
+              <span className="w-2 h-8 bg-gray-200 rounded-full"></span>
+              현재 노래 목록 ({songs.length})
+            </h2>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-separate border-spacing-y-3">
+                <thead>
+                  <tr className="text-gray-400 text-sm font-black">
+                    <th className="px-4 py-2">ID</th>
+                    <th className="px-4 py-2">곡 정보</th>
+                    <th className="px-4 py-2">난이도</th>
+                    <th className="px-4 py-2 text-right">관리</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {songs.map((song) => (
+                    <tr key={song.id} className="bg-gray-50 hover:bg-gray-100 transition-colors group">
+                      <td className="px-4 py-4 rounded-l-2xl font-bold text-gray-400">{song.id}</td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-white rounded-lg overflow-hidden border border-gray-200">
+                             <img src={`${BACKEND_URL}${song.imagePath}`} alt={song.title} className="w-full h-full object-cover" onError={(e)=>e.target.src='https://placehold.co/40'}/>
+                          </div>
+                          <div>
+                            <p className="font-black text-black leading-tight">{song.title}</p>
+                            <p className="text-xs font-bold text-gray-400">{song.artist} | {song.bpm} BPM</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className={`text-[10px] font-black px-2 py-1 rounded-full ${
+                          song.difficulty === 3 ? 'bg-red-100 text-red-500' : 
+                          song.difficulty === 2 ? 'bg-blue-100 text-blue-500' : 'bg-green-100 text-green-500'
+                        }`}>
+                          {song.difficulty === 1 ? 'EASY' : song.difficulty === 2 ? 'NORMAL' : 'HARD'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 rounded-r-2xl text-right">
+                        <button 
+                          onClick={() => handleDelete(song.id)}
+                          className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {songs.length === 0 && !isLoading && (
+                <div className="text-center py-20 text-gray-400 font-bold">등록된 노래가 없습니다.</div>
+              )}
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  );
+};
+
+export default AdminDashboard;
+</file>
+
+<file path="frontend/src/pages/setting.jsx">
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const Settings = () => {
+  const navigate = useNavigate();
+
+  // 설정 상태 관리 (이미지 예시의 84%로 초기값 설정)
+  const [volume, setVolume] = useState(84);
+
+  // [수정] 저장 버튼 핸들러: 이제 /select 페이지로 이동합니다.
+  const handleSave = () => {
+    const settings = { volume };
+    localStorage.setItem('gameSettings', JSON.stringify(settings));
+    alert("설정이 저장되었습니다! 🎵");
+    navigate('/select'); // App.jsx에 정의된 곡 선택 페이지 경로
+  };
+
+  // 로그아웃 핸들러
+  const handleLogout = () => {
+    if (window.confirm("로그아웃 하시겠습니까?")) {
+      localStorage.removeItem('user'); 
+      navigate('/Login');
+    }
+  };
+const userId = localStorage.getItem('userId');
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col p-8 font-sans">
+      {/* 헤더 부분 */}
+      <header className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-8 w-8 text-gray-800 group-hover:text-black" 
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-3xl font-black cursor-pointer" onClick={() => navigate('/Home')}>
+            마그네슘 부족
+          </h1>
+        </div>
+        <div className="flex gap-6 text-sm text-gray-500 font-bold">
+          <button onClick={() => navigate('/Home')} className="hover:text-black">홈</button>
+          <button onClick={() => navigate('/Ranking')} className="hover:text-black">랭킹</button>
+          <span className="text-black border-b-2 border-[#F8C4B4]">설정</span>
+        </div>
+      </header>
+
+      {/* 메인 설정 영역 */}
+      <main className="flex-1 max-w-2xl mx-auto w-full flex flex-col gap-10">
+        <h2 className="text-4xl font-black text-[#333] mb-4 text-center">게임 설정</h2>
+        <h5 className="text-4xl font-black text-[#F8C4B4] mb-4 text-center">{userId}</h5>
+
+        {/* 배경 음악 설정 카드 */}
+        <section className="bg-gray-50 p-8 rounded-[40px] shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-black">배경 음악</h3>
+            <span className="text-[#F8C4B4] font-black text-2xl">{volume}%</span>
+          </div>
+          <input 
+            type="range" 
+            min="0" max="100" 
+            value={volume}
+            onChange={(e) => setVolume(e.target.value)}
+            className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#F8C4B4]"
+          />
+        </section>
+
+        {/* 로그아웃 버튼 섹션 (흰색 배경, 빨간 글씨, 큰 디자인) */}
+        <section className="flex justify-center">
+          <button 
+            onClick={handleLogout}
+            className="px-24 py-6 text-3xl font-black rounded-[30px] shadow-xl transition-all active:scale-95 bg-white text-red-500 border-2 border-gray-100 hover:bg-gray-50"
+          >
+            로그아웃하기
+          </button>
+        </section>
+      </main>
+
+      {/* 하단 저장 버튼 */}
+      <footer className="py-8 flex justify-center">
+        <button 
+          onClick={handleSave}
+          className="px-24 py-6 text-3xl font-black rounded-[30px] shadow-2xl transition-all active:scale-95 bg-[#F8C4B4] text-white hover:brightness-105"
+        >
+          설정 저장하기
+        </button>
+      </footer>
+    </div>
+  );
+};
+
+export default Settings;
+</file>
+
 <file path="backend/src/main/java/com/facebeat/controller/UserController.java">
 package com.facebeat.controller;
 
@@ -2224,8 +2606,13 @@ package com.facebeat.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter @Setter
+@NoArgsConstructor // 기본 생성자 추가
 @Table(name = "scores")
 public class Score {
 
@@ -2246,38 +2633,29 @@ public class Score {
     @Column(name = "score_value")
     private Integer score;
 
-    private Integer combo;
-    private String grade;
+    //[삭제됨] combo, grade 변수 불필요해서 삭제함.
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Score() {}
-
     // 생성자 추가 
     @Builder
-    public Score(User user, Song song, Integer score, Integer combo, String grade) {
+    public Score(User user, Song song, Integer score) { //[삭제됨] combo, grade 삭제.
         this.user = user;
         this.song = song;
         this.score = score;
-        this.combo = combo;
-        this.grade = grade;
     }
 
     public Long getId() { return id; }
     public User getUser() { return user; }
     public Song getSong() { return song; }
     public Integer getScore() { return score; }
-    public Integer getCombo() { return combo; }
-    public String getGrade() { return grade; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
     public void setId(Long id) { this.id = id; }
     public void setUser(User user) { this.user = user; }
     public void setSong(Song song) { this.song = song; }
     public void setScore(Integer score) { this.score = score; }
-    public void setCombo(Integer combo) { this.combo = combo; }
-    public void setGrade(String grade) { this.grade = grade; }
 }
 </file>
 
@@ -2286,78 +2664,15 @@ package com.facebeat.repository;
 
 import com.facebeat.entity.Score;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ScoreRepository extends JpaRepository<Score, Long> {
-    List<Score> findBySongIdOrderByScoreDesc(Long songId);
-}
-</file>
 
-<file path="backend/src/main/java/com/facebeat/service/ScoreService.java">
-package com.facebeat.service;
-
-import com.facebeat.dto.request.ScoreRequest;
-import com.facebeat.dto.response.RankingResponse;
-import com.facebeat.entity.Score;
-import com.facebeat.entity.Song;
-import com.facebeat.entity.User;
-import com.facebeat.repository.ScoreRepository;
-import com.facebeat.repository.SongRepository; // SongRepository 필요
-import com.facebeat.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@Service
-@RequiredArgsConstructor
-public class ScoreService {
-
-    private final ScoreRepository scoreRepository;
-    private final UserRepository userRepository;
-    private final SongRepository songRepository; // SongRepository가 없으면 만들어야 함!
-
-    // 1. 점수 저장하기
-    @Transactional
-    public void saveScore(ScoreRequest request) {
-        // 유저 찾기
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-
-        // 노래 찾기
-        Song song = songRepository.findById(request.getSongId())
-                .orElseThrow(() -> new IllegalArgumentException("노래를 찾을 수 없습니다."));
-
-        // 점수 객체 생성
-        Score score = Score.builder()
-                .user(user)
-                .song(song)
-                .score(request.getScore())
-                .combo(request.getCombo())
-                .grade(request.getGrade())
-                .build();
-
-        // 저장!
-        scoreRepository.save(score);
-    }
-
-    // 2. 랭킹 조회하기
-    @Transactional(readOnly = true)
-    public List<RankingResponse> getRanking(Long songId) {
-        // DB에서 점수 모두 가져오기
-        List<Score> scores = scoreRepository.findBySongIdOrderByScoreDesc(songId);
-
-        // 랭킹 번호표 붙여서 내보내기
-        List<RankingResponse> responseList = new ArrayList<>();
-        for (int i = 0; i < scores.size(); i++) {
-            // i는 0부터 시작하니까 +1 해서 등수(1등, 2등...) 매김
-            responseList.add(new RankingResponse(i + 1, scores.get(i)));
-        }
-
-        return responseList;
-    }
+    // 🏆 Top 10 랭킹 조회
+    // 변수명 변경 반영: s.music -> s.song, s.scoreValue -> s.score
+    @Query("SELECT s FROM Score s JOIN FETCH s.user JOIN FETCH s.song ORDER BY s.score DESC, s.createdAt ASC")
+    List<Score> findTop10ByOrderByScoreDescCreatedAtAsc();
 }
 </file>
 
@@ -2401,120 +2716,88 @@ VALUES
 );
 </file>
 
-<file path="frontend/src/pages/Home.jsx">
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+<file path="backend/src/main/java/com/facebeat/dto/request/LoginRequest.java">
+package com.facebeat.dto.request;
 
-const Home = () => {
-  const navigate = useNavigate();
-  const [serverStatus, setServerStatus] = useState("connecting"); // connecting, success, error
-  const [serverMessage, setServerMessage] = useState("서버 연결 확인 중...");
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-  useEffect(() => {
-    fetch("http://localhost:8080/api/test")
-      .then((res) => res.json())
-      .then((data) => {
-        setServerMessage(data.message);
-        setServerStatus("success");
-      })
-      .catch((err) => {
-        console.error(err);
-        setServerMessage("서버 오프라인");
-        setServerStatus("error");
-      });
-  }, []);
+@Getter
+@NoArgsConstructor
+public class LoginRequest {
+    private String userId;
+    private String password;
 
-  return (
-    <div className="relative min-h-screen bg-[#FFF9F9] flex flex-col items-center justify-center overflow-hidden">
-      
-      {/* --- 상단 헤더 (우측 정렬 로직 핵심) --- */}
-      <header className="absolute top-0 left-0 right-0 w-full p-8 flex justify-end items-center z-20">
-        {/* 좌측 로고 영역: justify-between에 의해 왼쪽 끝 고정 */}
-
-        {/* 우측 네비게이션 영역: justify-between에 의해 오른쪽 끝 고정 */}
-        <nav className="flex gap-8 text-sm text-gray-500 font-bold">
-          <button 
-            onClick={() => navigate('/Ranking')} 
-            className="hover:text-black hover:scale-105 transition-all"
-          >
-            랭킹
-          </button>
-          <button 
-            onClick={() => navigate('/Settings')} 
-            className="hover:text-black hover:scale-105 transition-all"
-          >
-            설정
-          </button>
-        </nav>
-      </header>
-
-      {/* --- 배경 장식 (파스텔 원형 엘리먼트) --- */}
-      <div className="absolute -top-20 -left-20 w-80 h-80 bg-[#F8C4B4] opacity-20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#B4E4F8] opacity-20 rounded-full blur-3xl animate-pulse" />
-      
-
-      {/* --- 서버 상태 표시 --- */}
-      <div className="absolute top-28 flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-md rounded-full shadow-sm border border-white/50">
-        <div className={`w-2 h-2 rounded-full ${
-          serverStatus === "success" ? "bg-green-400 animate-ping" : 
-          serverStatus === "error" ? "bg-red-400" : "bg-yellow-400"
-        }`} />
-        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
-          {serverMessage}
-        </span>
-      </div>
-      
-
-      {/* --- 메인 타이틀 섹션 --- */}
-      <div className="text-center z-10 mt-12">
-        <div className="inline-block px-4 py-1 mb-6 bg-[#F8C4B4] text-white text-sm font-black rounded-lg transform -rotate-2">
-          NEW RHYTHM GAME
-        </div>
-        <h1 className="text-8xl font-black text-[#333] mb-4 tracking-tighter">
-          마그네슘 <span className="text-[#F8C4B4]">부족</span>
-        </h1>
-        <p className="text-gray-400 font-medium mb-16 tracking-wide">
-          당신의 표정이 리듬이 되는 순간
-        </p>
-      </div>
-      
-      {/* --- 버튼 그룹 --- */}
-      <div className="flex gap-8 z-10">
-        <button 
-          onClick={() => navigate('/select')} 
-          className="group relative w-56 py-6 bg-white rounded-[30px] shadow-[0_15px_35px_rgba(248,196,180,0.4)] transition-all hover:-translate-y-2 active:translate-y-0"
-        >
-          <div className="absolute inset-0 bg-[#F8C4B4] rounded-[30px] opacity-0 group-hover:opacity-100 transition-opacity" />
-          <span className="relative text-2xl font-black text-[#F8C4B4] group-hover:text-white transition-colors">
-            게임 시작
-          </span>
-        </button>
-
-        <button 
-          onClick={() => navigate('/tutorial')} 
-          className="group w-56 py-6 bg-white/40 backdrop-blur-sm border-2 border-white rounded-[30px] shadow-xl transition-all hover:bg-white hover:border-[#F8C4B4]"
-        >
-          <span className="text-2xl font-black text-gray-400 group-hover:text-[#F8C4B4] transition-colors">
-            튜토리얼
-          </span>
-        </button>
-      </div>
-
-      {/* --- 하단 푸터 --- */}
-      <div className="absolute bottom-10 text-gray-300 text-sm font-bold">
-        © 2026 Team Magnesium Deficiency. All rights reserved.
-      </div>
-
-    </div>
-  );
-};
-
-export default Home;
+    public String getUserId() { return userId; }
+    public String getPassword() { return password; }
+}
 </file>
 
-<file path="README.md">
-# magnesium-deficiency
-학습동아리입니다.
+<file path="backend/src/main/java/com/facebeat/service/ScoreService.java">
+package com.facebeat.service;
+
+import com.facebeat.dto.request.ScoreRequest; //[추가] 저장 요청 DTO
+import com.facebeat.dto.response.RankingResponse;
+import com.facebeat.entity.Score;
+import com.facebeat.entity.Song; //[추가]
+import com.facebeat.entity.User; //[추가]
+import com.facebeat.repository.ScoreRepository;
+import com.facebeat.repository.SongRepository; //[추가]
+import com.facebeat.repository.UserRepository; //[추가]
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ScoreService {
+
+    private final ScoreRepository scoreRepository;
+    private final UserRepository userRepository; //[추가]
+    private final SongRepository songRepository; //[추가]
+
+    /* 1. 점수 저장 기능 추가 */
+    @Transactional
+    public Long saveScore(ScoreRequest request){
+        // 1-1. 유저 확인
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        // 1-2. 노래 확인
+        Song song = songRepository.findById(request.getSongId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 노래입니다."));
+        // 1-3. 엔티티 생성 (Builder 사용)
+        Score score = Score.builder()
+                .user(user)
+                .song(song)
+                .score(request.getScore())
+                .build();
+        // 1-4. DB 저장
+        scoreRepository.save(score);
+
+        return score.getId();
+    }
+    @Transactional(readOnly = true)
+    public List<RankingResponse> getTop10Ranking() {
+        // 1. DB에서 데이터 가져오기
+        List<Score> scores = scoreRepository.findTop10ByOrderByScoreDescCreatedAtAsc();
+        
+        List<RankingResponse> responseList = new ArrayList<>();
+        
+        // 2. DTO로 변환
+        for (Score s : scores) {
+            responseList.add(RankingResponse.builder()
+                .userId(s.getUser().getUserId())     // 유저 아이디
+                .songTitle(s.getSong().getTitle())   // 🔥 [수정] getSong().getTitle()
+                .score(s.getScore())                 // 🔥 [수정] getScore()
+                .build());
+        }
+        
+        return responseList;
+    }
+}
 </file>
 
 <file path="backend/src/main/java/com/facebeat/service/UserService.java">
@@ -2641,132 +2924,6 @@ function App() {
 }
 
 export default App;
-</file>
-
-<file path="frontend/src/pages/Login.jsx">
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Auth.css';
-
-const Login = () => {
-  const navigate = useNavigate();
-  const [userId, setUserId] = useState('');
-  const [password, setPassword] = useState('');
-
-  // 기존 허용 정규표현식 (영문, 숫자, 특수문자)
-  const validRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
-  // 한글 감지 정규표현식
-  const koreanRegex = /[ㄱ-ㅎㅏ-ㅣ가-힣]/;
-
-  // 입력 핸들러 함수
-  const handleInputChange = (e, setter) => {
-    const value = e.target.value;
-
-    // 1. 한글이 포함되어 있는지 먼저 검사
-    if (koreanRegex.test(value)) {
-      alert('한글은 입력할 수 없습니다.');
-      return; // 한글이 있으면 여기서 중단하여 setter를 실행하지 않음
-    }
-
-    // 2. 한글이 없고, 기존 validRegex(특수문자/영문/숫자)를 통과할 때만 상태 업데이트
-    if (value === '' || validRegex.test(value)) {
-      setter(value);
-    }
-  };
-
-  const handleLogin = async () => {
-    if (!userId || !password) {
-      alert('아이디와 비밀번호를 모두 입력해 주세요.');
-      return;
-    }
-
-    const isAdmin = userId === 'admin123';
-    const API_URL = isAdmin 
-      ? 'http://localhost:8080/api/admin/login' 
-      : 'http://localhost:8080/api/users/login';
-
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(isAdmin ? { id: userId, password } : { userId, password }),
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        
-        if (isAdmin) {
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('userRole', 'ADMIN');
-          localStorage.setItem('userId', userId);
-          alert("관리자님, 환영합니다!");
-          navigate('/AdminDashboard');
-        } else {
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('userRole', 'USER');
-          localStorage.setItem('userId', userData.userId);
-          alert(`${userData.userId}님, 환영합니다!`);
-          navigate('/Home');
-        }
-      } else {
-        const errorData = await response.text();
-        alert(errorData || '아이디 또는 비밀번호가 일치하지 않습니다.');
-      }
-    } catch (err) {
-      console.error('로그인 에러:', err);
-      alert('서버 연결 실패');
-    }
-  };
-
-  return (
-    <div className="auth-container">
-      <div className="bg-circle circle-1"></div>
-      <div className="bg-circle circle-2"></div>
-
-      <div className="auth-card">
-        <h1 className="auth-title">로그인</h1>
-        <p className="auth-subtitle">Welcome back to Magnesium Deficiency!</p>
-
-        <div className="input-group">
-          <div className="input-wrapper">
-            <label className="field-label">USER ID</label>
-            <input 
-              type="text" 
-              value={userId}
-              // handleInputChange를 사용하도록 수정
-              onChange={(e) => handleInputChange(e, setUserId)}
-              placeholder="아이디를 입력하세요"
-              className="auth-input"
-            />
-          </div>
-
-          <div className="input-wrapper">
-            <label className="field-label">PASSWORD</label>
-            <input 
-              type="password" 
-              value={password}
-              // handleInputChange를 사용하도록 수정
-              onChange={(e) => handleInputChange(e, setPassword)}
-              placeholder="비밀번호를 입력하세요"
-              className="auth-input"
-            />
-          </div>
-        </div>
-
-        <div className="auth-btn-group">
-          <button onClick={handleLogin} className="auth-btn btn-primary">
-            LOGIN
-          </button>
-          <button onClick={() => navigate('/signup')} className="link-btn">
-            아직 계정이 없으신가요? 회원가입하기
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Login;
 </file>
 
 <file path="frontend/src/pages/Signup.jsx">
@@ -2917,11 +3074,255 @@ const Signup = () => {
 export default Signup;
 </file>
 
+<file path="frontend/src/pages/Home.jsx">
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+
+const Home = () => {
+  const navigate = useNavigate();
+  const [serverStatus, setServerStatus] = useState("connecting"); // connecting, success, error
+  const [serverMessage, setServerMessage] = useState("서버 연결 확인 중...");
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/test")
+      .then((res) => res.json())
+      .then((data) => {
+        setServerMessage(data.message);
+        setServerStatus("success");
+      })
+      .catch((err) => {
+        console.error(err);
+        setServerMessage("서버 오프라인");
+        setServerStatus("error");
+      });
+  }, []);
+const userId = localStorage.getItem('userId');
+  return (
+    <div className="relative min-h-screen bg-[#FFF9F9] flex flex-col items-center justify-center overflow-hidden">
+      {/* --- 상단 헤더 (우측 정렬 로직 핵심) --- */}
+      <header className="absolute top-0 left-0 right-0 w-full p-8 flex justify-between items-center z-20">
+      {/* 좌측 로고 영역: userId 스타일은 유지하되 mb-4를 제거하여 수직 정렬을 맞춤 */}
+      <h5 className="font-black text-[#F8C4B4] text-center">{userId}</h5>
+      
+      {/* 우측 네비게이션 영역: gap-6과 text-sm을 적용하여 두 번째 코드와 동일하게 설정 */}
+      <nav className="flex gap-6 text-sm text-gray-500 font-bold">
+        <button 
+          onClick={() => navigate('/Ranking')} 
+          className="hover:text-black transition-colors"
+        >
+          랭킹
+        </button>
+        <button 
+          onClick={() => navigate('/Settings')} 
+          className="hover:text-black transition-colors"
+        >
+          설정
+        </button>
+      </nav>
+    </header>
+
+      {/* --- 배경 장식 (파스텔 원형 엘리먼트) --- */}
+      <div className="absolute -top-20 -left-20 w-80 h-80 bg-[#F8C4B4] opacity-20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#B4E4F8] opacity-20 rounded-full blur-3xl animate-pulse" />
+      
+
+      {/* --- 서버 상태 표시 --- */}
+      <div className="absolute top-28 flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-md rounded-full shadow-sm border border-white/50">
+        <div className={`w-2 h-2 rounded-full ${
+          serverStatus === "success" ? "bg-green-400 animate-ping" : 
+          serverStatus === "error" ? "bg-red-400" : "bg-yellow-400"
+        }`} />
+        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+          {serverMessage}
+        </span>
+      </div>
+      
+
+      {/* --- 메인 타이틀 섹션 --- */}
+      <div className="text-center z-10 mt-12">
+        <div className="inline-block px-4 py-1 mb-6 bg-[#F8C4B4] text-white text-sm font-black rounded-lg transform -rotate-2">
+          NEW RHYTHM GAME
+        </div>
+        <h1 className="text-8xl font-black text-[#333] mb-4 tracking-tighter">
+          마그네슘 <span className="text-[#F8C4B4]">부족</span>
+        </h1>
+        <p className="text-gray-400 font-medium mb-16 tracking-wide">
+          당신의 표정이 리듬이 되는 순간
+        </p>
+      </div>
+      
+      {/* --- 버튼 그룹 --- */}
+      <div className="flex gap-8 z-10">
+        <button 
+          onClick={() => navigate('/select')} 
+          className="group relative w-56 py-6 bg-white rounded-[30px] shadow-[0_15px_35px_rgba(248,196,180,0.4)] transition-all hover:-translate-y-2 active:translate-y-0"
+        >
+          <div className="absolute inset-0 bg-[#F8C4B4] rounded-[30px] opacity-0 group-hover:opacity-100 transition-opacity" />
+          <span className="relative text-2xl font-black text-[#F8C4B4] group-hover:text-white transition-colors">
+            게임 시작
+          </span>
+        </button>
+
+        <button 
+          onClick={() => navigate('/tutorial')} 
+          className="group w-56 py-6 bg-white/40 backdrop-blur-sm border-2 border-white rounded-[30px] shadow-xl transition-all hover:bg-white hover:border-[#F8C4B4]"
+        >
+          <span className="text-2xl font-black text-gray-400 group-hover:text-[#F8C4B4] transition-colors">
+            튜토리얼
+          </span>
+        </button>
+      </div>
+
+      {/* --- 하단 푸터 --- */}
+      <div className="absolute bottom-10 text-gray-300 text-sm font-bold">
+        © 2026 Team Magnesium Deficiency. All rights reserved.
+      </div>
+
+    </div>
+  );
+};
+
+export default Home;
+</file>
+
+<file path="frontend/src/pages/Login.jsx">
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Auth.css';
+
+const Login = () => {
+  const navigate = useNavigate();
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
+
+  // 기존 허용 정규표현식 (영문, 숫자, 특수문자)
+  const validRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+  // 한글 감지 정규표현식
+  const koreanRegex = /[ㄱ-ㅎㅏ-ㅣ가-힣]/;
+
+  // 입력 핸들러 함수
+  const handleInputChange = (e, setter) => {
+    const value = e.target.value;
+
+    // 1. 한글이 포함되어 있는지 먼저 검사
+    if (koreanRegex.test(value)) {
+      alert('한글은 입력할 수 없습니다.');
+      return; // 한글이 있으면 여기서 중단하여 setter를 실행하지 않음
+    }
+
+    // 2. 한글이 없고, 기존 validRegex(특수문자/영문/숫자)를 통과할 때만 상태 업데이트
+    if (value === '' || validRegex.test(value)) {
+      setter(value);
+    }
+  };
+
+  const handleLogin = async () => {
+    if (!userId || !password) {
+      alert('아이디와 비밀번호를 모두 입력해 주세요.');
+      return;
+    }
+
+    const isAdmin = userId === 'admin123';
+    const API_URL = isAdmin 
+      ? 'http://localhost:8080/api/admin/login' 
+      : 'http://localhost:8080/api/users/login';
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(isAdmin ? { id: userId, password } : { userId, password }),
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        
+        if (isAdmin) {
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userRole', 'ADMIN');
+          localStorage.setItem('userId', userId);
+          alert("관리자님, 환영합니다!");
+          // 로그인 성공 시
+          localStorage.setItem('userId', userData.userId);
+          navigate('/AdminDashboard');
+        } else {
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userRole', 'USER');
+          localStorage.setItem('userId', userData.userId);
+          alert(`${userData.userId}님, 환영합니다!`);
+          // 로그인 성공 시
+          localStorage.setItem('userId', userData.userId);
+          navigate('/Home');
+        }
+      } else {
+        const errorData = await response.text();
+        alert(errorData || '아이디 또는 비밀번호가 일치하지 않습니다.');
+      }
+    } catch (err) {
+      console.error('로그인 에러:', err);
+      alert('서버 연결 실패');
+      
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <div className="bg-circle circle-1"></div>
+      <div className="bg-circle circle-2"></div>
+
+      <div className="auth-card">
+        <h1 className="auth-title">로그인</h1>
+        <p className="auth-subtitle">Welcome back to Magnesium Deficiency!</p>
+
+        <div className="input-group">
+          <div className="input-wrapper">
+            <label className="field-label">USER ID</label>
+            <input 
+              type="text" 
+              value={userId}
+              // handleInputChange를 사용하도록 수정
+              onChange={(e) => handleInputChange(e, setUserId)}
+              placeholder="아이디를 입력하세요"
+              className="auth-input"
+            />
+          </div>
+
+          <div className="input-wrapper">
+            <label className="field-label">PASSWORD</label>
+            <input 
+              type="password" 
+              value={password}
+              // handleInputChange를 사용하도록 수정
+              onChange={(e) => handleInputChange(e, setPassword)}
+              placeholder="비밀번호를 입력하세요"
+              className="auth-input"
+            />
+          </div>
+        </div>
+
+        <div className="auth-btn-group">
+          <button onClick={handleLogin} className="auth-btn btn-primary">
+            LOGIN
+          </button>
+          <button onClick={() => navigate('/signup')} className="link-btn">
+            아직 계정이 없으신가요? 회원가입하기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
+</file>
+
 <file path="frontend/src/pages/Tutorial.jsx">
 import React, { useState, useEffect, useRef } from 'react';
 import Webcam from "react-webcam";
 import { useNavigate } from 'react-router-dom';
 import * as faceapi from 'face-api.js';
+const userId = localStorage.getItem('userId');
 
 const Tutorial = () => {
   const expressionsList = [
@@ -3081,231 +3482,123 @@ const Tutorial = () => {
 export default Tutorial;
 </file>
 
-<file path="backend/src/main/java/com/facebeat/dto/request/LoginRequest.java">
-package com.facebeat.dto.request;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-@Getter
-@NoArgsConstructor
-public class LoginRequest {
-    private String userId;
-    private String password;
-
-    public String getUserId() { return userId; }
-    public String getPassword() { return password; }
-}
-</file>
-
 <file path="frontend/src/pages/RhythmGame.css">
+/* 1. 기본 레이아웃 및 배경 */
 .game-container {
   position: relative;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
   background: #000;
-  font-family: 'Pretendard', sans-serif;
-  z-index: 1;
+  overflow: hidden;
+  font-family: 'Pretendard', sans-serif; /* 혹은 굵은 시스템 폰트 */
 }
 
 .webcam-bg {
   position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scaleX(-1);
-  z-index: 2;
-  opacity: 0.5;
+  transform: scaleX(-1); /* 좌우 반전 */
+  opacity: 0.4;
+  z-index: 1;
 }
 
+/* 2. 레인 시스템 */
 .lane-container {
   display: flex;
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   z-index: 10;
+  padding: 0 50px;
 }
 
 .lane {
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  position: relative; /* 자식인 note-stream의 기준 */
-  transition: background 0.15s ease-in-out;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+/* 감정별 하이라이트 배경색 */
+.lane.active { opacity: 1; }
+.lane.inactive { opacity: 0.15; }
+
+.lane.happy.active { background: rgba(255, 235, 59, 0.4); }
+.lane.sad.active { background: rgba(33, 150, 243, 0.4); }
+.lane.angry.active { background: rgba(244, 67, 54, 0.4); }
+.lane.neutral.active { background: rgba(255, 255, 255, 0.3); }
+.lane.surprised.active { background: rgba(156, 39, 176, 0.4); }
+
+.target-emoji {
+  font-size: 4rem;
+  margin-top: 80px;
+  text-align: center;
+  filter: drop-shadow(0 0 10px white);
+}
+
+.note-stream {
+  flex: 1;
+  position: relative;
+  width: 100%;
   overflow: hidden;
 }
 
-.lane.active { 
-  background: var(--lane-color); 
-  opacity: 1; 
-  box-shadow: inset 0 0 100px rgba(255, 255, 255, 0.2);
-}
-
-.lane.inactive { background: transparent; opacity: 0.15; }
-
-.lane.happy { --lane-color: rgba(255, 235, 59, 0.45); }
-.lane.sad { --lane-color: rgba(33, 150, 243, 0.45); }
-.lane.angry { --lane-color: rgba(244, 67, 54, 0.5); }
-.lane.neutral { --lane-color: rgba(255, 255, 255, 0.5); }
-.lane.surprised { --lane-color: rgba(156, 39, 176, 0.45); }
-
-.target-emoji { font-size: 4.5rem; margin-top: 50px; z-index: 20; position: relative; }
-
-/* 노드가 지나가는 길 - 레인 전체를 채워야 함 */
-.note-stream {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
+/* 3. 이모지(노트) 및 상승 애니메이션 */
 .note-emoji.rising {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 4.5rem;
-  z-index: 15;
-  animation-name: moveUpSmooth;
+  font-size: 4rem;
+  bottom: -100px;
+  animation-name: moveUp;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
 
-/* 판정된 이모지는 자연스럽게 사라짐 */
-.note-emoji.rising.judged {
-  opacity: 0;
-  transition: opacity 0.2s;
+/* 일시정지 시 애니메이션 멈춤 */
+.note-emoji.paused {
+  animation-play-state: paused !important;
 }
 
-/* 아래에서 위 타겟까지 올라가는 애니메이션 */
-@keyframes moveUpSmooth {
-  from { bottom: -10%; }
-  to { bottom: 100%; } /* 타겟 이모지 위치를 지나 화면 끝까지 */
+@keyframes moveUp {
+  0% { bottom: 0; opacity: 0; }
+  10% { opacity: 1; }
+  100% { bottom: 100%; opacity: 1; }
 }
 
-.ui-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 150;
-  pointer-events: none;
-}
-
-.score-capsule {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: white;
-  padding: 10px 35px;
-  border-radius: 999px;
-  border: 4px solid #F8C4B4;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-  animation: scoreBounce 2s ease-in-out infinite;
-}
-
-@keyframes scoreBounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-10px); }
-}
-
-.score-value { font-size: 2.2rem; font-weight: 900; color: #333; min-width: 60px; text-align: center; }
-.score-label { font-size: 1rem; font-weight: 900; color: #F8C4B4; }
-
-.judgement-display {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 7rem;
-  font-weight: 900;
-  text-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-}
-
-.judgement-display.perfect { color: #ffff33; }
-.judgement-display.good { color: #33ccff; }
-.judgement-display.miss { color: #ff3333; }
-
-.final-score-text {
-  font-size: 10rem;
-  font-weight: 900;
-  color: #F8C4B4;
-  text-shadow: 0 0 50px rgba(248, 196, 180, 0.5);
-  margin-bottom: 50px;
-}
-
-.time-limit-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 8px;
-  background: #F8C4B4;
-  z-index: 300;
-  animation: timerShrink 30s linear forwards;
-}
-
-@keyframes timerShrink { from { width: 100%; } to { width: 0%; } }
-
-.overlay-screen {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 200;
-}
-
-/* 시간바 컨테이너 */
+/* 4. 상단 시간바(Progress Bar) */
 .progress-bar-container {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 8px; /* 바의 두께 */
-  background: rgba(255, 255, 255, 0.2); /* 배경 트랙 색상 */
-  z-index: 200; /* 모든 요소 위에 표시 */
+  height: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 200;
 }
 
-/* 실제 줄어드는 바 */
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #ff7e5f, #feb47b); /* 예쁜 그라데이션 */
-  box-shadow: 0 0 10px rgba(255, 126, 95, 0.8);
-  transition: width 0.1s linear; /* 부드럽게 움직이게 함 */
+  background: linear-gradient(90deg, #F8C4B4, #B4E4F8);
+  box-shadow: 0 0 15px rgba(248, 196, 180, 0.8);
+  transition: width 0.1s linear;
 }
 
-/* 기존 스타일들... */
-.loading-overlay {
-  position: absolute;
-  inset: 0;
-  background: black;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 300;
-}
-
-/* 일시정지 아이콘 버튼 (플레이 중 우측 상단) */
+/* 5. 일시정지 아이콘 버튼 (우측 상단) */
 .pause-icon-btn {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 30px;
+  right: 30px;
   background: rgba(255, 255, 255, 0.2);
-  border: 2px solid white;
+  border: 3px solid white;
   color: white;
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
+  font-weight: 900;
   cursor: pointer;
   z-index: 150;
   display: flex;
@@ -3319,44 +3612,162 @@ public class LoginRequest {
   transform: scale(1.1);
 }
 
-/* 일시정지 메뉴 오버레이 */
-.pause-menu {
-  background: rgba(0, 0, 0, 0.85) !important;
+/* 6. 오버레이 화면 (Ready, Paused, Finished 공통) */
+.overlay-screen {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  color: white;
+  text-align: center;
 }
 
-.menu-title {
-  font-size: 4rem;
+.game-title, .menu-title {
+  font-size: 5rem;
+  font-weight: 900;
   color: #F8C4B4;
-  margin-bottom: 40px;
-  letter-spacing: 5px;
-  text-shadow: 0 0 15px rgba(248, 196, 180, 0.5);
+  margin-bottom: 20px;
+  letter-spacing: -2px;
 }
 
+.song-detail-box {
+  margin-bottom: 40px;
+}
+
+.song-title-text {
+  font-size: 2.5rem;
+  font-weight: 900;
+}
+
+.song-sub-text {
+  font-size: 1.2rem;
+  color: #ccc;
+}
+
+/* 7. 버튼 그룹 및 공통 버튼 스타일 */
 .button-group {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: 300px;
+  width: 350px;
 }
 
-/* 일시정지 시 노트 애니메이션 멈춤 */
-.note-emoji.paused {
-  animation-play-state: paused !important;
+.button-group.horizontal {
+  flex-direction: row !important;
+  justify-content: center;
+  width: auto;
+  min-width: 600px;
+  gap: 30px;
 }
 
-/* PAUSE 전용 버튼 스타일링 */
-.menu-btn.resume { background: #4CAF50; color: white; }
-.menu-btn.restart { background: #FF9800; color: white; }
-.menu-btn.select { background: #2196F3; color: white; }
-.menu-btn { padding: 15px 45px; font-size: 1.3rem; font-weight: 800; border: none; border-radius: 50px; cursor: pointer; transition: 0.2s; margin: 10px; }
-.menu-btn.start, .menu-btn.retry { background: #F8C4B4; color: white; }
-.menu-btn.home { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid white; }
-.menu-btn:hover { transform: scale(1.1); }
+.menu-btn {
+  padding: 20px 40px;
+  font-size: 1.8rem;
+  font-weight: 900;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.menu-btn:hover {
+  transform: translateY(-5px);
+  filter: brightness(1.1);
+}
+
+.menu-btn.start, .menu-btn.resume, .menu-btn.retry {
+  background: #F8C4B4;
+  color: white;
+}
+
+.menu-btn.select {
+  background: #B4E4F8;
+  color: #333;
+}
+
+.menu-btn.restart {
+  background: #eee;
+  color: #333;
+}
+
+/* 8. 판정 및 점수 UI */
+.ui-layer {
+  position: absolute;
+  bottom: 50px;
+  width: 100%;
+  pointer-events: none;
+  z-index: 110;
+}
+
+.score-capsule {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  color: #333;
+  padding: 15px 50px;
+  border-radius: 50px;
+  font-size: 2.5rem;
+  font-weight: 900;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.judgement-display {
+  position: absolute;
+  top: -300px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 7rem;
+  font-weight: 900;
+  font-style: italic;
+  text-shadow: 0 0 20px rgba(0,0,0,0.8);
+}
+
+.judgement-display.perfect { color: #ffff33; }
+.judgement-display.good { color: #33ccff; }
+.judgement-display.miss { color: #ff3333; }
+
+/* 9. 결과 화면 전용 */
+.result-label {
+  font-size: 1.5rem;
+  color: #B4E4F8;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.final-score-text {
+  font-size: 10rem;
+  font-weight: 900;
+  margin-bottom: 60px;
+  text-shadow: 0 0 40px rgba(248, 196, 180, 0.8);
+}
+
+/* 로딩 화면 */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  color: #F8C4B4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: 900;
+  z-index: 1000;
+}
 </file>
 
 <file path="frontend/src/pages/SongSelection.jsx">
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+const userId = localStorage.getItem('userId');
 
 const SongSelection = () => {
   const [songs, setSongs] = useState([]);
@@ -3401,8 +3812,8 @@ const SongSelection = () => {
             artist: '마그네슘 부족',
             bpm: 100,
             difficulty: 1,
-            file_path: '/birthday_star.mp3',
-            image_path: '/birthday_star.png', // 여기 수정됨
+            filepath: '/birthday_star.mp3',
+            imagepath: '/birthday_star.png', // 여기 수정됨
           }
         ]);
         setSelectedSongId(1);
@@ -3441,7 +3852,7 @@ const SongSelection = () => {
           artist: selectedSongData.artist,
           bpm: selectedSongData.bpm,
           difficulty: selectedSongData.difficulty,
-          file_path: selectedSongData.file_path,
+          filepath: selectedSongData.filepath,
           image_path: selectedSongData.image_path,
         },
       },
@@ -3551,7 +3962,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import * as faceapi from 'face-api.js';
 import './RhythmGame.css';
 
-// 설정 상수
+const userId = localStorage.getItem('userId');
+
 const EMOTION_CONFIG = {
   neutral:   { weight: 6.0, perfect: 0.90, good: 0.50 }, 
   happy:     { weight: 1.5, perfect: 0.80, good: 0.45 }, 
@@ -3559,77 +3971,194 @@ const EMOTION_CONFIG = {
   angry:     { weight: 1.6, perfect: 0.60, good: 0.30 }, 
   sad:       { weight: 0.5, perfect: 0.55, good: 0.25 }  
 };
+
 const EMOTIONS = Object.keys(EMOTION_CONFIG);
 const EMOJI_MAP = { happy: '😊', sad: '😭', angry: '😡', neutral: '😐', surprised: '😮' };
 const BACKEND_URL = 'http://localhost:8080';
+
+// [추가] 리소스 URL을 생성하는 헬퍼 함수
+const getResourceUrl = (path) => {
+  if (!path) return ''; // 경로가 없으면 빈 문자열 반환
+  // 이미 http로 시작하면(외부 URL이면) 그대로 두고, 아니면 백엔드 주소 붙이기
+  return path.startsWith('http') ? path : `${BACKEND_URL}${path}`;
+};
+
 
 const RhythmGame = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // 1. 상태 관리
-  const [gameState, setGameState] = useState('ready'); // ready, playing, paused, finished
+  const [gameState, setGameState] = useState('ready'); 
   const [currentEmotion, setCurrentEmotion] = useState('neutral');
   const [notes, setNotes] = useState([]); 
   const [score, setScore] = useState(0);
   const [judgement, setJudgement] = useState(null);
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [progress, setProgress] = useState(100);
+  const [isNewRecord, setIsNewRecord] = useState(false);
 
-  // 2. 타이머 및 외부 객체 관리
   const videoRef = useRef(null);
   const audioRef = useRef(new Audio()); 
   const gameLoopRef = useRef(null);
   const noteTimeoutRef = useRef(null);
-  const endTimerRef = useRef(null);
   const latestExpressionsRef = useRef({});
   const isDetecting = useRef(false);
+  const hasUpdatedScore = useRef(false);
+  const pauseStartTimeRef = useRef(0);
+  const judgedNotesRef = useRef(new Set());
 
-  // 3. 노래 데이터 처리
+  // [수정] location.state.song이 없을 경우의 기본값에 filePath, imagePath 사용
   const selectedSong = useMemo(() => location.state?.song || { 
-    title: "기본 곡", artist: "Artist", bpm: 120, difficulty: 2, file_path: "song_30s.mp3" 
+    id: 1, title: "기본 곡", artist: "Artist", bpm: 120, difficulty: 2, filePath: "song_30s.mp3", imagePath: "" 
   }, [location.state]);
 
   const settings = useMemo(() => {
-    const bpm = selectedSong.bpm || 120;
     const diff = selectedSong.difficulty;
     const diffLabel = (diff === 1 || diff === 'Easy') ? "EASY" : (diff === 3 || diff === 'Hard') ? "HARD" : "NORMAL";
-    let baseTiming = (60000 / bpm) * 4; 
-    const config = { 'EASY': 1.5, 'NORMAL': 1.0, 'HARD': 0.7 }[diffLabel];
-    return { hitTiming: baseTiming * config, spawnRange: [1000, 2000] };
+    let baseTiming = (60000 / 100) * 3; 
+    return { 
+      hitTiming: baseTiming, 
+      spawnRange: (diffLabel === 'HARD' ? [800, 1200] : [1200, 1800]), 
+      label: diffLabel 
+    };
   }, [selectedSong]);
 
-  // 4. 기능 함수들
   const stopAllTimers = useCallback(() => {
     if (gameLoopRef.current) clearInterval(gameLoopRef.current);
     if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
-    if (endTimerRef.current) clearTimeout(endTimerRef.current);
     gameLoopRef.current = null;
     noteTimeoutRef.current = null;
     audioRef.current.pause();
   }, []);
 
-  const spawnNote = useCallback(() => {
-    // 일시정지 상태면 노트를 생성하지 않음
+  const handlePause = useCallback(() => {
     if (gameState !== 'playing') return;
+    pauseStartTimeRef.current = Date.now();
+    stopAllTimers();
+    setGameState('paused');
+  }, [gameState, stopAllTimers]);
 
+  const handleResume = useCallback(() => {
+    if (gameState !== 'paused') return;
+    const pauseDuration = Date.now() - pauseStartTimeRef.current;
+    setNotes(prev => prev.map(n => ({
+      ...n,
+      hitTime: n.hitTime + pauseDuration
+    })));
+    setGameState('playing');
+    audioRef.current.play();
+  }, [gameState]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (gameState === 'playing') handlePause();
+        else if (gameState === 'paused') handleResume();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, handlePause, handleResume]);
+
+  useEffect(() => {
+    return () => {
+      stopAllTimers();
+      if (audioRef.current) {
+        audioRef.current.src = "";
+        audioRef.current.load();
+      }
+      if (videoRef.current && videoRef.current.srcObject) {
+        videoRef.current.srcObject.getTracks().forEach(t => t.stop());
+      }
+    };
+  }, [stopAllTimers]);
+
+  useEffect(() => {
+    if (gameState === 'finished' && !hasUpdatedScore.current) {
+      const saveScoreToDB = async () => {
+        try {
+          const response = await fetch(`${BACKEND_URL}/api/scores/best?user_id=${userId}&song_id=${selectedSong.id}`);
+          let prevBest = 0;
+          if (response.ok) {
+            const data = await response.json();
+            prevBest = data.score_value || 0;
+          }
+          if (score > prevBest) {
+            await fetch(`${BACKEND_URL}/api/scores`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: parseInt(userId),
+                song_id: selectedSong.id,
+                score_value: score
+              }),
+            });
+            setIsNewRecord(true);
+          }
+        } catch (err) { console.error(err); }
+        finally { hasUpdatedScore.current = true; }
+      };
+      saveScoreToDB();
+    }
+  }, [gameState, score, selectedSong.id]);
+
+  const handleJudgement = useCallback((noteEmotion) => {
+    const rawProb = latestExpressionsRef.current[noteEmotion] || 0; 
+    const config = EMOTION_CONFIG[noteEmotion];
+    let res = { text: 'Miss', type: 'miss', add: 0 };
+
+    if (rawProb >= config.perfect) {
+      const ratio = (rawProb - config.perfect) / (1 - config.perfect);
+      res = { text: 'Perfect!', type: 'perfect', add: 150 + Math.floor(ratio * 50) };
+    } else if (rawProb >= config.good) {
+      const ratio = (rawProb - config.good) / (config.perfect - config.good);
+      res = { text: 'Good!', type: 'good', add: 50 + Math.floor(ratio * 99) };
+    }
+
+    setJudgement({ text: res.add > 0 ? `${res.text}` : res.text, type: res.type });
+    setScore(p => p + res.add);
+    setTimeout(() => setJudgement(null), 500);
+  }, []);
+
+  const spawnNote = useCallback(() => {
+    if (gameState !== 'playing') return;
     const randomEm = EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)];
     const now = Date.now();
-    
     setNotes(prev => [...prev, { 
-      id: `${now}-${Math.random()}`, 
-      emotion: randomEm, 
-      hitTime: now + settings.hitTiming, 
-      judged: false 
+      id: `${now}-${Math.random()}`, emotion: randomEm, hitTime: now + settings.hitTiming, judged: false 
     }]);
-
     const nextDelay = Math.random() * (settings.spawnRange[1] - settings.spawnRange[0]) + settings.spawnRange[0];
     noteTimeoutRef.current = setTimeout(spawnNote, nextDelay);
   }, [gameState, settings]);
 
-  // 5. 초기 모델 초기화
   useEffect(() => {
-    const initFaceApi = async () => {
+    if (gameState === 'playing') {
+      gameLoopRef.current = setInterval(() => {
+        const now = Date.now();
+        if (audioRef.current.duration) {
+          const cp = ((audioRef.current.duration - audioRef.current.currentTime) / audioRef.current.duration) * 100;
+          setProgress(Math.max(0, cp));
+        }
+        
+        setNotes(prev => prev.map(n => {
+          if (!n.judged && now >= n.hitTime && !judgedNotesRef.current.has(n.id)) {
+            judgedNotesRef.current.add(n.id);
+            handleJudgement(n.emotion);
+            return { ...n, judged: true };
+          }
+          return n;
+        }).filter(n => now < n.hitTime + 1000));
+      }, 16);
+      spawnNote();
+    }
+    return () => {
+      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
+      if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
+    };
+  }, [gameState, spawnNote, handleJudgement]);
+
+  useEffect(() => {
+    const init = async () => {
       try {
         await Promise.all([
           faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
@@ -3638,13 +4167,11 @@ const RhythmGame = () => {
         setIsModelLoaded(true);
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         if (videoRef.current) videoRef.current.srcObject = stream;
-      } catch (err) { console.error("Init Error:", err); }
+      } catch (err) { console.error(err); }
     };
-    initFaceApi();
-    return () => stopAllTimers();
-  }, [stopAllTimers]);
+    init();
+  }, []);
 
-  // 6. 감정 감지 루프
   const detectExpressions = useCallback(async () => {
     if (!videoRef.current || videoRef.current.paused || isDetecting.current) return;
     isDetecting.current = true;
@@ -3653,10 +4180,10 @@ const RhythmGame = () => {
       const expressions = detections[0].expressions;
       latestExpressionsRef.current = expressions;
       let bestEmotion = 'neutral';
-      let maxScore = -1;
+      let maxS = -1;
       EMOTIONS.forEach(em => {
-        const weighted = (expressions[em] || 0) * EMOTION_CONFIG[em].weight;
-        if (weighted > maxScore) { maxScore = weighted; bestEmotion = em; }
+        const w = (expressions[em] || 0) * EMOTION_CONFIG[em].weight;
+        if (w > maxS) { maxS = w; bestEmotion = em; }
       });
       setCurrentEmotion(bestEmotion); 
     }
@@ -3664,80 +4191,25 @@ const RhythmGame = () => {
     requestAnimationFrame(detectExpressions);
   }, []);
 
-  // 7. 게임 엔진 제어 (일시정지 로직 통합)
-  useEffect(() => {
-    if (gameState === 'playing') {
-      gameLoopRef.current = setInterval(() => {
-        const now = Date.now();
-        
-        if (audioRef.current.duration) {
-          const currentProgress = ((audioRef.current.duration - audioRef.current.currentTime) / audioRef.current.duration) * 100;
-          setProgress(Math.max(0, currentProgress));
-        }
-
-        setNotes(prev => prev.map(note => {
-          if (!note.judged && now >= note.hitTime) {
-            const rawProb = latestExpressionsRef.current[note.emotion] || 0;
-            const config = EMOTION_CONFIG[note.emotion];
-            let res = { text: 'Miss', type: 'miss', add: 0 };
-            if (rawProb >= config.perfect) res = { text: 'Perfect!', type: 'perfect', add: 100 };
-            else if (rawProb >= config.good) res = { text: 'Good!', type: 'good', add: 50 };
-            setScore(p => p + res.add);
-            setJudgement({ text: res.text, type: res.type });
-            setTimeout(() => setJudgement(null), 500);
-            return { ...note, judged: true };
-          }
-          return note;
-        }).filter(note => now < note.hitTime + 1000));
-      }, 16);
-      spawnNote();
-    } else {
-      // playing 상태가 아니면 타이머 제거 (일시정지 포함)
-      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
-      if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
-    }
-    return () => {
-      if (gameLoopRef.current) clearInterval(gameLoopRef.current);
-      if (noteTimeoutRef.current) clearTimeout(noteTimeoutRef.current);
-    };
-  }, [gameState, spawnNote, stopAllTimers]);
-
-  // 8. 제어 함수들
+  // [수정] getResourceUrl 헬퍼와 selectedSong.filePath 사용
   const startGame = () => {
     const audio = audioRef.current;
-    const cleanPath = selectedSong.file_path.startsWith('/') ? selectedSong.file_path.substring(1) : selectedSong.file_path;
-    audio.src = `${BACKEND_URL}/${cleanPath}`;
-    audio.crossOrigin = "anonymous";
+    const songUrl = getResourceUrl(selectedSong.filePath);
 
+    if (!songUrl) {
+      alert("노래 파일 경로가 올바르지 않습니다.");
+      return;
+    }
+
+    audio.src = songUrl;
+    audio.crossOrigin = "anonymous";
     audio.play().then(() => {
-      setNotes([]);
-      setScore(0);
+      setNotes([]); setScore(0);
+      judgedNotesRef.current.clear();
+      setIsNewRecord(false); hasUpdatedScore.current = false;
       setGameState('playing');
       audio.onended = () => { setGameState('finished'); stopAllTimers(); };
-    }).catch(err => { alert("오디오 재생 실패"); });
-  };
-
-  const pauseGame = () => {
-    if (gameState !== 'playing') return;
-    setGameState('paused');
-    audioRef.current.pause(); // 음악 중지
-  };
-
-  const resumeGame = () => {
-    if (gameState !== 'paused') return;
-    audioRef.current.play().then(() => {
-      setGameState('playing'); // 엔진 자동 재시작
-    });
-  };
-
-  const restartGame = () => {
-    stopAllTimers();
-    startGame();
-  };
-
-  const goToSongSelection = () => {
-    stopAllTimers();
-    navigate('/select'); // 노래 선택 페이지 경로에 맞게 수정
+    }).catch(err => alert("오디오 재생에 실패했습니다. 파일을 확인해주세요."));
   };
 
   return (
@@ -3745,76 +4217,70 @@ const RhythmGame = () => {
       {!isModelLoaded && <div className="loading-overlay">모델 로딩 중...</div>}
       <video ref={videoRef} autoPlay playsInline muted onPlay={() => requestAnimationFrame(detectExpressions)} className="webcam-bg" />
       
-      {/* 상단 시간바 */}
       {(gameState === 'playing' || gameState === 'paused') && (
-        <div className="progress-bar-container">
-          <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+        <>
+          <div className="progress-bar-container">
+            <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
+          </div>
+          <button className="game-pause-btn" onClick={handlePause}>
+            <span>II</span>
+          </button>
+        </>
+      )}
+
+      {gameState === 'paused' && (
+        <div className="overlay-screen pause-screen">
+          <h1 className="game-title">PAUSED</h1>
+          <div className="button-group horizontal">
+            <button className="menu-btn start" onClick={handleResume}>RESUME</button>
+            <button className="menu-btn select" onClick={() => navigate('/select')}>QUIT</button>
+          </div>
         </div>
       )}
 
-      {/* 게임 대기 화면 */}
+      {gameState === 'finished' && (
+        <div className="overlay-screen result-screen">
+          {isNewRecord && <p className="new-record-badge">NEW RECORD! 🏆</p>}
+          <h2 className="result-label">FINAL SCORE</h2>
+          <h1 className="final-score-text">{score.toLocaleString()}</h1>
+          <div className="button-group horizontal">
+            <button className="menu-btn retry" onClick={() => { setGameState('ready'); setProgress(100); }}>RETRY</button>
+            <button className="menu-btn select" onClick={() => navigate('/select')}>곡 선택</button>
+          </div>
+        </div>
+      )}
+
       {gameState === 'ready' && (
         <div className="overlay-screen">
           <h1 className="game-title">Emotion Rhythm</h1>
-          <div className="song-detail-box">
-             <p className="song-title-text">{selectedSong.title}</p>
-             <p className="song-sub-text">{selectedSong.artist}</p>
-          </div>
           <button className="menu-btn start" onClick={startGame}>START</button>
         </div>
       )}
-
-      {/* [신규] 일시정지 오버레이 메뉴 */}
-      {gameState === 'paused' && (
-        <div className="overlay-screen pause-menu">
-          <h1 className="menu-title">PAUSED</h1>
-          <div className="button-group">
-            <button className="menu-btn resume" onClick={resumeGame}>이어서 하기</button>
-            <button className="menu-btn restart" onClick={restartGame}>다시 하기</button>
-            <button className="menu-btn select" onClick={goToSongSelection}>곡 선택하러 가기</button>
-          </div>
-        </div>
-      )}
-
-      {/* 결과 화면 */}
-      {gameState === 'finished' && (
-        <div className="overlay-screen result-screen">
-          <h1 className="final-score-text">{score}</h1>
-          <button className="menu-btn retry" onClick={() => setGameState('ready')}>RETRY</button>
-        </div>
-      )}
-
-      {/* 인게임 요소 */}
-      {(gameState === 'playing' || gameState === 'paused' || gameState === 'ready') && (
-        <>
-          {gameState === 'playing' && (
-            <button className="pause-icon-btn" onClick={pauseGame}>❚❚</button>
-          )}
-          
-          <div className="lane-container">
-            {EMOTIONS.map((emotion) => (
-              <div key={emotion} className={`lane ${emotion} ${currentEmotion === emotion ? 'active' : 'inactive'}`}>
-                <div className="target-emoji">{EMOJI_MAP[emotion]}</div>
-                <div className="note-stream">
-                  {notes.filter(n => n.emotion === emotion && !n.judged).map(note => (
-                    <div 
-                      key={note.id} 
-                      className={`note-emoji rising ${gameState === 'paused' ? 'paused' : ''}`} 
-                      style={{ animationDuration: `${settings.hitTiming}ms` }}
-                    >
-                      {EMOJI_MAP[note.emotion]}
-                    </div>
-                  ))}
-                </div>
+      
+      {(gameState !== 'finished') && (
+        <div className="lane-container">
+          {EMOTIONS.map(em => (
+            <div key={em} className={`lane ${em} ${currentEmotion === em ? 'active' : 'inactive'}`}>
+              <div className="target-emoji">{EMOJI_MAP[em]}</div>
+              <div className="note-stream">
+                {notes.filter(n => n.emotion === em && !n.judged).map(n => (
+                  <div 
+                    key={n.id} 
+                    className={`note-emoji rising ${gameState === 'paused' ? 'paused' : ''}`} 
+                    style={{ animationDuration: `${settings.hitTiming}ms` }}
+                  >
+                    {EMOJI_MAP[n.emotion]}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </>
+            </div>
+          ))}
+        </div>
       )}
 
       {gameState === 'playing' && (
         <div className="ui-layer">
-          <div className="score-capsule">SCORE: {score}</div>
+          <div className="score-capsule">SCORE: {score.toLocaleString()}</div>
           {judgement && <div className={`judgement-display ${judgement.type}`}>{judgement.text}</div>}
         </div>
       )}

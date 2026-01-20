@@ -11,7 +11,7 @@ const SongSelection = () => {
   const BACKEND_URL = 'http://localhost:8080';
 
   const getResourceUrl = (path) => {
-    if (!path) return '/G54d4NraAAAAx6y.jpg';
+    if (!path) return '/G54d4NraAAAAx6y.jpg'; 
     return path.startsWith('http') ? path : `${BACKEND_URL}${path}`;
   };
 
@@ -41,8 +41,8 @@ const SongSelection = () => {
             artist: '마그네슘 부족',
             bpm: 100,
             difficulty: 1,
-            filePath: '/birthday_star.mp3',
-            imagePath: '/birthday_star.png',
+            filePath: '/songs/birthday_star.mp3',
+            imagePath: '/images/birthday_star.png',
           }
         ]);
         setSelectedSongId(1);
@@ -57,20 +57,21 @@ const SongSelection = () => {
 
   const handleSelectSong = (id) => {
     if (selectedSongId === id) {
-      setSelectedSongId(null);
+      setSelectedSongId(null); 
     } else {
-      setSelectedSongId(id);
+      setSelectedSongId(id); 
     }
   };
 
   const handleStartGame = () => {
     const selectedSongData = songs.find((s) => s.id === selectedSongId);
-    
+
     if (!selectedSongData) {
-      alert("플레이할 노래를 선택해 주세요! ");
+      alert("플레이할 노래를 선택해 주세요! 😊");
       return;
     }
 
+    // [수정] API 데이터 형식(camelCase)에 맞게 filePath, imagePath를 전달
     navigate('/RhythmGame', {
       state: {
         song: {
@@ -127,7 +128,7 @@ const SongSelection = () => {
             }`}
           >
             <div className="w-full aspect-video rounded-2xl mb-4 overflow-hidden bg-gray-200 relative">
-              
+              {/* [수정] API 데이터 형식(camelCase)에 맞게 song.imagePath 사용 */}
               <img 
                 src={getResourceUrl(song.imagePath)}
                 alt={song.title} 
@@ -137,7 +138,6 @@ const SongSelection = () => {
                   e.currentTarget.src = '/G54d4NraAAAAx6y.jpg';
                 }}
               />
-              
             </div>
             <div className="flex justify-between items-end">
               <div>
