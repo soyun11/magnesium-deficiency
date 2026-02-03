@@ -40,7 +40,7 @@
 
 ## Overview
 
-**마그네슘 부족(Magnesium Deficiency)**은 학습 동아리 프로젝트로 개발된 혁신적인 웹 기반 리듬 게임입니다. 전통적인 키보드/마우스 입력 대신 **실시간 얼굴 표정 인식**을 게임 컨트롤로 활용하여, face-api.js를 통해 😊(기쁨), 😢(슬픔), 😡(분노), 😐(무표정), 😮(놀람) 5가지 감정을 감지하고 리듬에 맞춰 노트를 처리하는 독특한 게임플레이를 제공합니다.
+**마그네슘 부족(Magnesium Deficiency)** 은 학습 동아리 프로젝트로 개발된 혁신적인 웹 기반 리듬 게임입니다. 전통적인 키보드/마우스 입력 대신 **실시간 얼굴 표정 인식**을 게임 컨트롤로 활용하여, face-api.js를 통해 😊(기쁨), 😢(슬픔), 😡(분노), 😐(무표정), 😮(놀람) 5가지 감정을 감지하고 리듬에 맞춰 노트를 처리하는 독특한 게임플레이를 제공합니다.
 
 ### 프로젝트 배경
 - **개발 기간**: 2025년 1월 ~ 2월 (9주차 완료)
@@ -61,7 +61,7 @@ Spring Boot 백엔드와 React 프론트엔드로 구성된 풀스택 애플리�
 | 📄 | **Documentation** | <ul><li>상세한 주석 및 커밋 메시지</li><li>API 엔드포인트 명세</li><li>데이터베이스 마이그레이션 스크립트 문서화</li><li>Figma UI/UX 프로토타입</li></ul> |
 | 🔌 | **Integrations**  | <ul><li>**face-api.js 0.22.2** - 실시간 표정 인식 (TensorFlow.js 기반)</li><li>**Flyway** - 데이터베이스 버전 관리</li><li>**React Webcam** - 카메라 제어</li><li>**MySQL** - 데이터 영속성</li></ul> |
 | 🧩 | **Modularity**    | <ul><li>재사용 가능한 React 컴포넌트</li><li>Service/Repository 레이어 분리</li><li>**SOLID** 원칙 적용</li><li>DTO 패턴으로 계층 간 데이터 전달</li></ul> |
-| 🧪 | **Testing**       | <ul><li>Spring Boot Test 프레임워크</li><li>JUnit 5 단위 테스트</li><li>H2 인메모리 DB 테스트</li><li>실제 사용자 체험 피드백 수집</li></ul> |
+| 🧪 | **Testing**       | <ul><li>수동 통합 테스트 (각 기능별 실행 확인)</li><li>브라우저 호환성 테스트 (Chrome/Edge)</li><li>표정 인식 정확도 테스트</li><li>데이터베이스 연동 확인</li></ul> |
 | ⚡️  | **Performance**   | <ul><li>**Vite** 빌드 도구 (빠른 HMR)</li><li>**Tailwind CSS** 최적화</li><li>Lazy loading & 코드 스플리팅</li><li>표정 인식 딜레이 최소화 (16ms 간격)</li></ul> |
 | 🛡️ | **Security**      | <ul><li>**BCrypt** 비밀번호 암호화 (work factor 12)</li><li>Spring Security 인증/인가</li><li>CORS 정책 설정</li><li>SQL Injection 방지 (JPA)</li><li>환경 변수로 DB 비밀번호 관리</li></ul> |
 | 📦 | **Dependencies**  | <ul><li>**npm** (Frontend) - React Router, face-api.js</li><li>**Gradle** (Backend) - Spring Data JPA, MySQL Driver</li><li>주요: Spring Security, Flyway, Lombok</li></ul> |
@@ -402,19 +402,39 @@ Spring Boot 백엔드와 React 프론트엔드로 구성된 풀스택 애플리�
 
 ### Testing
 
-테스트 스위트를 실행합니다:
+프로젝트에서 실제로 수행한 테스트:
 
-**Backend Testing (JUnit):**
+**수동 통합 테스트:**
 ```sh
+# 백엔드 서버 정상 작동 확인
 ❯ cd backend
-❯ ./gradlew test
+❯ ./gradlew bootRun
+# http://localhost:8080/api/test 접속 확인
+
+# 프론트엔드 개발 서버 확인
+❯ cd frontend
+❯ npm run dev
+# http://localhost:5173 접속 및 기능 테스트
 ```
 
-**Frontend Testing:**
-```sh
-❯ cd frontend
-❯ npm run test
-```
+**주요 테스트 항목:**
+- ✅ 회원가입/로그인 기능 (BCrypt 암호화 확인)
+- ✅ 아이디 중복 확인 API 동작
+- ✅ 곡 목록 불러오기 (DB 연동)
+- ✅ 게임 플레이 및 표정 인식 정확도
+- ✅ 점수 저장 및 랭킹 시스템
+- ✅ 관리자 페이지 곡 업로드/삭제
+- ✅ 오디오 재생 (CORS 해결)
+- ✅ 브라우저 호환성 (Chrome, Edge)
+
+**개발 중 발견 및 해결한 버그:**
+- 로그인 시 한글 입력 방지 (정규표현식 추가)
+- 관리자 로그인 라우팅 오류 (AdminController 생성)
+- 점수 저장 오류 (user_id 타입 변경: int → varchar)
+- 오디오 자동재생 muted 문제 해결
+- 난이도별 노트 생성 간격 조정
+
+> **참고**: 현재 JUnit 단위 테스트와 H2 인메모리 DB 테스트는 구현되지 않았습니다. 향후 계획에 포함되어 있습니다.
 
 ---
 
@@ -642,28 +662,33 @@ CREATE TABLE scores (
   - [ ] GitHub Pages 또는 Vercel 배포
   - [ ] 환경 변수 관리 (DB 비밀번호 보안)
   - [ ] 프로덕션 빌드 최적화
-  - [ ] 실제 사용자 체험 테스트
+  - [ ] 실제 사용자 체험 테스트 및 피드백 수집
 
 ### 📋 향후 계획
 
-- [ ] **`Phase 11: 멀티플레이어 모드`**: 
+- [ ] **`Phase 11: 자동화 테스트 구축`**: 
+  - [ ] JUnit 5 단위 테스트 작성
+  - [ ] Spring Boot Test 통합 테스트
+  - [ ] H2 인메모리 DB 테스트 환경
+  - [ ] Frontend Jest/Vitest 테스트
+
+- [ ] **`Phase 12: 멀티플레이어 모드`**: 
   - [ ] WebSocket 실시간 통신
   - [ ] 동시 접속 플레이어 매칭
   - [ ] 실시간 점수 비교
   
-- [ ] **`Phase 12: 사용자 콘텐츠 생성`**: 
+- [ ] **`Phase 13: 사용자 콘텐츠 생성`**: 
   - [ ] 커스텀 곡 업로드 (사용자)
   - [ ] BPM 자동 분석 도구
   - [ ] 노트 에디터 기능
   
-- [ ] **`Phase 13: 모바일 최적화`**: 
+- [ ] **`Phase 14: 모바일 최적화`**: 
   - [ ] React Native 포팅
   - [ ] 터치 인터페이스 지원
   - [ ] 모바일 카메라 최적화
   
-- [ ] **`Phase 14: 고급 기능`**: 
+- [ ] **`Phase 15: 고급 기능`**: 
   - [ ] AI 난이도 자동 조정
-  - [ ] 리플레이 시스템
   - [ ] 소셜 기능 (친구 추가, 챌린지)
 
 ---
